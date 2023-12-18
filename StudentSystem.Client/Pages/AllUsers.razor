@@ -1,0 +1,48 @@
+﻿@page "/users"
+
+@using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+@inject IClientAuthService ClientAuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Users</PageTitle>
+<h1>Users</h1>
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="RegisterUser">Add User</MudButton>
+<br/>
+<MudTable Items="ClientAuthService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
+    <HeaderContent>
+        <MudTh>Image</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Role</MudTh>
+
+    </HeaderContent>
+    <RowTemplate Context="userDetails">
+        <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
+        <MudTd DataLabel="Email">
+            @userDetails.Email
+        </MudTd>
+        <MudTd DataLabel="Role">
+            @userDetails.Role
+        </MudTd>
+    </RowTemplate>
+
+</MudTable>
+
+
+
+@code {
+
+    List<User> userDetails = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        userDetails = await ClientAuthService.GetAllUser();
+    }
+
+    void RegisterUser()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+}

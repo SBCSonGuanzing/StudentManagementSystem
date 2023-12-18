@@ -1,0 +1,98 @@
+﻿@using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Shared.DTOs
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IClientAuthService ClientAuthService
+@inject ILocalStorageService LocalStorageService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ISnackbar Snackbar
+
+@layout AuthLayout
+@page "/register"
+
+<MudText Typo="Typo.h4">Register</MudText>
+
+    <EditForm Model="user" OnValidSubmit="HandleRegistration">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Email" @bind-Value="@user.Email"
+                              For="@(() => user.Email)">
+                </MudTextField>
+                <MudTextField Label="Password" @bind-Value="@user.Password"
+                              For="@(() => user.Password)">
+                </MudTextField>
+                <MudSelect Label="Role" @bind-Value="user.Role">
+                    <MudSelectItem Value="@("Admin")" />
+                    <MudSelectItem Value="@("Student")" />
+                </MudSelect>
+
+            <br />
+            @if (user.Role == "Student")
+            {
+
+                <MudTextField Label="FirstName" @bind-Value="@user.StudentDTO.FirstName"
+                              For="@(() => user.StudentDTO.FirstName)">
+                </MudTextField>
+                <MudTextField Label="LastName" @bind-Value="@user.StudentDTO.LastName"
+                              For="@(() => user.StudentDTO.LastName)">
+                </MudTextField>
+                <MudTextField Label="Contact" @bind-Value="@user.StudentDTO.Contact"
+                              For="@(() => user.StudentDTO.Contact)">
+                </MudTextField>
+                <MudTextField Label="Address" @bind-Value="@user.StudentDTO.Address"
+                              For="@(() => user.StudentDTO.Address)">
+                </MudTextField>
+
+                <MudDatePicker Label="Birth Date" @bind-Date="user.StudentDTO.BirthDate"></MudDatePicker>
+                <MudImage Src="@user.StudentDTO.Image" Elevation="25" Class="rounded my-2"></MudImage>
+                <br />
+                <InputFile id="fileInput" OnChange="OnFileChange" hidden />
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                           for="fileInput">
+                    Upload Image
+                </MudButton>
+            
+            }
+            </MudCardContent>
+        </MudCard>
+    <br />
+
+
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Register</MudButton>
+    </EditForm>
+
+@code {
+    UserDTO user = new UserDTO();
+
+    string[] roles = { "Admin", "User" };
+
+    private async void HandleRegistration()
+    {
+        await ClientAuthService.Register(user);
+        NavigationManager.NavigateTo("/login");
+
+        Snackbar.Add(
+            "Registration Successful",
+            Severity.Success,
+        config =>
+        {
+            config.ShowTransitionDuration = 200;
+            config.HideTransitionDuration = 400;
+            config.VisibleStateDuration = 2500;
+        });
+    }
+
+    async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        var resizedImage = await e.File.RequestImageFileAsync(format, 200, 200);
+        var buffer = new byte[resizedImage.Size];
+        await resizedImage.OpenReadStream().ReadAsync(buffer);
+        var imageData = $"data:{format}; base64, {Convert.ToBase64String(buffer)}";
+        user.StudentDTO.Image = imageData;
+    }
+}

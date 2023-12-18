@@ -1,0 +1,82 @@
+﻿@using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Shared.DTOs
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IClientAuthService ClientAuthService 
+@inject ILocalStorageService LocalStorageService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ISnackbar Snackbar
+
+@layout AuthLayout 
+@page "/login"
+
+<MudText Typo="Typo.h4">Login</MudText>
+@if (errorMessage != null)
+{
+    <p class="text-danger">@errorMessage</p>
+}
+<EditForm Model="user" OnValidSubmit="login">
+    <DataAnnotationsValidator/>
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Email" @bind-Value="@user.Email"
+                          For="@(() => user.Email)">
+                </MudTextField>
+
+            
+                <MudTextField Label="Password" @bind-Value="@user.Password"
+                                For="@(() => user.Password)">
+                </MudTextField>
+            </MudCardContent>
+        </MudCard>
+    <br />
+    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Login</MudButton>
+    <MudButton ButtonType="ButtonType.Button" Color="Color.Success" Variant="Variant.Filled" OnClick="HandleRegister">Register</MudButton>
+</EditForm>
+<br />
+
+@code {
+
+    LoginDTO user = new LoginDTO();  
+    private string errorMessage;
+
+    private async void login()
+    {
+        var response = await ClientAuthService.Login(user);
+        var token = ClientAuthService.token.Value;
+
+        if (response == "success")
+        {
+            await LocalStorageService.SetItemAsync("token", token);
+            var auth_state = await AuthStateProvider.GetAuthenticationStateAsync();
+           
+            Snackbar.Add(
+            "Login Successful",
+            Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+
+            if (auth_state.User.IsInRole("Admin"))
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+            }
+        } else
+        {
+            errorMessage = response;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleRegister()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+}
