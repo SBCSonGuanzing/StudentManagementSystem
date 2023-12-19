@@ -10,24 +10,22 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+            <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Info">Dashboard</MudNavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="users">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Users
-            </NavLink>
+            <MudNavLink Href="/subjects" Icon="@Icons.Material.Filled.Subject" IconColor="Color.Info">Subjects</MudNavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="books">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Books
-            </NavLink>
+            <MudNavLink Href="/books" Icon="@Icons.Material.Filled.Book" IconColor="Color.Info">Books</MudNavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="professors">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Professors
-            </NavLink>
+            <MudNavLink Href="/professors" Icon="@Icons.Material.Filled.Person4" IconColor="Color.Info">Professors</MudNavLink>
+        </div>
+        <div class="nav-item px-3">
+            <MudNavLink Href="/students" Icon="@Icons.Material.Filled.Person" IconColor="Color.Info">Students</MudNavLink>
+        </div>
+        <div class="nav-item px-3">
+            <MudNavLink Href="/users" Icon="@Icons.Material.Filled.People" IconColor="Color.Info">Users</MudNavLink>
         </div>
     </nav>
 </div>

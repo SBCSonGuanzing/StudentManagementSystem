@@ -1,0 +1,56 @@
+﻿@page "/students"
+
+@using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+@inject IClientAuthService ClientAuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Students</PageTitle>
+<h1>Students</h1>
+<br />
+<MudTable Items="ClientAuthService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
+    <HeaderContent>
+        <MudTh>Image</MudTh>
+        <MudTh>First Name</MudTh>
+        <MudTh>Last Name</MudTh>
+        <MudTh>Contact</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Birth Date</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="userDetails">
+        <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
+        <MudTd DataLabel="FirstName">
+            @userDetails.Student.FirstName
+        </MudTd>
+        <MudTd DataLabel="LastName">
+            @userDetails.Student.LastName
+        </MudTd>
+        <MudTd DataLabel="Contact">
+            @userDetails.Student.Contact
+        </MudTd>
+        <MudTd DataLabel="Address">
+            @userDetails.Student.Address
+        </MudTd>
+         <MudTd DataLabel="Birth Date">
+            @userDetails.Student.BirthDate
+        </MudTd>
+    </RowTemplate>
+
+</MudTable>
+
+@code {
+
+    List<User> userDetails = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        userDetails = await ClientAuthService.GetAllUser();
+    }
+
+    void RegisterUser()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+}
