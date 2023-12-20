@@ -9,20 +9,19 @@ namespace StudentSystem.Shared.DTOs
 {
     public class UserDTO
     {
-        [Required(ErrorMessage = "Email is required.")]
 
         public string Email { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Password is required.")]
 
 
         public string Password { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Role is required.")]
 
         public string Role { get; set; }
 
+        public string? Avatar { get; set; } = string.Empty;
+
         // Reference StudentDTO
 
-        public StudentDTO? StudentDTO { get; set; } = new StudentDTO();
+        public UserDetailsDTO? UserDetails { get; set; } = new UserDetailsDTO();
 
     }
 }

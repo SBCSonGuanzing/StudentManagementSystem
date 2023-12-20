@@ -1,0 +1,139 @@
+﻿@page "/subject/{id:int}"
+@page "/subject"
+
+@using StudentSystem.Client.Services.SubjectServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+@inject HttpClient Http
+@inject IClientSubjectService clientSubjectService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+@if (id is null)
+{
+    <PageTitle>New Subject</PageTitle>
+    <h2>Create a New Subject</h2>
+}
+
+else
+{
+    <PageTitle>Edit @subject.Name</PageTitle>
+    <h2>Edit @subject.Name</h2>
+}
+
+<EditForm Model="subject" OnValidSubmit="HandleSubmit">
+
+    @if (id is null)
+    {
+        <DataAnnotationsValidator />
+    }
+
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="Name" @bind-Value="@subject.Name"
+                          For="@(() => subject.Name)">
+            </MudTextField>
+            <MudTextField Label="Category" @bind-Value="@subject.Category"
+                          For="@(() => subject.Category)">
+            </MudTextField>
+            <MudTextField Label="Description" @bind-Value="@subject.Description"
+                          For="@(() => subject.Description)">
+            </MudTextField>
+        </MudCardContent>
+    </MudCard>
+    <br />
+
+    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mr-2">@(isNew ? "Create Subject" : "Update Subject")</MudButton>
+    @if (!isNew)
+    {
+        <MudButton ButtonType="ButtonType.Button"
+                   OnClick="() => DeleteSubject(subject.Id)"
+                   Color="Color.Error"
+                   Variant="Variant.Filled">
+            Delete Subject
+        </MudButton>
+    }
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? id { get; set; }
+
+    string btnText = string.Empty;
+
+    bool isNew = true;
+
+    public Subject subject = new Subject();
+
+    protected override void OnInitialized()
+    {
+        btnText = id == null ? "Save New Subject" : "Update Subject";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id is not null)
+        {
+            var result = await clientSubjectService.GetSingleSubject((int)id);
+            if (result != null)
+            {
+                subject = result;
+                isNew = false;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/all-subjects");
+            }
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (id is null)
+        {
+            await clientSubjectService.AddSubject(subject);
+            Snackbar.Add(
+
+            "Added Subject Successfully",
+
+            Severity.Success,
+
+            config =>
+
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+        }
+        else
+        {
+            await clientSubjectService.UpdateSubject((int)id, subject);
+            Snackbar.Add(
+                "Update Subject Successfully",
+                Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+        }
+    }
+
+    async void DeleteSubject(int id)
+    {
+        await clientSubjectService.DeleteSubject(id);
+        StateHasChanged();
+        Snackbar.Add(
+                "Deleted Subject Successfully",
+                Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+    }
+
+}

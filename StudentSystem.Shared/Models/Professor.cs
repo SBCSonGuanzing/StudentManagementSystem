@@ -15,10 +15,11 @@ namespace StudentSystem.Shared.Models
         public string Contact { get; set; }
         public string Address { get; set; }
         public DateTime? BirthDate { get; set; } = DateTime.Now;
+        public string Image { get; set; } = string.Empty;
 
         [JsonIgnore]
-        public Student Student { get; set; }
-        public int StudentId { get; set; }
+        public User User { get; set; }
+        public int UserId { get; set; }
 
     }   
 }

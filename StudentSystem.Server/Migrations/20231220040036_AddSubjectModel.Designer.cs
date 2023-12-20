@@ -12,8 +12,8 @@ using StudentSystem.Server.Data;
 namespace StudentSystem.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231218104934_UsernameToEmail")]
-    partial class UsernameToEmail
+    [Migration("20231220040036_AddSubjectModel")]
+    partial class AddSubjectModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,16 +88,21 @@ namespace StudentSystem.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Professors");
                 });
@@ -125,6 +130,10 @@ namespace StudentSystem.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -138,6 +147,31 @@ namespace StudentSystem.Server.Migrations
                         .IsUnique();
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.Subject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Test", b =>
@@ -164,6 +198,10 @@ namespace StudentSystem.Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -203,13 +241,13 @@ namespace StudentSystem.Server.Migrations
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Professor", b =>
                 {
-                    b.HasOne("StudentSystem.Shared.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
+                    b.HasOne("StudentSystem.Shared.Models.User", "User")
+                        .WithOne("Professor")
+                        .HasForeignKey("StudentSystem.Shared.Models.Professor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Student");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Student", b =>
@@ -225,6 +263,8 @@ namespace StudentSystem.Server.Migrations
 
             modelBuilder.Entity("StudentSystem.Shared.Models.User", b =>
                 {
+                    b.Navigation("Professor");
+
                     b.Navigation("Student");
                 });
 #pragma warning restore 612, 618

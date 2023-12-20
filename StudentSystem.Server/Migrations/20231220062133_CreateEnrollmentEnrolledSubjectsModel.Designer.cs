@@ -12,8 +12,8 @@ using StudentSystem.Server.Data;
 namespace StudentSystem.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231218101459_BookStudentRelationship")]
-    partial class BookStudentRelationship
+    [Migration("20231220062133_CreateEnrollmentEnrolledSubjectsModel")]
+    partial class CreateEnrollmentEnrolledSubjectsModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,21 +24,6 @@ namespace StudentSystem.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("BookStudent", b =>
-                {
-                    b.Property<int>("BooksId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BooksId", "StudentsId");
-
-                    b.HasIndex("StudentsId");
-
-                    b.ToTable("BookStudent");
-                });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Book", b =>
                 {
@@ -65,6 +50,57 @@ namespace StudentSystem.Server.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EnrollmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnrollmentId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("EnrolledSubjects");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.Enrollment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SchoolYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Semester")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Enrollments");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.Professor", b =>
                 {
                     b.Property<int>("Id")
@@ -88,16 +124,21 @@ namespace StudentSystem.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Professors");
                 });
@@ -117,11 +158,18 @@ namespace StudentSystem.Server.Migrations
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("BookId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -134,10 +182,37 @@ namespace StudentSystem.Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BookId");
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.Subject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Test", b =>
@@ -165,6 +240,13 @@ namespace StudentSystem.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Avatar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -177,34 +259,34 @@ namespace StudentSystem.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("BookStudent", b =>
+            modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
                 {
-                    b.HasOne("StudentSystem.Shared.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksId")
+                    b.HasOne("StudentSystem.Shared.Models.Enrollment", "Enrollment")
+                        .WithMany("EnrolledSubjects")
+                        .HasForeignKey("EnrollmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("StudentSystem.Shared.Models.Student", null)
+                    b.HasOne("StudentSystem.Shared.Models.Subject", "Subject")
                         .WithMany()
-                        .HasForeignKey("StudentsId")
+                        .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Enrollment");
+
+                    b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("StudentSystem.Shared.Models.Professor", b =>
+            modelBuilder.Entity("StudentSystem.Shared.Models.Enrollment", b =>
                 {
                     b.HasOne("StudentSystem.Shared.Models.Student", "Student")
-                        .WithMany()
+                        .WithMany("Enrollment")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -212,8 +294,23 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.Professor", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.User", "User")
+                        .WithOne("Professor")
+                        .HasForeignKey("StudentSystem.Shared.Models.Professor", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.Student", b =>
                 {
+                    b.HasOne("StudentSystem.Shared.Models.Book", null)
+                        .WithMany("Students")
+                        .HasForeignKey("BookId");
+
                     b.HasOne("StudentSystem.Shared.Models.User", "User")
                         .WithOne("Student")
                         .HasForeignKey("StudentSystem.Shared.Models.Student", "UserId")
@@ -223,8 +320,25 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.Book", b =>
+                {
+                    b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.Enrollment", b =>
+                {
+                    b.Navigation("EnrolledSubjects");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.Student", b =>
+                {
+                    b.Navigation("Enrollment");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.User", b =>
                 {
+                    b.Navigation("Professor");
+
                     b.Navigation("Student");
                 });
 #pragma warning restore 612, 618

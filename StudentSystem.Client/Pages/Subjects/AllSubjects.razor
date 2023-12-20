@@ -1,5 +1,87 @@
-﻿<h3>AllSubjects</h3>
+﻿@page "/all-subjects"
+
+@using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Client.Services.SubjectServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+@inject IClientSubjectService ClientSubjectService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Subjects</PageTitle>
+<h1>Subjects</h1>
+
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddSubject">Add Subject</MudButton>
+<br />
+<br />
+<MudTable Items="ClientSubjectService.subjects" Hover="true" Striped="true" Dense="true" Class="mb-2">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Category</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="subjectDetails">
+        <MudTd DataLabel="Name">
+            @subjectDetails.Name
+        </MudTd>
+        <MudTd DataLabel="Category">
+            @subjectDetails.Category
+        </MudTd>
+        <MudTd DataLabel="Description">
+            @subjectDetails.Description
+        </MudTd>
+        <MudTd>
+            <MudIconButton OnClick="() => editSubject(subjectDetails.Id)"
+                           Icon="@Icons.Material.Filled.Edit"
+                           Color="Color.Primary"
+                           Variant="Variant.Filled"></MudIconButton>
+            <MudIconButton OnClick="() => deleteSubject(subjectDetails.Id)"
+                           Icon="@Icons.Material.Filled.Delete"
+                           Color="Color.Error"
+                           Variant="Variant.Filled">
+            </MudIconButton>
+        </MudTd>
+    </RowTemplate>
+
+</MudTable>
 
 @code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientSubjectService.GetAllSubjects();
+    }
+
+    void AddSubject()
+    {
+        NavigationManager.NavigateTo("/subject");
+    }
+
+    async void deleteSubject(int id)
+    {
+        await ClientSubjectService.DeleteSubject(id);
+        StateHasChanged();
+        Snackbar.Add(
+
+            "Deleted Subject Successfully",
+
+            Severity.Success,
+
+            config =>
+
+            {
+                config.ShowTransitionDuration = 200;
+
+                config.HideTransitionDuration = 400;
+
+                config.VisibleStateDuration = 2500;
+
+            });
+    }
+
+
+    void editSubject(int id) => NavigationManager.NavigateTo($"/subject/{id}");
+
 
 }

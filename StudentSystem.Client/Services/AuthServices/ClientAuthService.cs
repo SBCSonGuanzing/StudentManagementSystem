@@ -38,7 +38,7 @@ namespace StudentSystem.Client.Services.AuthServices
         public async Task Register(UserDTO request)
         {
             await _httpClient.PostAsJsonAsync("api/Auth/register", request);
-            _navigationManager.NavigateTo("/");
+            _navigationManager.NavigateTo("/all-users");
         }
         private async Task<string> SetToken(HttpResponseMessage message)
         {

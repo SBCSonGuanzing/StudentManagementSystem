@@ -27,6 +27,7 @@ namespace StudentSystem.Server.Services.AuthServices
         {
             var users = await _context.Users
                .Include(p => p.Student)
+               .Include(p => p.Professor)
                .ToListAsync();
             return users;
         }
@@ -63,20 +64,40 @@ namespace StudentSystem.Server.Services.AuthServices
                 Role = request.Role
             };
 
-            if (request.Role == "Student")
+            if(request.Role == "Admin")
+            {
+                new_user.Avatar = request.Avatar;
+            }
+
+            else if (request.Role == "Student")
             {
                 Student student_details = new Student
                 {
-                    FirstName = request.StudentDTO.FirstName,
-                    LastName = request.StudentDTO.LastName,
-                    Contact = request.StudentDTO.Contact,
-                    Address = request.StudentDTO.Address,
-                    BirthDate = request.StudentDTO.BirthDate,
-                    Image = request.StudentDTO.Image,
+                    FirstName = request.UserDetails.FirstName,
+                    LastName = request.UserDetails.LastName,
+                    Contact = request.UserDetails.Contact,
+                    Address = request.UserDetails.Address,
+                    BirthDate = request.UserDetails.BirthDate,
+                    Image = request.UserDetails.Image,
                     User = new_user,
                     UserId = new_user.Id
                 };
                 _context.Students.Add(student_details);
+            }
+            else if (request.Role == "Professor")
+            {
+                Professor professor_details = new Professor
+                {
+                    FirstName = request.UserDetails.FirstName,
+                    LastName = request.UserDetails.LastName,
+                    Contact = request.UserDetails.Contact,
+                    Address = request.UserDetails.Address,
+                    BirthDate = request.UserDetails.BirthDate,
+                    Image = request.UserDetails.Image,
+                    User = new_user,
+                    UserId = new_user.Id
+                };
+                _context.Professors.Add(professor_details);
             }
 
             _context.Users.Add(new_user);

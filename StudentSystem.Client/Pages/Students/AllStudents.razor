@@ -1,4 +1,4 @@
-﻿@page "/students"
+﻿@page "/all-students"
 
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Shared.DTOs
@@ -9,6 +9,10 @@
 <PageTitle>Students</PageTitle>
 <h1>Students</h1>
 <br />
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddStudent">Add Student</MudButton>
+<br />
+<br />
+
 <MudTable Items="ClientAuthService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Image</MudTh>
@@ -19,22 +23,27 @@
         <MudTh>Birth Date</MudTh>
     </HeaderContent>
     <RowTemplate Context="userDetails">
-        <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
-        <MudTd DataLabel="FirstName">
-            @userDetails.Student.FirstName
-        </MudTd>
-        <MudTd DataLabel="LastName">
-            @userDetails.Student.LastName
-        </MudTd>
-        <MudTd DataLabel="Contact">
-            @userDetails.Student.Contact
-        </MudTd>
-        <MudTd DataLabel="Address">
-            @userDetails.Student.Address
-        </MudTd>
-         <MudTd DataLabel="Birth Date">
-            @userDetails.Student.BirthDate
-        </MudTd>
+        @if(userDetails.Student != null)
+        {
+
+            <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
+            <MudTd DataLabel="FirstName">
+                @userDetails.Student.FirstName
+            </MudTd>
+            <MudTd DataLabel="LastName">
+                @userDetails.Student.LastName
+            </MudTd>
+            <MudTd DataLabel="Contact">
+                @userDetails.Student.Contact
+            </MudTd>
+            <MudTd DataLabel="Address">
+                @userDetails.Student.Address
+            </MudTd>
+            <MudTd DataLabel="Birth Date">
+                @userDetails.Student.BirthDate
+            </MudTd>
+        }
+        
     </RowTemplate>
 
 </MudTable>
@@ -53,4 +62,8 @@
         NavigationManager.NavigateTo("/register");
     }
 
+    void AddStudent()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
 }

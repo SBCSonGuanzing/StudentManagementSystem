@@ -1,5 +1,88 @@
-﻿<h3>AllBooks</h3>
+﻿@page "/all-books"
+
+@using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Client.Services.BookServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+@inject IClientBookService ClientBookService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Books</PageTitle>
+<h1>Books</h1>
+
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddBook">Add Book</MudButton>
+<br />
+<br />
+<MudTable Items="ClientBookService.books" Hover="true" Striped="true" Dense="true" Class="mb-2">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Category</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="bookDetails">
+        <MudTd DataLabel="Name">
+            @bookDetails.Name
+        </MudTd>
+        <MudTd DataLabel="Category">
+            @bookDetails.Category
+        </MudTd>
+        <MudTd DataLabel="Description">
+            @bookDetails.Description
+        </MudTd>
+        <MudTd>
+            <MudIconButton OnClick="() => editDifficulty(bookDetails.Id)"
+                           Icon="@Icons.Material.Filled.Edit"
+                           Color="Color.Primary"
+                           Variant="Variant.Filled"></MudIconButton>
+            <MudIconButton OnClick="() => deleteBook(bookDetails.Id)"
+                           Icon="@Icons.Material.Filled.Delete"
+                           Color="Color.Error"
+                           Variant="Variant.Filled">
+            </MudIconButton>
+        </MudTd>
+    </RowTemplate>
+
+</MudTable>
 
 @code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientBookService.GetAllBooks();
+    }
+
+    void AddBook()
+    {
+        NavigationManager.NavigateTo("/book");
+    }
+
+    async void deleteBook(int id)
+    {
+        await ClientBookService.DeleteBook(id);
+        StateHasChanged();
+        Snackbar.Add(
+
+            "Deleted Book Successfully",
+
+            Severity.Success,
+
+            config =>
+
+            {
+                config.ShowTransitionDuration = 200;
+
+                config.HideTransitionDuration = 400;
+
+                config.VisibleStateDuration = 2500;
+
+            });
+    }
+
+
+
+    void editDifficulty(int id) => NavigationManager.NavigateTo($"/book/{id}");
+
 
 }

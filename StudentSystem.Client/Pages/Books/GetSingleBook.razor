@@ -1,0 +1,140 @@
+﻿@page "/book/{id:int}"
+@page "/book"
+
+@using StudentSystem.Client.Services.BookServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+@inject HttpClient Http
+@inject IClientBookService clientBookService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+@if (id is null)
+{
+    <PageTitle>New Book</PageTitle>
+    <h2>Create a New Book</h2>
+}
+ 
+else {
+    <PageTitle>Edit @book.Name</PageTitle>
+    <h2>Edit @book.Name</h2>
+}
+
+<EditForm Model="book" OnValidSubmit="HandleSubmit">
+
+    @if (id is null)
+    {
+        <DataAnnotationsValidator />
+    }
+
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="Name" @bind-Value="@book.Name"
+                          For="@(() => book.Name)">
+            </MudTextField>
+            <MudTextField Label="Category" @bind-Value="@book.Category"
+                          For="@(() => book.Category)">
+            </MudTextField>
+            <MudTextField Label="Description" @bind-Value="@book.Description"
+                          For="@(() => book.Description)">
+            </MudTextField>
+        </MudCardContent>
+    </MudCard>
+    <br />
+
+    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mr-2">@(isNew ? "Create Book" : "Update Book")</MudButton>
+    @if (!isNew)
+    {
+        <MudButton ButtonType="ButtonType.Button"
+                   OnClick="() => DeleteBook(book.Id)"
+                   Color="Color.Error"
+                   Variant="Variant.Filled">
+            Delete Book
+        </MudButton>
+    }
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? id { get; set; }
+
+    string btnText = string.Empty;
+
+    bool isNew = true;
+
+    public Book book = new Book();
+
+    protected override void OnInitialized()
+    {
+        btnText = id == null ? "Save New Book" : "Update Book";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id is not null)
+        {
+            var result = await clientBookService.GetSingleBook((int)id);
+            if (result != null)
+            {
+                book = result;
+                isNew = false;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/all-books");
+            }
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (id is null)
+        {
+           
+
+            await clientBookService.AddBook(book);
+            Snackbar.Add(
+
+            "Added Book Successfully",
+
+            Severity.Success,
+
+            config =>
+
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+        }
+        else
+        {
+            await clientBookService.UpdateBook((int)id, book);
+            Snackbar.Add(
+                "Update Book Successfully",
+                Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+        }
+    }
+
+    async void DeleteBook(int id)
+    {
+        await clientBookService.DeleteBook(id);
+        StateHasChanged();
+        Snackbar.Add(
+                "Deleted Book Successfully",
+                Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+    }
+
+}

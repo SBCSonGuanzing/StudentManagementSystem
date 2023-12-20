@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StudentSystem.Shared.Models
+namespace StudentSystem.Shared.DTOs
 {
-    public class Book
+    public class BookDTO
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
-        public List<Student>? Students { get; set; }
-    }   
+
+    }
 }

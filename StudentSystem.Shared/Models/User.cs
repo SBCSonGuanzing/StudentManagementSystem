@@ -14,9 +14,10 @@ namespace StudentSystem.Shared.Models
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
         public string Role { get; set; }
+        public string? Avatar { get; set; } = string.Empty;
 
         // Reference Student Model
         public Student? Student { get; set; }
-
+        public Professor? Professor { get; set; }
     }
 }

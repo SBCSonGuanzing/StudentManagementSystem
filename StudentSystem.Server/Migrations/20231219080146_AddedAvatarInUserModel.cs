@@ -5,24 +5,25 @@
 namespace StudentSystem.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class UsernameToEmail : Migration
+    public partial class AddedAvatarInUserModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Username",
+            migrationBuilder.AddColumn<string>(
+                name: "Avatar",
                 table: "Users",
-                newName: "Email");
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Email",
-                table: "Users",
-                newName: "Username");
+            migrationBuilder.DropColumn(
+                name: "Avatar",
+                table: "Users");
         }
     }
 }

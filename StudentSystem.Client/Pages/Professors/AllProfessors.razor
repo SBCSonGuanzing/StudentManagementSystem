@@ -1,5 +1,67 @@
-﻿<h3>AllProfessors</h3>
+﻿@page "/all-professors"
+
+@using StudentSystem.Client.Services.ProfessorServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+@inject IClientProfessorService ClientProfessorService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Professors</PageTitle>
+<h1>Professors</h1>
+<br />
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddStudent">Add Professor</MudButton>
+<br />
+<br />
+
+<MudTable Items="ClientProfessorService.professors" Hover="true" Striped="true" Dense="true" Class="mb-2">
+    <HeaderContent>
+        <MudTh>Image</MudTh>
+        <MudTh>First Name</MudTh>
+        <MudTh>Last Name</MudTh>
+        <MudTh>Contact</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Birth Date</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="professorDetails">
+       
+            <MudTd DataLabel="Image"><MudAvatar Image="@professorDetails.Image"></MudAvatar></MudTd>
+            <MudTd DataLabel="FirstName">
+                @professorDetails.FirstName
+            </MudTd>
+            <MudTd DataLabel="LastName">
+                @professorDetails.LastName
+            </MudTd>
+            <MudTd DataLabel="Contact">
+                @professorDetails.Contact
+            </MudTd>
+            <MudTd DataLabel="Address">
+                @professorDetails.Address
+            </MudTd>
+            <MudTd DataLabel="Birth Date">
+                @professorDetails.BirthDate
+            </MudTd>
+        
+
+    </RowTemplate>
+
+</MudTable>
 
 @code {
 
+    List<Professor> professorDetails = new List<Professor>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        professorDetails = await ClientProfessorService.GetAllProfessors();
+    }
+
+    void RegisterUser()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+    void AddStudent()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
 }

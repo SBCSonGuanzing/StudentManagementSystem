@@ -1,4 +1,4 @@
-﻿@page "/users"
+﻿@page "/all-users"
 
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Shared.DTOs
@@ -8,7 +8,9 @@
 
 <PageTitle>Users</PageTitle>
 <h1>Users</h1>
+
 <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="RegisterUser">Add User</MudButton>
+<br/>
 <br/>
 <MudTable Items="ClientAuthService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
@@ -18,7 +20,20 @@
 
     </HeaderContent>
     <RowTemplate Context="userDetails">
-        <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
+        @if (userDetails.Role == "Admin")
+        {
+            <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Avatar"></MudAvatar></MudTd>
+        }
+        else if(userDetails.Role == "Student" && userDetails.Student != null) 
+        {
+            <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
+
+        }
+        else if (userDetails.Role == "Professor" && userDetails.Professor.Image != null)
+        {
+            <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Professor.Image"></MudAvatar></MudTd>
+        }
+
         <MudTd DataLabel="Email">
             @userDetails.Email
         </MudTd>

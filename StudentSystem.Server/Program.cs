@@ -3,6 +3,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StudentSystem.Server.Data;
 using StudentSystem.Server.Services.AuthServices;
+using StudentSystem.Server.Services.BookServices;
+using StudentSystem.Server.Services.ProfessorServices;
+using StudentSystem.Server.Services.SubjectServices;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -44,6 +47,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         })
     ;
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IProfessorService, ProfessorService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDbContext<DataContext>();   
 
