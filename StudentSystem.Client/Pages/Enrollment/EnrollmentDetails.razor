@@ -1,0 +1,43 @@
+﻿@page "/enrollment-details"
+@page "/enrollment-details/{id:int}"
+
+@using StudentSystem.Client.Services.EnrolledSubjectsService
+@using StudentSystem.Client.Services.StudentServices
+@using StudentSystem.Client.Services.SubjectServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+
+@inject IClientSubjectService clientSubjectService
+@inject IClientStudentService clientStudentService
+@inject IClientEnrolledSubjectService clientEnrolledSubjectService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+
+<h3>Enrollment Details</h3>
+
+<MudTable Items="enrolledSubjects">
+    <HeaderContent>
+        <MudTh>Subject Name</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="context">
+        <MudTd>@context.Subject.Name</MudTd>
+    </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No Subjects found</MudText>
+        </NoRecordsContent>
+</MudTable>
+
+    @code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    List<EnrolledSubjects> enrolledSubjects = new List<EnrolledSubjects>();
+
+    // On Initialized
+    protected override async Task OnInitializedAsync()
+    {
+        enrolledSubjects = await clientEnrolledSubjectService.GetSingleEnrolledSubjects(Id);
+    }
+}

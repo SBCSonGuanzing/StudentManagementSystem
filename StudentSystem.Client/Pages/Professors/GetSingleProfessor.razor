@@ -1,0 +1,117 @@
+﻿@page "/professor/{id:int}"
+@page "/professor"
+
+@using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Client.Services.ProfessorServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+
+@inject HttpClient Http
+@inject IClientProfessorService clientProfessorService
+@inject IClientAuthService ClientAuthService
+
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<h3>GetSingleStudent</h3>
+
+<EditForm Model="professor" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="FirstName" @bind-Value="@professor.FirstName"
+                          For="@(() => professor.FirstName)">
+            </MudTextField>
+            <MudTextField Label="LastName" @bind-Value="@professor.LastName"
+                          For="@(() => professor.FirstName)">
+            </MudTextField>
+            <MudTextField Label="Contact" @bind-Value="@professor.Contact"
+                          For="@(() => professor.Contact)">
+            </MudTextField>
+            <MudTextField Label="Address" @bind-Value="@professor.Address"
+                          For="@(() => professor.Address)">
+            </MudTextField>
+            <MudTextField Label="BirthDate" @bind-Value="@professor.BirthDate"
+                          For="@(() => professor.BirthDate)">
+            </MudTextField>
+            <MudImage Src="@professor.Image" Elevation="25" Class="rounded my-2"></MudImage>
+            <br />
+            <InputFile id="fileInput" OnChange="OnFileChange" hidden />
+            <MudButton HtmlTag="label"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.CloudUpload"
+                       for="fileInput">
+                Upload Image
+            </MudButton>
+        </MudCardContent>
+    </MudCard>
+    <br />
+
+    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mr-2">Update Student</MudButton>
+
+    <MudButton ButtonType="ButtonType.Button"
+               OnClick="() => DeleteProfessor(professor.Id)"
+               Color="Color.Error"
+               Variant="Variant.Filled">
+        Delete Book
+    </MudButton>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? id { get; set; }
+
+    string btnText = string.Empty;
+
+    bool isNew = true;
+
+    public Professor professor = new Professor();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await clientProfessorService.GetSingleProfessor((int)id);
+        professor = result;
+    }
+
+    async Task HandleSubmit()
+    {
+
+        await clientProfessorService.UpdateProfessor((int)id, professor);
+        Snackbar.Add(
+            "Update Student Successfully",
+            Severity.Success,
+        config =>
+        {
+            config.ShowTransitionDuration = 200;
+            config.HideTransitionDuration = 400;
+            config.VisibleStateDuration = 2500;
+        });
+    }
+
+    async void DeleteProfessor(int id)
+    {
+        await clientProfessorService.DeleteProfessor(id);
+        StateHasChanged();
+        Snackbar.Add(
+                "Deleted Student Successfully",
+                Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+    }
+
+    async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        var resizedImage = await e.File.RequestImageFileAsync(format, 200, 200);
+        var buffer = new byte[resizedImage.Size];
+        await resizedImage.OpenReadStream().ReadAsync(buffer);
+        var imageData = $"data:{format}; base64, {Convert.ToBase64String(buffer)}";
+        professor.Image = imageData;
+    }
+
+}

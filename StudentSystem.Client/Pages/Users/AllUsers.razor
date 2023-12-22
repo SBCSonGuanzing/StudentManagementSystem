@@ -9,9 +9,6 @@
 <PageTitle>Users</PageTitle>
 <h1>Users</h1>
 
-<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="RegisterUser">Add User</MudButton>
-<br/>
-<br/>
 <MudTable Items="ClientAuthService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Image</MudTh>
@@ -29,7 +26,7 @@
             <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
 
         }
-        else if (userDetails.Role == "Professor" && userDetails.Professor.Image != null)
+        else if (userDetails.Role == "Professor" && userDetails.Professor != null)
         {
             <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Professor.Image"></MudAvatar></MudTd>
         }
@@ -41,9 +38,9 @@
             @userDetails.Role
         </MudTd>
     </RowTemplate>
-
 </MudTable>
 
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="RegisterUser">Add User</MudButton>
 
 
 @code {

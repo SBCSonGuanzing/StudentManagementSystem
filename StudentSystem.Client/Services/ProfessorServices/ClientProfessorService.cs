@@ -3,6 +3,7 @@ using static System.Reflection.Metadata.BlobBuilder;
 using System.Net.Http;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
+using System.Net;
 
 namespace StudentSystem.Client.Services.ProfessorServices
 {
@@ -17,6 +18,17 @@ namespace StudentSystem.Client.Services.ProfessorServices
         }
         public List<Professor> professors { get; set; }
 
+        public async Task DeleteProfessor(int id)
+        {
+            HttpResponseMessage? response = await _httpClient.DeleteAsync($"api/Professor/{id}");
+
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                List<Professor>? content = await response.Content.ReadFromJsonAsync<List<Professor>>();
+                if (content != null) professors = content;
+            }
+        }
+
         public async Task<List<Professor>> GetAllProfessors()
         {
             var result = await _httpClient.GetFromJsonAsync<List<Professor>>($"api/Professor");
@@ -25,6 +37,22 @@ namespace StudentSystem.Client.Services.ProfessorServices
                 professors = result;
             }
             return result;
+        }
+
+        public async Task<Professor> GetSingleProfessor(int id)
+        {
+            var result = await _httpClient.GetAsync($"api/Professor/{id}");
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return await result.Content.ReadFromJsonAsync<Professor>();
+            }
+            return null;    
+        }
+
+        public async Task UpdateProfessor(int id, Professor professor)
+        {
+            await _httpClient.PutAsJsonAsync($"api/Professor/update-professor/{id}", professor);
+            _navigationManager.NavigateTo("/all-professors");
         }
     }
 }

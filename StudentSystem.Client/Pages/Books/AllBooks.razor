@@ -11,26 +11,18 @@
 <PageTitle>Books</PageTitle>
 <h1>Books</h1>
 
-<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddBook">Add Book</MudButton>
-<br />
-<br />
+
 <MudTable Items="ClientBookService.books" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Name</MudTh>
-        <MudTh>Category</MudTh>
-        <MudTh>Description</MudTh>
+       
         <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate Context="bookDetails">
         <MudTd DataLabel="Name">
             @bookDetails.Name
         </MudTd>
-        <MudTd DataLabel="Category">
-            @bookDetails.Category
-        </MudTd>
-        <MudTd DataLabel="Description">
-            @bookDetails.Description
-        </MudTd>
+        
         <MudTd>
             <MudIconButton OnClick="() => editDifficulty(bookDetails.Id)"
                            Icon="@Icons.Material.Filled.Edit"
@@ -43,8 +35,10 @@
             </MudIconButton>
         </MudTd>
     </RowTemplate>
-
 </MudTable>
+
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddBook">Add Book</MudButton>
+
 
 @code {
 

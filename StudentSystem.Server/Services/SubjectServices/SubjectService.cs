@@ -18,8 +18,7 @@ namespace StudentSystem.Server.Services.SubjectServices
             var newSubject = new Subject()
             {
                 Name = subject.Name,
-                Category = subject.Category,
-                Description = subject.Description,
+               
             };
 
             _context.Add(newSubject);
@@ -67,8 +66,7 @@ namespace StudentSystem.Server.Services.SubjectServices
                 return null;
 
             subjects.Name = request.Name;
-            subjects.Description = request.Description;
-            subjects.Category = request.Category;
+         
 
             await _context.SaveChangesAsync();
 

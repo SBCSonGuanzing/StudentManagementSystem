@@ -33,12 +33,7 @@ else
             <MudTextField Label="Name" @bind-Value="@subject.Name"
                           For="@(() => subject.Name)">
             </MudTextField>
-            <MudTextField Label="Category" @bind-Value="@subject.Category"
-                          For="@(() => subject.Category)">
-            </MudTextField>
-            <MudTextField Label="Description" @bind-Value="@subject.Description"
-                          For="@(() => subject.Description)">
-            </MudTextField>
+            
         </MudCardContent>
     </MudCard>
     <br />
@@ -91,20 +86,32 @@ else
     {
         if (id is null)
         {
-            await clientSubjectService.AddSubject(subject);
-            Snackbar.Add(
-
-            "Added Subject Successfully",
-
-            Severity.Success,
-
-            config =>
-
+            if(!string.IsNullOrEmpty(subject.Name))
+            {        
+                await clientSubjectService.AddSubject(subject);
+                Snackbar.Add(
+                "Added Subject Successfully",
+                Severity.Success,
+                config =>
+                {
+                    config.ShowTransitionDuration = 200;
+                    config.HideTransitionDuration = 400;
+                    config.VisibleStateDuration = 2500;
+                });
+            } 
+            else
             {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
+                Snackbar.Add(
+                   "No Subject Added",
+                   Severity.Error, // Change Severity to Error for no subject added
+                   config =>
+                   {
+                       config.ShowTransitionDuration = 200;
+                       config.HideTransitionDuration = 400;
+                       config.VisibleStateDuration = 2500;
+                   });
+                NavigationManager.NavigateTo("/all-subjects");
+            }
         }
         else
         {

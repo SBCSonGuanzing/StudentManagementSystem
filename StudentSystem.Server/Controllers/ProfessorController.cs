@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudentSystem.Server.Services.ProfessorServices;
+using StudentSystem.Shared.DTOs;
 
 namespace StudentSystem.Server.Controllers
 {
@@ -18,7 +19,37 @@ namespace StudentSystem.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Professor>>> GetAllProfessors()
         {
-            return await _professorService.GetAllProfessors();
+            return await _professorService.GetProfessors();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Professor>> DeleteProfessor(int id)
+        {
+            var result = await _professorService.DeleteProfessor(id);
+            if (result is null)
+            {
+                return NotFound("Professor not found");
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut("update-professor/{id}")]
+        public async Task<ActionResult<List<Professor>>> UpdateStudent(int id, UserDetailsDTO request)
+        {
+            var result = await _professorService.UpdateProfessor(id, request);
+            if (result is null)
+                return NotFound("Professor not found.");
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Professor>> GetSingleProfessor(int id)
+        {
+            var result = await _professorService.GetSingleProfessor(id);
+            if (result is null)
+                return NotFound("Professor not found.");
+            return Ok(result);
         }
 
     }

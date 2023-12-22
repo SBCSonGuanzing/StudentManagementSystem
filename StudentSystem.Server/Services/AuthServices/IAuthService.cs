@@ -7,6 +7,7 @@ namespace StudentSystem.Server.Services.AuthServices
         Task<List<User>> GetAllUsers();
         Task<User> Register(UserDTO request);
         Task<string> Login(LoginDTO request);
-        
+        Task<User> GetSingleUser(int id);
+
     }
 }

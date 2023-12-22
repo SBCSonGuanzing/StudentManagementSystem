@@ -17,8 +17,7 @@ namespace StudentSystem.Server.Services.BookServices
             var newBook = new Book()
             {
                 Name = book.Name,
-                Category = book.Category,
-                Description = book.Description,
+            
             };
 
             _context.Add(newBook);
@@ -66,8 +65,7 @@ namespace StudentSystem.Server.Services.BookServices
                 return null;
 
             books.Name= request.Name;
-            books.Description= request.Description;
-            books.Category= request.Category;
+            
 
             await _context.SaveChangesAsync();
 

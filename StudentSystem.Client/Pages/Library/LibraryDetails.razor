@@ -1,0 +1,41 @@
+﻿@page "/library-details"
+@page "/library-details/{id:int}"
+
+@using StudentSystem.Client.Services.BorrowedBooksServices
+@using StudentSystem.Client.Services.StudentServices
+@using StudentSystem.Client.Services.BookServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+
+@inject IClientStudentService clientStudentService
+@inject IClientBorrowedBooksService clientBorrowedBooksServices
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<h3>Library Details</h3>
+
+<MudTable Items="borrowedBooks">
+    <HeaderContent>
+        <MudTh>Book Name</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="context">
+        <MudTd>@context.Book.Name</MudTd>
+    </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No Borrowed Books found</MudText>
+        </NoRecordsContent>
+</MudTable>
+
+ @code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    List<BorrowedBooks> borrowedBooks = new List<BorrowedBooks>();
+
+    // On Initialized
+    protected override async Task OnInitializedAsync()
+    {
+        borrowedBooks = await clientBorrowedBooksServices.GetSingleBorrowedBook(Id);
+    }
+}

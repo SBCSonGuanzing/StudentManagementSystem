@@ -1,4 +1,5 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using System.Security.Claims
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">StudentSystem.Client</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -9,8 +10,19 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="d-flex justify-content-center mt-5">
+                    <MudAvatar Image="" Style="width: 120px; height:120px;"></MudAvatar>
+                </div>
+                <span style="color:white; font-size:17px; margin-top: 6px; font-weight: 500; ">  @context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value</span>
+@*                 <span style="color:white; font-size:17px; margin-top: 6px; font-weight: 500; ">  @context.User.Identity.Name</span>
+ *@            </Authorized>
+        </AuthorizeView>
+
         <div class="nav-item px-3">
-            <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Info">Dashboard</MudNavLink>
+            <MudNavLink Href="/home" Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Info">Dashboard</MudNavLink>
         </div>
         <div class="nav-item px-3">
             <MudNavLink Href="/all-subjects" Icon="@Icons.Material.Filled.Subject" IconColor="Color.Info">Subjects</MudNavLink>
@@ -26,6 +38,12 @@
         </div>
         <div class="nav-item px-3">
             <MudNavLink Href="/all-users" Icon="@Icons.Material.Filled.People" IconColor="Color.Info">Users</MudNavLink>
+        </div>
+         <div class="nav-item px-3">
+            <MudNavLink Href="/all-enrollment" Icon="@Icons.Material.Outlined.FolderOpen" IconColor="Color.Info">Enrollment</MudNavLink>
+        </div>
+        <div class="nav-item px-3">
+            <MudNavLink Href="/all-library" Icon="@Icons.Material.Outlined.FolderOpen" IconColor="Color.Info">Library</MudNavLink>
         </div>
     </nav>
 </div>

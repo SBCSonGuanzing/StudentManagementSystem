@@ -129,7 +129,8 @@ namespace StudentSystem.Server.Services.AuthServices
             List<Claim> claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
             // 403 Don't have the Correct Role 
@@ -145,6 +146,17 @@ namespace StudentSystem.Server.Services.AuthServices
                 );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
+        }
+
+        public async Task<User> GetSingleUser(int id)
+        {
+            var users = await _context.Users
+                     .Where(p => p.Id == id)
+                     .FirstOrDefaultAsync();
+            if (users == null)
+                return null;
+
+            return users;
         }
     }
 }

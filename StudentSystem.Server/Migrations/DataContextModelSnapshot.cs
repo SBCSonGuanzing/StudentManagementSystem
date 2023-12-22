@@ -30,14 +30,6 @@ namespace StudentSystem.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -45,6 +37,29 @@ namespace StudentSystem.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Books");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.BorrowedBooks", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LibraryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("LibraryId");
+
+                    b.ToTable("BorrowedBooks");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
@@ -96,6 +111,34 @@ namespace StudentSystem.Server.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("Enrollments");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.Library", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BorrowedReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateBorrowed")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateReturn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Libraries");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Professor", b =>
@@ -155,9 +198,6 @@ namespace StudentSystem.Server.Migrations
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -179,8 +219,6 @@ namespace StudentSystem.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
-
                     b.HasIndex("UserId")
                         .IsUnique();
 
@@ -194,14 +232,6 @@ namespace StudentSystem.Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -261,6 +291,25 @@ namespace StudentSystem.Server.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.BorrowedBooks", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentSystem.Shared.Models.Library", "Library")
+                        .WithMany("BorrowedBooks")
+                        .HasForeignKey("LibraryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Library");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
                 {
                     b.HasOne("StudentSystem.Shared.Models.Enrollment", "Enrollment")
@@ -291,6 +340,17 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.Library", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.Professor", b =>
                 {
                     b.HasOne("StudentSystem.Shared.Models.User", "User")
@@ -304,10 +364,6 @@ namespace StudentSystem.Server.Migrations
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Student", b =>
                 {
-                    b.HasOne("StudentSystem.Shared.Models.Book", null)
-                        .WithMany("Students")
-                        .HasForeignKey("BookId");
-
                     b.HasOne("StudentSystem.Shared.Models.User", "User")
                         .WithOne("Student")
                         .HasForeignKey("StudentSystem.Shared.Models.Student", "UserId")
@@ -317,14 +373,14 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("StudentSystem.Shared.Models.Book", b =>
-                {
-                    b.Navigation("Students");
-                });
-
             modelBuilder.Entity("StudentSystem.Shared.Models.Enrollment", b =>
                 {
                     b.Navigation("EnrolledSubjects");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.Library", b =>
+                {
+                    b.Navigation("BorrowedBooks");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Student", b =>

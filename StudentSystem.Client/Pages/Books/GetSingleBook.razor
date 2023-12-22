@@ -32,12 +32,7 @@ else {
             <MudTextField Label="Name" @bind-Value="@book.Name"
                           For="@(() => book.Name)">
             </MudTextField>
-            <MudTextField Label="Category" @bind-Value="@book.Category"
-                          For="@(() => book.Category)">
-            </MudTextField>
-            <MudTextField Label="Description" @bind-Value="@book.Description"
-                          For="@(() => book.Description)">
-            </MudTextField>
+         
         </MudCardContent>
     </MudCard>
     <br />
@@ -90,22 +85,39 @@ else {
     {
         if (id is null)
         {
-           
 
-            await clientBookService.AddBook(book);
-            Snackbar.Add(
-
-            "Added Book Successfully",
-
-            Severity.Success,
-
-            config =>
-
+            if(!string.IsNullOrEmpty(book.Name))
             {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
+                await clientBookService.AddBook(book);
+                Snackbar.Add(
+
+                "Added Book Successfully",
+
+                Severity.Success,
+
+                config =>
+
+                {
+                    config.ShowTransitionDuration = 200;
+                    config.HideTransitionDuration = 400;
+                    config.VisibleStateDuration = 2500;
+                });
+                return;
+            }
+            else
+            {
+                Snackbar.Add(
+                   "No Books Added",
+                   Severity.Error, // Change Severity to Error for no subject added
+                   config =>
+                   {
+                       config.ShowTransitionDuration = 200;
+                       config.HideTransitionDuration = 400;
+                       config.VisibleStateDuration = 2500;
+                   });
+                NavigationManager.NavigateTo("/all-books");
+            }
+
         }
         else
         {

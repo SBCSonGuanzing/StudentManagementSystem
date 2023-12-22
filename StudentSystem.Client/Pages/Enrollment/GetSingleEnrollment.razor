@@ -1,0 +1,184 @@
+﻿@page "/single-enrollment"
+@page "/single-enrollment/{id:int}"
+
+@using StudentSystem.Client.Services.EnrolledSubjectsService
+@using StudentSystem.Client.Services.StudentServices
+@using StudentSystem.Client.Services.SubjectServices
+@using StudentSystem.Shared.DTOs
+@using StudentSystem.Shared.Models
+
+@inject IClientSubjectService clientSubjectService
+@inject IClientStudentService clientStudentService
+@inject IClientEnrolledSubjectService clientEnrolledSubjectService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<h3>Enroll Subject</h3>
+
+<EditForm Model="enrollmentDTO" OnSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <MudTextField Label="Semester"
+                  @bind-Value="enrollmentDTO.Semester"
+                  For="@(() => enrollmentDTO.Semester)" />
+
+    <MudTextField Label="School Year"
+                  @bind-Value="enrollmentDTO.SchoolYear"
+                  For="@(() => enrollmentDTO.SchoolYear)" />
+
+    <MudDatePicker Label="Date Created"
+                   @bind-Date="enrollmentDTO.DateCreated" />
+
+    <MudSelect Label="Subjects" @bind-Value="subject.Id">
+        <MudSelectItem Value="0">Select Subject</MudSelectItem>
+        @foreach (var subjects in clientSubjectService.subjects)
+        {
+            <MudSelectItem Value="subjects.Id">@subjects.Name</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudButton OnClick=" AddSubject" ButtonType="ButtonType.Button" Class="mt-4" Color="Color.Primary" Variant="Variant.Filled">
+        Add Subject
+    </MudButton>
+    <br />
+    <div style="border-bottom: 2px solid black; margin-top: 20px; margin-bottom: 20px;"></div>
+    <br />
+
+    <h3>Subjects Enrolled</h3>
+
+    <MudTable Items="EnrolledSubjectsList"
+              Hover="true"
+              Striped="true"
+              Dense="true"
+              Class="mb-2">
+
+        <HeaderContent>
+            <MudTh>Subject Name</MudTh>
+        </HeaderContent>
+        <RowTemplate Context="subject">
+            <MudTd DataLabel="Subject">@subjectNames[@subject.SubjectId]</MudTd>
+                <MudTd>
+                    <MudButton OnClick="@(() => RemoveSubject(subject.SubjectId))"
+                               Icon="@Icons.Material.Filled.Remove"
+                               Size="Size.Small"
+                               ButtonType="ButtonType.Button"
+                               Class="mt-4"
+                               Color="Color.Primary"
+                               Variant="Variant.Filled">
+                        Remove
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+           
+        </MudTable>
+
+        <MudButton ButtonType="ButtonType.Submit" Class="mt-4" Color="Color.Primary" Variant="Variant.Filled">
+            Enroll
+        </MudButton>
+
+
+        <ValidationSummary />
+    </EditForm>
+
+
+
+    @code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    EnrollmentDTO enrollmentDTO = new EnrollmentDTO();
+
+    // Subject ID 
+    EnrolledSubjectsDTO enrolledSubjectsDTO = new EnrolledSubjectsDTO();
+
+    Subject subject = new Subject();
+
+    Student student = new Student();
+
+    private Dictionary<int, string> subjectNames = new Dictionary<int, string>();
+
+    List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
+
+    // Get All Subjects On Initialized
+    // Save Subject Name on a Dictionary
+
+    protected override async Task OnInitializedAsync()
+    {
+        await clientSubjectService.GetAllSubjects();
+
+        foreach (var subject in clientSubjectService.subjects)
+        {
+            subjectNames[subject.Id] = subject.Name;
+        }
+    }
+    
+
+    private void AddSubject()
+    {
+        if (!EnrolledSubjectsList.Any(s => s.SubjectId == subject.Id))
+        {
+            enrolledSubjectsDTO.SubjectId = subject.Id;
+            EnrolledSubjectsList.Add(enrolledSubjectsDTO);
+            enrolledSubjectsDTO = new EnrolledSubjectsDTO();
+        }
+        else
+        {
+            Snackbar.Add("Subject already exists on the list.", Severity.Warning, config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+        }
+    }
+
+    private void RemoveSubject(int id)
+    {
+        var prodDelete = EnrolledSubjectsList.Find(c => c.SubjectId == id);
+
+        // var selectedProduct = EnrolledSubjectsList
+        //     .FirstOrDefault(product => product.SubjectId == id);
+
+        if (prodDelete != null)
+        {
+            Snackbar.Add($"{subjectNames[prodDelete.SubjectId]} has been removed.", Severity.Error, config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+            EnrolledSubjectsList.Remove(prodDelete);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id != null)
+        {
+            enrollmentDTO.StudentId = Id;
+        }
+        enrollmentDTO.EnrolledSubjects = EnrolledSubjectsList;
+        await clientEnrolledSubjectService.AddEnrolledSubject(enrollmentDTO);
+        StateHasChanged();
+    }
+
+    async Task DeleteSubject()
+    {
+        await clientSubjectService.DeleteSubject(subject.Id);
+        StateHasChanged();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+        {
+            var result = await clientStudentService.GetSingleStudent((int)Id);
+            if (result is not null)
+                student = result;
+            else
+                NavigationManager.NavigateTo("/all-enrollment");
+
+        }
+
+    }
+}  

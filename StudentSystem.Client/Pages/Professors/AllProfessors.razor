@@ -5,13 +5,12 @@
 @using StudentSystem.Shared.Models
 @inject IClientProfessorService ClientProfessorService
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
 <PageTitle>Professors</PageTitle>
 <h1>Professors</h1>
 <br />
-<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddStudent">Add Professor</MudButton>
-<br />
-<br />
+
 
 <MudTable Items="ClientProfessorService.professors" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
@@ -21,6 +20,7 @@
         <MudTh>Contact</MudTh>
         <MudTh>Address</MudTh>
         <MudTh>Birth Date</MudTh>
+        <MudTd>Actions</MudTd>
     </HeaderContent>
     <RowTemplate Context="professorDetails">
        
@@ -40,11 +40,24 @@
             <MudTd DataLabel="Birth Date">
                 @professorDetails.BirthDate
             </MudTd>
-        
 
+        <MudTd>
+            <MudIconButton OnClick="() => editProfessor(professorDetails.Id)"
+                           Icon="@Icons.Material.Filled.Edit"
+                           Color="Color.Primary"
+                           Variant="Variant.Filled"></MudIconButton>
+            <MudIconButton OnClick="() => deleteProfessor(professorDetails.Id) "
+                           Icon="@Icons.Material.Filled.Delete"
+                           Color="Color.Error"
+                           Variant="Variant.Filled">
+            </MudIconButton>
+        </MudTd>
     </RowTemplate>
 
 </MudTable>
+
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddStudent">Add Professor</MudButton>
+
 
 @code {
 
@@ -64,4 +77,21 @@
     {
         NavigationManager.NavigateTo("/register");
     }
+
+    async void deleteProfessor(int id)
+    {
+        await ClientProfessorService.DeleteProfessor(id);
+        StateHasChanged();
+        Snackbar.Add(
+            "Deleted Professor Successfully",
+            Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+    }
+
+    void editProfessor(int id) => NavigationManager.NavigateTo($"/professor/{id}");
 }

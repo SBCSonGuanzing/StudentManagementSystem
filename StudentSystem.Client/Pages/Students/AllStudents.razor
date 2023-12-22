@@ -1,19 +1,22 @@
 ﻿@page "/all-students"
 
 @using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Client.Services.StudentServices
+
 @using StudentSystem.Shared.DTOs
 @using StudentSystem.Shared.Models
 @inject IClientAuthService ClientAuthService
+@inject IClientStudentService clientStudentService
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
 
 <PageTitle>Students</PageTitle>
 <h1>Students</h1>
 <br />
-<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddStudent">Add Student</MudButton>
-<br />
-<br />
 
-<MudTable Items="ClientAuthService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
+
+<MudTable Items="clientStudentService.students" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Image</MudTh>
         <MudTh>First Name</MudTh>
@@ -21,26 +24,38 @@
         <MudTh>Contact</MudTh>
         <MudTh>Address</MudTh>
         <MudTh>Birth Date</MudTh>
+        <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate Context="userDetails">
-        @if(userDetails.Student != null)
+        @if(userDetails != null)
         {
 
-            <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Student.Image"></MudAvatar></MudTd>
+            <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Image"></MudAvatar></MudTd>
             <MudTd DataLabel="FirstName">
-                @userDetails.Student.FirstName
+                @userDetails.FirstName
             </MudTd>
             <MudTd DataLabel="LastName">
-                @userDetails.Student.LastName
+                @userDetails.LastName
             </MudTd>
             <MudTd DataLabel="Contact">
-                @userDetails.Student.Contact
+                @userDetails.Contact
             </MudTd>
             <MudTd DataLabel="Address">
-                @userDetails.Student.Address
+                @userDetails.Address
             </MudTd>
             <MudTd DataLabel="Birth Date">
-                @userDetails.Student.BirthDate
+                @userDetails.BirthDate
+            </MudTd>
+            <MudTd>
+                <MudIconButton OnClick="() => editStudent(userDetails.Id)"
+                               Icon="@Icons.Material.Filled.Edit"
+                               Color="Color.Primary"
+                               Variant="Variant.Filled"></MudIconButton>
+                <MudIconButton OnClick="() => deleteStudent(userDetails.Id) "
+                               Icon="@Icons.Material.Filled.Delete"
+                               Color="Color.Error"
+                               Variant="Variant.Filled">
+                </MudIconButton>
             </MudTd>
         }
         
@@ -48,22 +63,37 @@
 
 </MudTable>
 
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddStudent">Add Student</MudButton>
+
+
 @code {
 
-    List<User> userDetails = new List<User>();
 
     protected override async Task OnInitializedAsync()
     {
-        userDetails = await ClientAuthService.GetAllUser();
+        await clientStudentService.GetAllStudents();
     }
 
-    void RegisterUser()
-    {
-        NavigationManager.NavigateTo("/register");
-    }
-
+  
     void AddStudent()
     {
         NavigationManager.NavigateTo("/register");
     }
+
+    async void deleteStudent(int id)
+    {
+        await clientStudentService.DeleteStudent(id);
+        StateHasChanged();
+        Snackbar.Add(
+            "Deleted Book Successfully",
+            Severity.Success,
+            config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+    }
+
+    void editStudent(int id) => NavigationManager.NavigateTo($"/student/{id}");
 }

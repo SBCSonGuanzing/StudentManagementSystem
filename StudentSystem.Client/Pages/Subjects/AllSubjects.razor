@@ -11,26 +11,17 @@
 <PageTitle>Subjects</PageTitle>
 <h1>Subjects</h1>
 
-<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddSubject">Add Subject</MudButton>
-<br />
-<br />
 <MudTable Items="ClientSubjectService.subjects" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Name</MudTh>
-        <MudTh>Category</MudTh>
-        <MudTh>Description</MudTh>
+     
         <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate Context="subjectDetails">
         <MudTd DataLabel="Name">
             @subjectDetails.Name
         </MudTd>
-        <MudTd DataLabel="Category">
-            @subjectDetails.Category
-        </MudTd>
-        <MudTd DataLabel="Description">
-            @subjectDetails.Description
-        </MudTd>
+       
         <MudTd>
             <MudIconButton OnClick="() => editSubject(subjectDetails.Id)"
                            Icon="@Icons.Material.Filled.Edit"
@@ -45,6 +36,7 @@
     </RowTemplate>
 
 </MudTable>
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="AddSubject">Add Subject</MudButton>
 
 @code {
 

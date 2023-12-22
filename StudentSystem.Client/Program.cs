@@ -7,7 +7,10 @@ using MudBlazor.Services;
 using StudentSystem.Client;
 using StudentSystem.Client.Services.AuthServices;
 using StudentSystem.Client.Services.BookServices;
+using StudentSystem.Client.Services.BorrowedBooksServices;
+using StudentSystem.Client.Services.EnrolledSubjectsService;
 using StudentSystem.Client.Services.ProfessorServices;
+using StudentSystem.Client.Services.StudentServices;
 using StudentSystem.Client.Services.SubjectServices;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -23,6 +26,9 @@ builder.Services.AddScoped<IClientAuthService, ClientAuthService>();
 builder.Services.AddScoped<IClientBookService, ClientBookService>();
 builder.Services.AddScoped<IClientProfessorService, ClientProfessorService>();
 builder.Services.AddScoped<IClientSubjectService, ClientSubjectService>();
+builder.Services.AddScoped<IClientStudentService, ClientStudentService>();
+builder.Services.AddScoped<IClientEnrolledSubjectService, ClientEnrolledSubjectService>();
+builder.Services.AddScoped<IClientBorrowedBooksService, ClientBorrowedBooksService>();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();

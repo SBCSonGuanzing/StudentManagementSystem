@@ -22,6 +22,8 @@ namespace StudentSystem.Shared.Models
         public int UserId { get; set; }
 
         [JsonIgnore]
-        public List<Enrollment> Enrollment { get; set; } 
+        public List<Enrollment> Enrollment { get; set; }
+        [JsonIgnore]
+        public List<Library> Library { get; set; }
     }
 }
