@@ -2,6 +2,7 @@
 @page "/library-details/{id:int}"
 
 @using StudentSystem.Client.Services.BorrowedBooksServices
+@using StudentSystem.Client.Services.EnrolledSubjectsService
 @using StudentSystem.Client.Services.StudentServices
 @using StudentSystem.Client.Services.BookServices
 @using StudentSystem.Shared.DTOs
@@ -9,33 +10,45 @@
 
 @inject IClientStudentService clientStudentService
 @inject IClientBorrowedBooksService clientBorrowedBooksServices
+@inject IClientEnrolledSubjectService ClientEnrolledSubjectService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
 <h3>Library Details</h3>
 
-<MudTable Items="borrowedBooks">
+<MudTable Items="borrowedBooks" Hover="@hover" Bordered="@bordered" Striped="@striped">
     <HeaderContent>
-        <MudTh>Book Name</MudTh>
+        <MudTh>Name of Book</MudTh>
+        <MudTh>Date Borrowed</MudTh>
+        <MudTh>Reason of Borrow</MudTh>
+        <MudTh>Date of Return</MudTh>
     </HeaderContent>
     <RowTemplate Context="context">
         <MudTd>@context.Book.Name</MudTd>
+        <MudTd>@context.Library.DateBorrowed</MudTd>
+        <MudTd>@context.Library.BorrowedReason</MudTd>
+        <MudTd>@context.Library.DateReturn</MudTd>
     </RowTemplate>
         <NoRecordsContent>
             <MudText>No Borrowed Books found</MudText>
         </NoRecordsContent>
 </MudTable>
 
- @code {
+    @code {
 
     [Parameter]
     public int Id { get; set; }
 
     List<BorrowedBooks> borrowedBooks = new List<BorrowedBooks>();
 
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+     
     // On Initialized
     protected override async Task OnInitializedAsync()
     {
         borrowedBooks = await clientBorrowedBooksServices.GetSingleBorrowedBook(Id);
+
     }
 }
