@@ -71,18 +71,42 @@ namespace StudentSystem.Server.Services.SubjectServices
         public async Task<List<Subject>> UpdateSubject(int id, SubjectDTO request)
         {
             var subjects = await _context.Subjects
-                .Where(team => team.Id == id)
+                .Include(p => p.Professors)
+                .Where(subject => subject.Id == id)
                 .FirstOrDefaultAsync();
 
             if (subjects == null)
                 return null;
 
             subjects.Name = request.Name;
-         
+            subjects.Professors = new List<Professor>();
+
+            foreach(int professorId in request.ProfessorIds)
+            {
+                Professor professor = _context.Professors.First(p => p.Id == professorId);
+                subjects.Professors.Add(professor);
+            }
 
             await _context.SaveChangesAsync();
-
             return await GetAllSubjects();
+
+            //Subject newSubject = new Subject()
+            //{
+            //    Name = request.Name,
+            //    Professors = new List<Professor>()
+            //};
+
+            //foreach (int id in request.ProfessorIds)
+            //{
+            //    // TODO: Query Professor with selectectedProf.Id
+            //    Professor professor = _context.Professors.First(p => p.Id == id);
+
+            //    newSubject.Professors.Add(professor);
+            //}
+
+            //_context.Add(newSubject);
+            //await _context.SaveChangesAsync();
+            //return await GetAllSubjects();
         }
     }
 }

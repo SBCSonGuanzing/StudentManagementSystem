@@ -60,7 +60,7 @@ else
                            MultiSelection="true"
                            @bind-SelectedValues="options">
 
-                    @foreach (var professor in subject.Professors)
+                    @foreach (Professor professor in Professors)
                     {
                         <MudSelectItem T="int" Value="@professor.Id">@professor.LastName</MudSelectItem>
                     }
@@ -134,7 +134,7 @@ else
                 subjects.ProfessorIds = new List<int>();
                 foreach(int id in options)
                 {
-                    
+
                     subjects.ProfessorIds.Add(id);
                 }
                 await clientSubjectService.AddSubject(subjects);
@@ -164,7 +164,22 @@ else
         }
         else
         {
-            await clientSubjectService.UpdateSubject((int)id, subject);
+
+            // subjects.ProfessorIds = new List<int>();
+            // foreach (int id in options)
+            // {
+
+            //     subjects.ProfessorIds.Add(id);
+            // }
+            // await clientSubjectService.AddSubject(subjects);
+
+            subjects.ProfessorIds = new List<int>();
+            foreach (int id in options)
+            {
+                subjects.ProfessorIds.Add(id);
+            }
+
+            await clientSubjectService.UpdateSubject((int)id, subjects);
             Snackbar.Add(
                 "Update Subject Successfully",
                 Severity.Success,

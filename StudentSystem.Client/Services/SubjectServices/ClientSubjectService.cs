@@ -60,7 +60,7 @@ namespace StudentSystem.Client.Services.SubjectServices
             return null;
         }
 
-        public async Task UpdateSubject(int id, Subject subject)
+        public async Task UpdateSubject(int id, SubjectDTO subject)
         {
             await _httpClient.PutAsJsonAsync($"api/Subject/update-subject/{id}", subject);
             _navigationManager.NavigateTo("/all-subjects");

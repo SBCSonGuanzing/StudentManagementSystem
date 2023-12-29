@@ -114,23 +114,9 @@
 
     List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
 
-    // TODO: Make a List of the Professors  
-
-    // Get All Subjects On Initialized
-    // Save Subject Name on a Dictionary
-
     protected override async Task OnInitializedAsync()
     { 
         await clientSubjectService.GetAllSubjects();
-
-        // foreach (var subject in clientSubjectService.subjects)
-        // {
-        //     subjectNames[subject.Id] = subject.Name;
-        // }
-        // foreach (var professor in clientSubjectService.subjects)
-        // {
-        //     professorNames[professor.Id] = professor.Professors;
-        // }
 
     }
 
@@ -195,8 +181,6 @@
                 student = result;
             else
                 NavigationManager.NavigateTo("/all-enrollment");
-
         }
-
     }
 }  

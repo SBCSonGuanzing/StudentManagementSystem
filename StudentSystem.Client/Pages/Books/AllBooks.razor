@@ -11,18 +11,15 @@
 <PageTitle>Books</PageTitle>
 <h1>Books</h1>
 
-
 <MudTable Items="ClientBookService.books" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Name</MudTh>
-       
         <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate Context="bookDetails">
         <MudTd DataLabel="Name">
             @bookDetails.Name
         </MudTd>
-        
         <MudTd>
             <MudIconButton OnClick="() => editDifficulty(bookDetails.Id)"
                            Icon="@Icons.Material.Filled.Edit"
@@ -74,9 +71,5 @@
             });
     }
 
-
-
     void editDifficulty(int id) => NavigationManager.NavigateTo($"/book/{id}");
-
-
 }
