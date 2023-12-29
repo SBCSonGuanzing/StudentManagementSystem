@@ -22,18 +22,6 @@ namespace StudentSystem.Server.Controllers
             return await _professorService.GetProfessors();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Professor>> DeleteProfessor(int id)
-        {
-            var result = await _professorService.DeleteProfessor(id);
-            if (result is null)
-            {
-                return NotFound("Professor not found");
-            }
-
-            return Ok(result);
-        }
-
         [HttpPut("update-professor/{id}")]
         public async Task<ActionResult<List<Professor>>> UpdateStudent(int id, UserDetailsDTO request)
         {

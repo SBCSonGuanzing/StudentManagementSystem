@@ -1,4 +1,5 @@
-﻿using StudentSystem.Shared.Models;
+﻿using StudentSystem.Shared.DTOs;
+using StudentSystem.Shared.Models;
 
 namespace StudentSystem.Client.Services.SubjectServices
 {
@@ -7,7 +8,7 @@ namespace StudentSystem.Client.Services.SubjectServices
         List<Subject> subjects { get; set; }
         Task<List<Subject>> GetAllSubjects();
         Task<Subject> GetSingleSubject(int id);
-        Task AddSubject(Subject subject);
+        Task AddSubject(SubjectDTO subject);
         Task UpdateSubject(int id, Subject subject);
         Task<List<Subject>> DeleteSubject(int id);
     }

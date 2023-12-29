@@ -23,18 +23,6 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Student>> DeleteStudent(int id)
-        {
-            var result = await _studentService.DeleteStudent(id);
-            if (result is null)
-            {
-                return NotFound("Student not found");
-            }
-
-            return Ok(result);
-        }
-
         [HttpPut("update-student/{id}")]
         public async Task<ActionResult<List<Student>>> UpdateStudent(int id, UserDetailsDTO request)
         {

@@ -12,18 +12,7 @@ namespace StudentSystem.Server.Services.ProfessorServices
         {
             _context = context;
         }
-        public async Task<List<Professor>?> DeleteProfessor(int id)
-        {
-            var prof = await _context.Professors.FindAsync(id);
-            if (prof is null)
-                return null;
-
-            _context.Professors.Remove(prof);
-            await _context.SaveChangesAsync();
-
-
-            return await _context.Professors.ToListAsync();
-        }
+       
 
         public async Task<List<Professor>> GetProfessors()
         {

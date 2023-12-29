@@ -148,13 +148,14 @@ namespace StudentSystem.Server.Services.AuthServices
             return jwt;
         }
 
-        public async Task<User> GetSingleUser(int id)
+        public async Task<string> GetSingleUser()
         {
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var users = await _context.Users
-                     .Where(p => p.Id == id)
+                     .Where(p => p.Id.ToString() == userId)
+                      .Select(p => p.Avatar)
                      .FirstOrDefaultAsync();
-            if (users == null)
-                return null;
 
             return users;
         }

@@ -18,17 +18,6 @@ namespace StudentSystem.Client.Services.ProfessorServices
         }
         public List<Professor> professors { get; set; }
 
-        public async Task DeleteProfessor(int id)
-        {
-            HttpResponseMessage? response = await _httpClient.DeleteAsync($"api/Professor/{id}");
-
-            if (response != null && response.IsSuccessStatusCode)
-            {
-                List<Professor>? content = await response.Content.ReadFromJsonAsync<List<Professor>>();
-                if (content != null) professors = content;
-            }
-        }
-
         public async Task<List<Professor>> GetAllProfessors()
         {
             var result = await _httpClient.GetFromJsonAsync<List<Professor>>($"api/Professor");

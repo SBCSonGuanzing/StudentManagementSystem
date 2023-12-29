@@ -22,6 +22,21 @@ namespace StudentSystem.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ProfessorSubject", b =>
+                {
+                    b.Property<int>("ProfessorsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProfessorsId", "SubjectsId");
+
+                    b.HasIndex("SubjectsId");
+
+                    b.ToTable("ProfessorSubject");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.Book", b =>
                 {
                     b.Property<int>("Id")
@@ -73,12 +88,17 @@ namespace StudentSystem.Server.Migrations
                     b.Property<int>("EnrollmentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProfessorId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EnrollmentId");
+
+                    b.HasIndex("ProfessorId");
 
                     b.HasIndex("SubjectId");
 
@@ -291,6 +311,21 @@ namespace StudentSystem.Server.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ProfessorSubject", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.Professor", null)
+                        .WithMany()
+                        .HasForeignKey("ProfessorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentSystem.Shared.Models.Subject", null)
+                        .WithMany()
+                        .HasForeignKey("SubjectsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.BorrowedBooks", b =>
                 {
                     b.HasOne("StudentSystem.Shared.Models.Book", "Book")
@@ -318,6 +353,10 @@ namespace StudentSystem.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("StudentSystem.Shared.Models.Professor", "Professor")
+                        .WithMany("EnrolledSubjects")
+                        .HasForeignKey("ProfessorId");
+
                     b.HasOne("StudentSystem.Shared.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
@@ -325,6 +364,8 @@ namespace StudentSystem.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Enrollment");
+
+                    b.Navigation("Professor");
 
                     b.Navigation("Subject");
                 });
@@ -343,7 +384,7 @@ namespace StudentSystem.Server.Migrations
             modelBuilder.Entity("StudentSystem.Shared.Models.Library", b =>
                 {
                     b.HasOne("StudentSystem.Shared.Models.Student", "Student")
-                        .WithMany()
+                        .WithMany("Library")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -383,9 +424,16 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("BorrowedBooks");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.Professor", b =>
+                {
+                    b.Navigation("EnrolledSubjects");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.Student", b =>
                 {
                     b.Navigation("Enrollment");
+
+                    b.Navigation("Library");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.User", b =>

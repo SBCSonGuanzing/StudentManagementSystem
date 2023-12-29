@@ -11,18 +11,7 @@ namespace StudentSystem.Server.Services.StudentServices
         {
             _context = context;
         }
-        public async Task<List<Student>?> DeleteStudent(int id)
-        {
-            var stud = await _context.Students.FindAsync(id);
-            if (stud is null)
-                return null;
 
-            _context.Students.Remove(stud);
-            await _context.SaveChangesAsync();
-
-
-            return await _context.Students.ToListAsync();
-        }
         public async Task<List<Student>> GetAllStudents()
         {
             var students = await _context.Students.ToListAsync();

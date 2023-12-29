@@ -47,5 +47,13 @@ namespace StudentSystem.Server.Controllers
             var result = await _authService.GetAllUsers();
             return Ok(result);
         }
+
+        [HttpGet("single-avatar")]
+        public async Task<ActionResult<string>> GetSingleUserAvater()
+        {
+            var result = await _authService.GetSingleUser();
+
+            return Ok(result); 
+        }
     }
 }

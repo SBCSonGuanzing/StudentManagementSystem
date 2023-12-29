@@ -19,17 +19,6 @@ namespace StudentSystem.Client.Services.StudentServices
 
         public List<Student> students { get; set; } = new List<Student>();
 
-        public async Task DeleteStudent(int id)
-        {
-            HttpResponseMessage? response = await _httpClient.DeleteAsync($"api/Student/{id}");
-
-            if (response != null && response.IsSuccessStatusCode)
-            {
-                List<Student>? content = await response.Content.ReadFromJsonAsync<List<Student>>();
-                if (content != null) students = content;
-            }   
-        }
-
         public async Task<List<Student>> GetAllStudents()
         {
             var result = await _httpClient.GetFromJsonAsync<List<Student>>($"api/Student");

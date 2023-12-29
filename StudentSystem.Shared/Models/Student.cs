@@ -23,7 +23,10 @@ namespace StudentSystem.Shared.Models
 
         [JsonIgnore]
         public List<Enrollment> Enrollment { get; set; }
+
         [JsonIgnore]
         public List<Library> Library { get; set; }
+
+
     }
 }

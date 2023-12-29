@@ -13,13 +13,21 @@ namespace StudentSystem.Server.Services.SubjectServices
         {
             _context = context;
         }
-        public async Task<List<Subject>> AddSubject(SubjectDTO subject)
+        public async Task<List<Subject>> AddSubject(SubjectDTO request)
         {
-            var newSubject = new Subject()
+            Subject newSubject = new Subject()
             {
-                Name = subject.Name,
-               
+                Name = request.Name,
+                Professors = new List<Professor>()
             };
+
+            foreach (int id in request.ProfessorIds)
+            {
+                // TODO: Query Professor with selectectedProf.Id
+                Professor professor = _context.Professors.First(p => p.Id == id);        
+
+                newSubject.Professors.Add(professor);
+            }
 
             _context.Add(newSubject);
             await _context.SaveChangesAsync();
@@ -41,7 +49,10 @@ namespace StudentSystem.Server.Services.SubjectServices
 
         public async Task<List<Subject>> GetAllSubjects()
         {
-            var subjects = await _context.Subjects.ToListAsync();
+            // TODO: Include Professors
+            var subjects = await _context.Subjects
+                .Include(p => p.Professors)
+                .ToListAsync();
             return subjects;
         }
 
@@ -49,6 +60,7 @@ namespace StudentSystem.Server.Services.SubjectServices
         {
             var subjects = await _context.Subjects
                      .Where(p => p.Id == id)
+                     .Include(p => p.Professors)
                      .FirstOrDefaultAsync();
             if (subjects == null)
                 return null;

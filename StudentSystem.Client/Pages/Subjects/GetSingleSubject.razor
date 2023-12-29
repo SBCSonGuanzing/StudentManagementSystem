@@ -1,15 +1,17 @@
 ﻿@page "/subject/{id:int}"
 @page "/subject"
 
+@using StudentSystem.Client.Services.ProfessorServices
 @using StudentSystem.Client.Services.SubjectServices
 @using StudentSystem.Shared.DTOs
 @using StudentSystem.Shared.Models
 @inject HttpClient Http
 @inject IClientSubjectService clientSubjectService
+@inject IClientProfessorService ClientProfessorService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
-@if (id is null)
+@if (id == 0)
 {
     <PageTitle>New Subject</PageTitle>
     <h2>Create a New Subject</h2>
@@ -21,19 +23,51 @@ else
     <h2>Edit @subject.Name</h2>
 }
 
-<EditForm Model="subject" OnValidSubmit="HandleSubmit">
+<EditForm Model="subjects" OnValidSubmit="HandleSubmit">
 
-    @if (id is null)
+    @if (id == 0)
     {
         <DataAnnotationsValidator />
     }
 
     <MudCard>
         <MudCardContent>
-            <MudTextField Label="Name" @bind-Value="@subject.Name"
-                          For="@(() => subject.Name)">
+
+
+            <MudTextField Label="Name" @bind-Value="@subjects.Name"
+                          For="@(() => subjects.Name)">
             </MudTextField>
-            
+
+            @* MudMultiSelect *@
+
+            @if(id == 0)
+            {
+                <MudSelect T="int"
+                           Label="Professors"
+                           MultiSelection="true"
+                           @bind-SelectedValues="options">
+
+                    @foreach (Professor professor in Professors)
+                    {
+                        <MudSelectItem T="int" Value="@professor.Id">@professor.LastName</MudSelectItem>
+                    }
+                </MudSelect>
+            } 
+            else
+            {
+                <MudSelect T="int"
+                           Label="Professors"
+                           MultiSelection="true"
+                           @bind-SelectedValues="options">
+
+                    @foreach (var professor in subject.Professors)
+                    {
+                        <MudSelectItem T="int" Value="@professor.Id">@professor.LastName</MudSelectItem>
+                    }
+                </MudSelect>
+
+            }
+
         </MudCardContent>
     </MudCard>
     <br />
@@ -52,27 +86,30 @@ else
 
 @code {
     [Parameter]
-    public int? id { get; set; }
-
+    public int id { get; set; }
     string btnText = string.Empty;
-
     bool isNew = true;
-
+    public SubjectDTO subjects = new SubjectDTO();
     public Subject subject = new Subject();
 
-    protected override void OnInitialized()
-    {
-        btnText = id == null ? "Save New Subject" : "Update Subject";
-    }
+    public List<Professor> Professors = new List<Professor>();
+
+    List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
 
     protected override async Task OnParametersSetAsync()
     {
-        if (id is not null)
+        if (id != 0)
         {
             var result = await clientSubjectService.GetSingleSubject((int)id);
             if (result != null)
             {
+
                 subject = result;
+                subjects.Name = result.Name;
+
+                var Profs = await ClientProfessorService.GetAllProfessors();
+                Professors = Profs;
+
                 isNew = false;
             }
             else
@@ -80,15 +117,27 @@ else
                 NavigationManager.NavigateTo("/all-subjects");
             }
         }
+        else
+        {
+
+            var result = await ClientProfessorService.GetAllProfessors();
+            Professors = result;
+        }
     }
 
     async Task HandleSubmit()
     {
-        if (id is null)
+        if (id == 0)
         {
-            if(!string.IsNullOrEmpty(subject.Name))
-            {        
-                await clientSubjectService.AddSubject(subject);
+            if(options != null)
+            {
+                subjects.ProfessorIds = new List<int>();
+                foreach(int id in options)
+                {
+                    
+                    subjects.ProfessorIds.Add(id);
+                }
+                await clientSubjectService.AddSubject(subjects);
                 Snackbar.Add(
                 "Added Subject Successfully",
                 Severity.Success,
@@ -143,4 +192,15 @@ else
             });
     }
 
+    // Code to Populate Multi Select
+
+    private int value { get; set; } = 0;
+    private IEnumerable<int> options { get; set; } = new HashSet<int>();
+
+    private List<Professor> GetProf(int subjectId)
+    {
+        // Assuming clientSubjectService.subjects is a collection of subjects
+        List<Professor> professors = subject.Professors ?? new List<Professor>();
+        return professors;
+    }
 }

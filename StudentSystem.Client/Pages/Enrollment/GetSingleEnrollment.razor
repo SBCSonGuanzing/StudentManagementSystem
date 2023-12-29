@@ -36,9 +36,16 @@
         }
     </MudSelect>
 
-    <MudButton OnClick=" AddSubject" ButtonType="ButtonType.Button" Class="mt-4" Color="Color.Primary" Variant="Variant.Filled">
+    <MudButton 
+        OnClick=" AddSubject"
+        Disabled="(subject.Id != 0 ? false : true)"
+        ButtonType="ButtonType.Button" 
+        Class="mt-4" Color="Color.Primary" 
+        Variant="Variant.Filled"
+    >
         Add Subject
     </MudButton>
+
     <br />
     <div style="border-bottom: 2px solid black; margin-top: 20px; margin-bottom: 20px;"></div>
     <br />
@@ -55,7 +62,7 @@
             <MudTh>Subject Name</MudTh>
         </HeaderContent>
         <RowTemplate Context="subject">
-            <MudTd DataLabel="Subject">@subjectNames[@subject.SubjectId]</MudTd>
+            <MudTd DataLabel="Subject">@clientSubjectService.subjects.First(s => s.Id ==subject.SubjectId).Name</MudTd>
                 <MudTd>
                     <MudButton OnClick="@(() => RemoveSubject(subject.SubjectId))"
                                Icon="@Icons.Material.Filled.Remove"
@@ -66,6 +73,14 @@
                                Variant="Variant.Filled">
                         Remove
                     </MudButton>
+
+                    <MudSelect Label="Profs" @bind-Value="EnrolledSubjectsList.First(s => s.SubjectId ==subject.SubjectId).ProfessorId">
+                        <MudSelectItem Value="0">Select Subject</MudSelectItem>
+                        @foreach (Professor prof in GetProf(subject.SubjectId))
+                            {
+                                <MudSelectItem Value="prof.Id">@prof.FirstName</MudSelectItem>
+                            }
+                    </MudSelect>
                 </MudTd>
             </RowTemplate>
            
@@ -81,7 +96,7 @@
 
 
 
-    @code {
+@code {
 
     [Parameter]
     public int Id { get; set; }
@@ -93,31 +108,45 @@
 
     Subject subject = new Subject();
 
+    Professor professor = new Professor(); 
+
     Student student = new Student();
 
-    private Dictionary<int, string> subjectNames = new Dictionary<int, string>();
-
     List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
+
+    // TODO: Make a List of the Professors  
 
     // Get All Subjects On Initialized
     // Save Subject Name on a Dictionary
 
     protected override async Task OnInitializedAsync()
-    {
+    { 
         await clientSubjectService.GetAllSubjects();
 
-        foreach (var subject in clientSubjectService.subjects)
-        {
-            subjectNames[subject.Id] = subject.Name;
-        }
+        // foreach (var subject in clientSubjectService.subjects)
+        // {
+        //     subjectNames[subject.Id] = subject.Name;
+        // }
+        // foreach (var professor in clientSubjectService.subjects)
+        // {
+        //     professorNames[professor.Id] = professor.Professors;
+        // }
+
     }
-    
+
+    private List<Professor> GetProf(int SubjectId)
+    {
+        List<Professor> data = clientSubjectService.subjects.First(s => s.Id == SubjectId).Professors;
+        return data;
+    }
 
     private void AddSubject()
     {
-        if (!EnrolledSubjectsList.Any(s => s.SubjectId == subject.Id))
+        if (!EnrolledSubjectsList.Any(s => s.SubjectId == subject.Id) && !EnrolledSubjectsList.Any(s => s.ProfessorId == professor.Id))
         {
             enrolledSubjectsDTO.SubjectId = subject.Id;
+            // TODO: Include Professor ID to enrolledSubjectsDTO
+            enrolledSubjectsDTO.ProfessorId = 0;
             EnrolledSubjectsList.Add(enrolledSubjectsDTO);
             enrolledSubjectsDTO = new EnrolledSubjectsDTO();
         }
@@ -136,24 +165,13 @@
     {
         var prodDelete = EnrolledSubjectsList.Find(c => c.SubjectId == id);
 
-        // var selectedProduct = EnrolledSubjectsList
-        //     .FirstOrDefault(product => product.SubjectId == id);
-
-        if (prodDelete != null)
-        {
-            Snackbar.Add($"{subjectNames[prodDelete.SubjectId]} has been removed.", Severity.Error, config =>
-            {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
-            EnrolledSubjectsList.Remove(prodDelete);
-        }
+        EnrolledSubjectsList.Remove(prodDelete);
+        
     }
 
     async Task HandleSubmit()
     {
-        if (Id != null)
+        if (Id != 0)
         {
             enrollmentDTO.StudentId = Id;
         }
@@ -170,7 +188,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id != null)
+        if (Id != 0)
         {
             var result = await clientStudentService.GetSingleStudent((int)Id);
             if (result is not null)

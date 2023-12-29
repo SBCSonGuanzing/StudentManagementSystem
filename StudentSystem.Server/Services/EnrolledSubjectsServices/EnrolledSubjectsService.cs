@@ -38,7 +38,8 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
                 {
                     var enrolled = new EnrolledSubjects
                     {
-                        SubjectId = enrolledSub.SubjectId
+                        SubjectId = enrolledSub.SubjectId,
+                        ProfessorId = enrolledSub.ProfessorId
                     };
 
                     enrollment.EnrolledSubjects.Add(enrolled);
@@ -58,8 +59,9 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
             public async Task<List<EnrolledSubjects>> GetAllEnrolledSubject()
             {
                 var enrolled = await _context.EnrolledSubjects
-                   .Include(p => p.Subject)
-                   .Include(p => p.Enrollment)
+                   .Include(e => e.Subject)
+                        .ThenInclude(subject => subject.Professors)
+                   .Include(e => e.Enrollment)
                    .ToListAsync();
                 return enrolled;
             }

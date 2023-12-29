@@ -1,20 +1,23 @@
 ﻿@page "/all-users"
 
 @using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Client.Services.UserServices
 @using StudentSystem.Shared.DTOs
 @using StudentSystem.Shared.Models
-@inject IClientAuthService ClientAuthService
+@inject IClientAuthService clientAuthService
+@inject IClientUserService clientUserService
 @inject NavigationManager NavigationManager
+@inject ISnackbar snackBar
 
 <PageTitle>Users</PageTitle>
 <h1>Users</h1>
 
-<MudTable Items="ClientAuthService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
+<MudTable Items="clientUserService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Image</MudTh>
         <MudTh>Email</MudTh>
         <MudTh>Role</MudTh>
-
+        <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate Context="userDetails">
         @if (userDetails.Role == "Admin")
@@ -37,6 +40,13 @@
         <MudTd DataLabel="Role">
             @userDetails.Role
         </MudTd>
+        <MudTd>
+            <MudIconButton OnClick="() => DeleteUser(userDetails.Id)"
+                           Icon="@Icons.Material.Filled.Delete"
+                           Color="Color.Error"
+                           Variant="Variant.Filled">
+            </MudIconButton>
+        </MudTd>
     </RowTemplate>
 </MudTable>
 
@@ -49,7 +59,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        userDetails = await ClientAuthService.GetAllUser();
+        userDetails = await clientUserService.GetAllUser();
     }
 
     void RegisterUser()
@@ -57,4 +67,25 @@
         NavigationManager.NavigateTo("/register");
     }
 
+    async void DeleteUser(int id)
+    {
+        await clientUserService.DeleteUser(id);
+        StateHasChanged();
+        snackBar.Add(
+
+            "Deleted User Successfully",
+
+            Severity.Success,
+
+            config =>
+
+            {
+                config.ShowTransitionDuration = 200;
+
+                config.HideTransitionDuration = 400;
+
+                config.VisibleStateDuration = 2500;
+
+            });
+    }
 }

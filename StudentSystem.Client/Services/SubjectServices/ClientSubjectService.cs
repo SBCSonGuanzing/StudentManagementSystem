@@ -2,6 +2,7 @@
 using StudentSystem.Shared.Models;
 using System.Net.Http.Json;
 using System.Net;
+using StudentSystem.Shared.DTOs;
 
 namespace StudentSystem.Client.Services.SubjectServices
 {
@@ -17,7 +18,7 @@ namespace StudentSystem.Client.Services.SubjectServices
 
         public List<Subject> subjects { get; set; } = new List<Subject>();
 
-        public async Task AddSubject(Subject subject)
+        public async Task AddSubject(SubjectDTO subject)
         {
             await _httpClient.PostAsJsonAsync("api/Subject", subject);
             _navigationManager.NavigateTo("/all-subjects");

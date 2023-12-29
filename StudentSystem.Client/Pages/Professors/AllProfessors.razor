@@ -46,11 +46,7 @@
                            Icon="@Icons.Material.Filled.Edit"
                            Color="Color.Primary"
                            Variant="Variant.Filled"></MudIconButton>
-            <MudIconButton OnClick="() => deleteProfessor(professorDetails.Id) "
-                           Icon="@Icons.Material.Filled.Delete"
-                           Color="Color.Error"
-                           Variant="Variant.Filled">
-            </MudIconButton>
+          
         </MudTd>
     </RowTemplate>
 
@@ -78,20 +74,7 @@
         NavigationManager.NavigateTo("/register");
     }
 
-    async void deleteProfessor(int id)
-    {
-        await ClientProfessorService.DeleteProfessor(id);
-        StateHasChanged();
-        Snackbar.Add(
-            "Deleted Professor Successfully",
-            Severity.Success,
-            config =>
-            {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
-    }
+   
 
     void editProfessor(int id) => NavigationManager.NavigateTo($"/professor/{id}");
 }

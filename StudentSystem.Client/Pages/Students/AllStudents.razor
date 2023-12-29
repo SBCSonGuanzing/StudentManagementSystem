@@ -51,11 +51,7 @@
                                Icon="@Icons.Material.Filled.Edit"
                                Color="Color.Primary"
                                Variant="Variant.Filled"></MudIconButton>
-                <MudIconButton OnClick="() => deleteStudent(userDetails.Id) "
-                               Icon="@Icons.Material.Filled.Delete"
-                               Color="Color.Error"
-                               Variant="Variant.Filled">
-                </MudIconButton>
+                
             </MudTd>
         }
         
@@ -80,20 +76,7 @@
         NavigationManager.NavigateTo("/register");
     }
 
-    async void deleteStudent(int id)
-    {
-        await clientStudentService.DeleteStudent(id);
-        StateHasChanged();
-        Snackbar.Add(
-            "Deleted Book Successfully",
-            Severity.Success,
-            config =>
-            {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
-    }
+    
 
     void editStudent(int id) => NavigationManager.NavigateTo($"/student/{id}");
 }

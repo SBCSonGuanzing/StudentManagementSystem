@@ -2,6 +2,7 @@
 @page "/enrollment-details/{id:int}"
 
 @using StudentSystem.Client.Services.EnrolledSubjectsService
+@using StudentSystem.Client.Services.ProfessorServices
 @using StudentSystem.Client.Services.StudentServices
 @using StudentSystem.Client.Services.SubjectServices
 @using StudentSystem.Shared.DTOs
@@ -10,18 +11,28 @@
 @inject IClientSubjectService clientSubjectService
 @inject IClientStudentService clientStudentService
 @inject IClientEnrolledSubjectService clientEnrolledSubjectService
+@inject IClientProfessorService ClientProfessorService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
 
 <h3>Enrollment Details</h3>
 
-<MudTable Items="enrolledSubjects">
+<MudTable Items="EnrolledSubjects">
     <HeaderContent>
         <MudTh>Subject Name</MudTh>
+        <MudTh>Professor Name</MudTh>
+        <MudTh>Date Created</MudTh>
+        <MudTh>Semester</MudTh>
+        <MudTh>School Year</MudTh>
+
     </HeaderContent>
     <RowTemplate Context="context">
         <MudTd>@context.Subject.Name</MudTd>
+        <MudTd>@Professor.FirstName @Professor.LastName</MudTd>
+        <MudTd>@context.Enrollment.DateCreated</MudTd>
+        <MudTd>@context.Enrollment.Semester</MudTd>
+        <MudTd>@context.Enrollment.SchoolYear</MudTd>
     </RowTemplate>
         <NoRecordsContent>
             <MudText>No Subjects found</MudText>
@@ -33,11 +44,15 @@
     [Parameter]
     public int Id { get; set; }
 
-    List<EnrolledSubjects> enrolledSubjects = new List<EnrolledSubjects>();
+    List<EnrolledSubjects> EnrolledSubjects = new List<EnrolledSubjects>();
+    Professor Professor = new Professor();
+    EnrolledSubjects EnrolledSubjectDetails = new EnrolledSubjects();
+
 
     // On Initialized
     protected override async Task OnInitializedAsync()
     {
-        enrolledSubjects = await clientEnrolledSubjectService.GetSingleEnrolledSubjects(Id);
+        EnrolledSubjects = await clientEnrolledSubjectService.GetSingleEnrolledSubjects(Id);
+        Professor = await ClientProfessorService.GetSingleProfessor(Id);
     }
 }

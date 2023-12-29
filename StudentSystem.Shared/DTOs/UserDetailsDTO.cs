@@ -14,5 +14,6 @@ namespace StudentSystem.Shared.DTOs
         public string? Address { get; set; }
         public DateTime? BirthDate { get; set; } = DateTime.Now;
         public string? Image { get; set; } = string.Empty;
+
     }
 }

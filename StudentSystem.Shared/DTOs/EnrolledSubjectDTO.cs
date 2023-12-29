@@ -9,5 +9,6 @@ namespace StudentSystem.Shared.DTOs
     public class EnrolledSubjectsDTO 
     {
         public int SubjectId { get; set; }
+        public int ProfessorId { get; set; }
     } 
 }

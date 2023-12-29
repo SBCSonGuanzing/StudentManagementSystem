@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace StudentSystem.Shared.DTOs
 {
-    public class SubjectDTO
+    public class ProfessorSubjectDTO
     {
-        public string Name { get; set; }
-        public List<int> ProfessorIds { get; set; }
-
+        public Professor Professor { get; set; }
+        public int ProfessorId { get; set; }
     }
 }

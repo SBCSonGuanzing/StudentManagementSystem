@@ -12,6 +12,7 @@ using StudentSystem.Client.Services.EnrolledSubjectsService;
 using StudentSystem.Client.Services.ProfessorServices;
 using StudentSystem.Client.Services.StudentServices;
 using StudentSystem.Client.Services.SubjectServices;
+using StudentSystem.Client.Services.UserServices;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -29,6 +30,7 @@ builder.Services.AddScoped<IClientSubjectService, ClientSubjectService>();
 builder.Services.AddScoped<IClientStudentService, ClientStudentService>();
 builder.Services.AddScoped<IClientEnrolledSubjectService, ClientEnrolledSubjectService>();
 builder.Services.AddScoped<IClientBorrowedBooksService, ClientBorrowedBooksService>();
+builder.Services.AddScoped<IClientUserService, ClientUserService>();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();

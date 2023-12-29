@@ -9,6 +9,7 @@ using StudentSystem.Server.Services.EnrolledSubjectsServices;
 using StudentSystem.Server.Services.ProfessorServices;
 using StudentSystem.Server.Services.StudentServices;
 using StudentSystem.Server.Services.SubjectServices;
+using StudentSystem.Server.Services.UserServices;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -56,6 +57,7 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IEnrolledSubjectsService, EnrolledSubjectsService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IBorrowedBooksService, BorrowedBooksService>();
+builder.Services.AddScoped<IUserService,  UserService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDbContext<DataContext>();   
 

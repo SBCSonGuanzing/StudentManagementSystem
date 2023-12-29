@@ -10,5 +10,7 @@ namespace StudentSystem.Client.Services.AuthServices
         Task<List<User>> GetAllUser();
         Task Register(UserDTO request);
         Task<string> Login(LoginDTO request);
+        Task<string> GetSingleUser();
+
     }
 }

@@ -2,10 +2,15 @@
 @page "/book"
 
 @using StudentSystem.Client.Services.BookServices
+@using StudentSystem.Client.Services.EnrolledSubjectsService
+@using StudentSystem.Client.Services.SubjectServices
 @using StudentSystem.Shared.DTOs
 @using StudentSystem.Shared.Models
 @inject HttpClient Http
 @inject IClientBookService clientBookService
+@inject IClientSubjectService clientSubjectService
+@inject IClientEnrolledSubjectService clientEnrolledSubjectService
+
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
@@ -35,6 +40,8 @@ else {
          
         </MudCardContent>
     </MudCard>
+
+
     <br />
 
     <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mr-2">@(isNew ? "Create Book" : "Update Book")</MudButton>
@@ -59,9 +66,14 @@ else {
 
     public Book book = new Book();
 
-    protected override void OnInitialized()
+        List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
+
+
+    protected override async void OnInitialized()
     {
         btnText = id == null ? "Save New Book" : "Update Book";
+
+        await clientSubjectService.GetAllSubjects();
     }
 
     protected override async Task OnParametersSetAsync()

@@ -49,13 +49,6 @@
     <br />
 
     <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mr-2">Update Student</MudButton>
-
-    <MudButton ButtonType="ButtonType.Button"
-               OnClick="() => DeleteProfessor(professor.Id)"
-               Color="Color.Error"
-               Variant="Variant.Filled">
-        Delete Book
-    </MudButton>
 </EditForm>
 
 @code {
@@ -89,20 +82,7 @@
         });
     }
 
-    async void DeleteProfessor(int id)
-    {
-        await clientProfessorService.DeleteProfessor(id);
-        StateHasChanged();
-        Snackbar.Add(
-                "Deleted Student Successfully",
-                Severity.Success,
-            config =>
-            {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
-    }
+    
 
     async Task OnFileChange(InputFileChangeEventArgs e)
     {

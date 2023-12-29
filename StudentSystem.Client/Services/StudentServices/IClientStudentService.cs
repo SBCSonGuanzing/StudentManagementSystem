@@ -8,7 +8,6 @@ namespace StudentSystem.Client.Services.StudentServices
         List<Student> students { get; set; }
         Task<List<Student>> GetAllStudents();
         Task<Student> GetSingleStudent(int id);
-        Task DeleteStudent(int id);
         Task UpdateStudent(int id, Student student);
     }
 }

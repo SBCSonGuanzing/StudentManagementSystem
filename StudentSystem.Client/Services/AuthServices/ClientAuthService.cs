@@ -28,6 +28,12 @@ namespace StudentSystem.Client.Services.AuthServices
             return result;
         }
 
+        public async Task<string> GetSingleUser()
+        {
+            var result = await _httpClient.GetStringAsync("api/Auth/single-avatar");
+            return result;
+        }
+
         public async Task<string> Login(LoginDTO request)
         {
             var result = await _httpClient.PostAsJsonAsync("api/Auth/login", request);
