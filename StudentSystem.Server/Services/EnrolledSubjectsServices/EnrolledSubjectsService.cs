@@ -72,6 +72,7 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
                 .Include(p=> p.Enrollment)
                     .ThenInclude(p=> p.Student)
                 .Include(p => p.Subject)   
+                    .ThenInclude(p => p.Professors)
                 .Include(p => p.Enrollment)
                 .Where(p => p.Enrollment.StudentId== id)
                 .ToListAsync();

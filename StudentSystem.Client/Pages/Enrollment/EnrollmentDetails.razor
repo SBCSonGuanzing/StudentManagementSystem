@@ -29,7 +29,7 @@
     </HeaderContent>
     <RowTemplate Context="context">
         <MudTd>@context.Subject.Name</MudTd>
-        <MudTd>@Professor.FirstName @Professor.LastName</MudTd>
+        <MudTd>@context.Professor.FirstName @context.Professor.LastName</MudTd>
         <MudTd>@context.Enrollment.DateCreated</MudTd>
         <MudTd>@context.Enrollment.Semester</MudTd>
         <MudTd>@context.Enrollment.SchoolYear</MudTd>
@@ -45,14 +45,10 @@
     public int Id { get; set; }
 
     List<EnrolledSubjects> EnrolledSubjects = new List<EnrolledSubjects>();
-    Professor Professor = new Professor();
-    EnrolledSubjects EnrolledSubjectDetails = new EnrolledSubjects();
 
 
-    // On Initialized
     protected override async Task OnInitializedAsync()
     {
         EnrolledSubjects = await clientEnrolledSubjectService.GetSingleEnrolledSubjects(Id);
-        Professor = await ClientProfessorService.GetSingleProfessor(Id);
     }
 }
