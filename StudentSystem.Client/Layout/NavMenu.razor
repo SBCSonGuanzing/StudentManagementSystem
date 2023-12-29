@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu" style="overflow-x: hidden;">
     <nav class="flex-column">
 
         <AuthorizeView>
@@ -26,38 +26,61 @@
             </Authorized>
         </AuthorizeView>
 
-        <div class="nav-item px-3">
-            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Info">Dashboard</MudNavLink>
-        </div>
-        <div class="nav-item px-3">
-            <MudNavLink Href="/all-subjects" Icon="@Icons.Material.Filled.Subject" IconColor="Color.Info">Subjects</MudNavLink>
-        </div>
-        <div class="nav-item px-3">
-            <MudNavLink Href="/all-books" Icon="@Icons.Material.Filled.Book" IconColor="Color.Info">Books</MudNavLink>
-        </div>
-        <div class="nav-item px-3">
-            <MudNavLink Href="/all-professors" Icon="@Icons.Material.Filled.Person4" IconColor="Color.Info">Professors</MudNavLink>
-        </div>
-        <div class="nav-item px-3">
-            <MudNavLink Href="/all-students" Icon="@Icons.Material.Filled.Person" IconColor="Color.Info">Students</MudNavLink>
-        </div>
-        <div class="nav-item px-3">
-            <MudNavLink Href="/all-users" Icon="@Icons.Material.Filled.People" IconColor="Color.Info">Users</MudNavLink>
-        </div>
-         <div class="nav-item px-3">
-            <MudNavLink Href="/all-enrollment" Icon="@Icons.Material.Outlined.FolderOpen" IconColor="Color.Info">Enrollment</MudNavLink>
-        </div>
-        <div class="nav-item px-3">
-            <MudNavLink Href="/all-library" Icon="@Icons.Material.Outlined.FolderOpen" IconColor="Color.Info">Library</MudNavLink>
-        </div>
+        <MudPaper Width="250px" Class="py-3" Elevation="0">
+            <MudNavMenu>
+             
+                <MudNavLink Href="/" 
+                    Icon="@Icons.Material.Filled.Dashboard" 
+                    IconColor="Color.Info">Dashboard
+                </MudNavLink>
+
+                <MudNavLink Href="/all-subjects" 
+                    Icon="@Icons.Material.Filled.Subject" 
+                    IconColor="Color.Info">Subjects
+                </MudNavLink>
+
+                <MudNavLink Href="/all-books" 
+                    Icon="@Icons.Material.Filled.Book" 
+                    IconColor="Color.Info">Books
+                </MudNavLink>
+
+                <MudNavLink Href="/all-professors" 
+                    Icon="@Icons.Material.Filled.Person4" 
+                    IconColor="Color.Info">Professors
+                </MudNavLink>
+
+                <MudNavLink Href="/all-students" 
+                    Icon="@Icons.Material.Filled.Person" 
+                    IconColor="Color.Info">Students
+                </MudNavLink>
+
+                <MudNavLink Href="/all-users" 
+                    Icon="@Icons.Material.Filled.People" 
+                    IconColor="Color.Info">Users
+                </MudNavLink>
+                
+                <MudNavGroup Title="Enrollment" Expanded="@isSelected"
+                             Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                    IconColor="Color.Info">
+                        <MudNavLink Href="/all-enrollment">Manage Enrollment</MudNavLink>
+                </MudNavGroup>
+
+                <MudNavGroup Title="Library" Expanded="@isSelected"
+                             Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                    IconColor="Color.Info">
+                        <MudNavLink Href="/all-library">Manage Library</MudNavLink>
+                </MudNavGroup>
+
+            </MudNavMenu>
+        </MudPaper>
+
     </nav>
 </div>
 
 @code {
     private string avatar;
-
+    private bool isSelected = false;
     private bool collapseNavMenu = true;
-
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
@@ -70,4 +93,8 @@
         avatar = await clientAuthService.GetSingleUser();
     }
 
+    void ToggleEnrollment()
+    {
+        isSelected = !isSelected;
+    }
 }

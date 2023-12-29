@@ -16,13 +16,13 @@
         <DataAnnotationsValidator />
         <MudCard>
             <MudCardContent>
-                <MudTextField Label="Email" @bind-Value="@user.Email"
+            <MudTextField Label="Email" @bind-Value="@user.Email" Variant="Variant.Outlined"
                               For="@(() => user.Email)">
                 </MudTextField>
-                <MudTextField Label="Password" @bind-Value="@user.Password"
+            <MudTextField Label="Password" @bind-Value="@user.Password" Variant="Variant.Outlined"
                               For="@(() => user.Password)">
                 </MudTextField>
-                <MudSelect Label="Role" @bind-Value="user.Role">
+            <MudSelect Label="Role" @bind-Value="user.Role" Variant="Variant.Outlined">
                     <MudSelectItem Value="@("Admin")" />
                     <MudSelectItem Value="@("Student")" />
                     <MudSelectItem Value="@("Professor")" />
@@ -46,20 +46,20 @@
             @if (user.Role == "Student")
             {
 
-                <MudTextField Label="FirstName" @bind-Value="@user.UserDetails.FirstName"
+                <MudTextField Label="FirstName" @bind-Value="@user.UserDetails.FirstName" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.FirstName)">
                 </MudTextField>
-                <MudTextField Label="LastName" @bind-Value="@user.UserDetails.LastName"
+                <MudTextField Label="LastName" @bind-Value="@user.UserDetails.LastName" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.LastName)">
                 </MudTextField>
-                <MudTextField Label="Contact" @bind-Value="@user.UserDetails.Contact"
+                <MudTextField Label="Contact" @bind-Value="@user.UserDetails.Contact" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.Contact)">
                 </MudTextField>
-                <MudTextField Label="Address" @bind-Value="@user.UserDetails.Address"
+                <MudTextField Label="Address" @bind-Value="@user.UserDetails.Address" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.Address)">
                 </MudTextField>
 
-                <MudDatePicker Label="Birth Date" @bind-Date="user.UserDetails.BirthDate"></MudDatePicker>
+                <MudDatePicker Label="Birth Date" @bind-Date="user.UserDetails.BirthDate" Variant="Variant.Outlined"></MudDatePicker>
                 <MudImage Src="@user.UserDetails.Image" Elevation="25" Class="rounded my-2"></MudImage>
                 <br />
                 <InputFile id="fileInput" OnChange="OnFileChange" hidden />
@@ -75,21 +75,21 @@
             @if (user.Role == "Professor")
             {
 
-                <MudTextField Label="FirstName" @bind-Value="@user.UserDetails.FirstName"
+                <MudTextField Label="FirstName" @bind-Value="@user.UserDetails.FirstName" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.FirstName)">
                 </MudTextField>
-                <MudTextField Label="LastName" @bind-Value="@user.UserDetails.LastName"
+                <MudTextField Label="LastName" @bind-Value="@user.UserDetails.LastName" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.LastName)">
                 </MudTextField>
-                <MudTextField Label="Contact" @bind-Value="@user.UserDetails.Contact"
+                <MudTextField Label="Contact" @bind-Value="@user.UserDetails.Contact" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.Contact)">
                 </MudTextField>
-                <MudTextField Label="Address" @bind-Value="@user.UserDetails.Address"
+                <MudTextField Label="Address" @bind-Value="@user.UserDetails.Address" Variant="Variant.Outlined"
                               For="@(() => user.UserDetails.Address)">
                 </MudTextField>
 
-                <MudDatePicker Label="Birth Date" @bind-Date="user.UserDetails.BirthDate"></MudDatePicker>
-                <MudImage Src="@user.UserDetails.Image" Elevation="25" Class="rounded my-2"></MudImage>
+                <MudDatePicker Label="Birth Date" @bind-Date="user.UserDetails.BirthDate" Variant="Variant.Outlined"></MudDatePicker>
+                <MudImage Src="@user.UserDetails.Image" Elevation="25" Class="rounded my-2" Variant="Variant.Outlined"></MudImage>
                 <br />
                 <InputFile id="fileInput" OnChange="OnFileChange" hidden />
                 <MudButton HtmlTag="label"

@@ -90,23 +90,6 @@ namespace StudentSystem.Server.Services.SubjectServices
             await _context.SaveChangesAsync();
             return await GetAllSubjects();
 
-            //Subject newSubject = new Subject()
-            //{
-            //    Name = request.Name,
-            //    Professors = new List<Professor>()
-            //};
-
-            //foreach (int id in request.ProfessorIds)
-            //{
-            //    // TODO: Query Professor with selectectedProf.Id
-            //    Professor professor = _context.Professors.First(p => p.Id == id);
-
-            //    newSubject.Professors.Add(professor);
-            //}
-
-            //_context.Add(newSubject);
-            //await _context.SaveChangesAsync();
-            //return await GetAllSubjects();
         }
     }
 }

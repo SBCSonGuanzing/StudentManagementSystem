@@ -19,12 +19,12 @@
     <DataAnnotationsValidator/>
         <MudCard>
             <MudCardContent>
-                <MudTextField Label="Email" @bind-Value="@user.Email"
+            <MudTextField Label="Email" @bind-Value="@user.Email" Variant="Variant.Outlined"
                           For="@(() => user.Email)">
                 </MudTextField>
 
-            
-                <MudTextField Label="Password" @bind-Value="@user.Password"
+
+            <MudTextField Label="Password" @bind-Value="@user.Password" Variant="Variant.Outlined"
                                 For="@(() => user.Password)">
                 </MudTextField>
             </MudCardContent>

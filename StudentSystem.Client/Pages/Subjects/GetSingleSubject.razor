@@ -49,7 +49,7 @@ else
 
                     @foreach (Professor professor in Professors)
                     {
-                        <MudSelectItem T="int" Value="@professor.Id">@professor.LastName</MudSelectItem>
+                        <MudSelectItem T="int" Value="@professor.Id"    > @professor.LastName</MudSelectItem>
                     }
                 </MudSelect>
             } 
@@ -165,14 +165,6 @@ else
         else
         {
 
-            // subjects.ProfessorIds = new List<int>();
-            // foreach (int id in options)
-            // {
-
-            //     subjects.ProfessorIds.Add(id);
-            // }
-            // await clientSubjectService.AddSubject(subjects);
-
             subjects.ProfessorIds = new List<int>();
             foreach (int id in options)
             {
@@ -205,6 +197,8 @@ else
                 config.HideTransitionDuration = 400;
                 config.VisibleStateDuration = 2500;
             });
+
+        NavigationManager.NavigateTo("/all-subjects");
     }
 
     // Code to Populate Multi Select
