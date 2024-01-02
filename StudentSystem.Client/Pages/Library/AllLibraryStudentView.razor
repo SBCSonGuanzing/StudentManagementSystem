@@ -57,15 +57,9 @@
 
     Student? student = new Student();
 
-    public string userId;
-    public int studentId;
-
     protected override async Task OnInitializedAsync()
     {
         student = await ClientUserService.GetSingleStudent();
-       @*  studentId = await ClientUserService.GetSingleStudent(int.Parse(userId));
-        student = await ClientStudentService.GetSingleStudent(studentId); *@
-
     }
 
     void AddBorrowedBook(int id)

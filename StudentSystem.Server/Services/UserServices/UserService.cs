@@ -61,14 +61,18 @@ namespace StudentSystem.Server.Services.UserServices
             return student;
         }
 
-        public async Task<int> GetSingleProfessor(int id)
+        public async Task<Professor?> GetSingleProfessor()
         {
-            var professor = await _context.Professors
-                    .Where(p => p.UserId == id)
-                    .Select(p => p.Id)
-                    .FirstOrDefaultAsync();
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if (userId.IsNullOrEmpty()) return null;
 
-            return professor;
+            var Professor = await _context.Users
+                     .Where(p => p.Id.ToString() == userId)
+                     .Select(p => p.Professor)
+                     .FirstOrDefaultAsync();
+            return Professor;
+
         }
 
         public async Task<string> GetUserRole()
@@ -82,18 +86,6 @@ namespace StudentSystem.Server.Services.UserServices
             return users;
         }
 
-        public async Task<Professor?> GetSingleLibrary()
-        {
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId.IsNullOrEmpty()) return null;
-
-            var student = await _context.Users
-                      .Where(p => p.Id.ToString() == userId)
-                      .Select(p => p.Professor)
-                      .FirstOrDefaultAsync();
-
-            return student;
-        }
+       
     }
 }

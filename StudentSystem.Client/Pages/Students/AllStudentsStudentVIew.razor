@@ -15,7 +15,8 @@
 
 @if(student == null)
 {
-    
+    <MudText Typo="Typo.h1">No Valid User</MudText>
+
 }
 else
 {
@@ -68,14 +69,11 @@ else
 
     public Student? student = new Student();
 
-    public string userId;
-    public int studentId;
+  
 
     protected override async Task OnInitializedAsync()
     {
-        userId = await ClientUserService.GetSingleUser();
         student = await ClientUserService.GetSingleStudent();
-@*         student = await ClientStudentService.GetSingleStudent(studentId); *@
     }
 
     void AddSubject(int id)

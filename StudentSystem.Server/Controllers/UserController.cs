@@ -53,14 +53,7 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
-        [HttpGet("professor-id/{id}")]
-        public async Task<ActionResult<int>> GetSingleProfessor(int id)
-        {
-            var result = await _userService.GetSingleProfessor(id);
-            //if (result is null)
-            //    return NotFound("Student not found.");
-            return Ok(result);
-        }
+      
 
         [HttpGet("user-role")]
         public async Task<ActionResult<string>> GetUserRole()

@@ -56,16 +56,7 @@ namespace StudentSystem.Client.Services.UserServices
             return null;
         }
         
-        public async Task<int> GetSingleProfessor(int id)
-        {
-            var result = await _httpClient.GetAsync($"api/User/professor-id/{id}");
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                return await result.Content.ReadFromJsonAsync<int>();
-            }
-            return 0;
-        }
-
+     
         public async Task<string> GetUserRole()
         {
             var result = await _httpClient.GetStringAsync("api/User/user-role");

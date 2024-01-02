@@ -151,13 +151,36 @@ namespace StudentSystem.Server.Services.AuthServices
         public async Task<string> GetSingleUser()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var Role = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
 
-            var users = await _context.Users
+            if(Role == "Admin")
+            {
+                var adminAvatar = await _context.Users
                      .Where(p => p.Id.ToString() == userId)
                       .Select(p => p.Avatar)
                      .FirstOrDefaultAsync();
 
-            return users;
+                return adminAvatar;
+            }
+            if (Role == "Student")
+            {
+                var studentAvatar = await _context.Users
+                    .Where(p => p.Id.ToString() == userId)
+                    .Select(p => p.Student.Image)
+                     .FirstOrDefaultAsync();
+                return studentAvatar;
+            }
+
+            if (Role == "Professor")
+            {
+                var professorAvatar = await _context.Users
+                    .Where(p => p.Id.ToString() == userId)
+                    .Select(p => p.Professor.Image)
+                     .FirstOrDefaultAsync();
+                return professorAvatar;
+            }
+
+            return null;
         }
     }
 }

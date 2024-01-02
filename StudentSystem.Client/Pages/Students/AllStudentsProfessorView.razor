@@ -13,8 +13,6 @@
 
 <h3>Manage Enrollment</h3>
 
-@userId
-@professorId
 
 @* <MudTable Items="new List<Student> { student }" Hover="true" Striped="true" Dense="true" Class="mb-2">
 
@@ -59,19 +57,15 @@
     <p style="height:500px;"></p>
 
     @code
-    {
+{
 
     public Student student = new Student();
 
-    public string userId;
-    public int professorId;
 
     protected override async Task OnInitializedAsync()
     {
-        userId = await ClientUserService.GetSingleUser();
-        professorId = await ClientUserService.GetSingleProfessor(int.Parse(userId));
-@*         student = await ClientStudentService.GetSingleStudent(studentId);
- *@    }
+        
+    }
 
     void AddSubject(int id)
     {
