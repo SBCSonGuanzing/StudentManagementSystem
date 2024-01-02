@@ -31,7 +31,7 @@ namespace StudentSystem.Server.Services.UserServices
 
             var users = await _context.Users
                      .Where(p => p.Id.ToString() == userId)
-                      .Select(p => p.Avatar)
+                      .Select(p => p.Id.ToString())
                      .FirstOrDefaultAsync();
 
             return users;
@@ -44,6 +44,16 @@ namespace StudentSystem.Server.Services.UserServices
                .Include(p => p.Professor)
                .ToListAsync();
             return users;
+        }
+
+        public async Task<int> GetSingleStudent(int id)
+        {
+            var student = await _context.Students
+                      .Where(p => p.UserId == id)
+                      .Select(p => p.Id)
+                      .FirstOrDefaultAsync();
+           
+            return student;
         }
     }
 }

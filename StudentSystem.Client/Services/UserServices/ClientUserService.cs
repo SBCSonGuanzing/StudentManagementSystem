@@ -1,5 +1,6 @@
 ﻿
 using StudentSystem.Shared.Models;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace StudentSystem.Client.Services.UserServices
@@ -37,6 +38,22 @@ namespace StudentSystem.Client.Services.UserServices
                 users = result;
             }
             return result;
+        }
+
+        public async Task<string> GetSingleUser()
+        {
+            var result = await _httpClient.GetStringAsync("api/User/single-avatar");
+            return result;
+        }
+
+        public async Task<int> GetSingleStudent(int id)
+        {
+            var result = await _httpClient.GetAsync($"api/User/{id}");
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return await result.Content.ReadFromJsonAsync<int>();
+            }
+            return 0;
         }
     }
 }

@@ -29,47 +29,97 @@
         <MudPaper Width="250px" Class="py-3" Elevation="0">
             <MudNavMenu>
              
-                <MudNavLink Href="/" 
+                <MudNavLink Href="/dashboard" 
                     Icon="@Icons.Material.Filled.Dashboard" 
                     IconColor="Color.Info">Dashboard
                 </MudNavLink>
 
-                <MudNavLink Href="/all-subjects" 
-                    Icon="@Icons.Material.Filled.Subject" 
-                    IconColor="Color.Info">Subjects
-                </MudNavLink>
+                 <AuthorizeView Roles="Admin">
+                     <Authorized>
+                        <MudNavLink Href="/all-subjects"
+                                    Icon="@Icons.Material.Filled.Subject"
+                                    IconColor="Color.Info">
+                            Subjects
+                        </MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
+       
 
-                <MudNavLink Href="/all-books" 
-                    Icon="@Icons.Material.Filled.Book" 
-                    IconColor="Color.Info">Books
-                </MudNavLink>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MudNavLink Href="/all-books"
+                                    Icon="@Icons.Material.Filled.Book"
+                                    IconColor="Color.Info">
+                            Books
+                        </MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
+             
 
-                <MudNavLink Href="/all-professors" 
-                    Icon="@Icons.Material.Filled.Person4" 
-                    IconColor="Color.Info">Professors
-                </MudNavLink>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MudNavLink Href="/all-professors"
+                                    Icon="@Icons.Material.Filled.Person4"
+                                    IconColor="Color.Info">
+                            Professors
+                        </MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
 
-                <MudNavLink Href="/all-students" 
+                <AuthorizeView Roles="Admin"> 
+                    <Authorized>
+                        <MudNavLink Href="/all-students" 
                     Icon="@Icons.Material.Filled.Person" 
                     IconColor="Color.Info">Students
                 </MudNavLink>
-
-                <MudNavLink Href="/all-users" 
-                    Icon="@Icons.Material.Filled.People" 
-                    IconColor="Color.Info">Users
-                </MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
                 
-                <MudNavGroup Title="Enrollment" Expanded="@isSelected"
-                             Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
-                    IconColor="Color.Info">
-                        <MudNavLink Href="/all-enrollment">Manage Enrollment</MudNavLink>
-                </MudNavGroup>
 
-                <MudNavGroup Title="Library" Expanded="@isSelected"
-                             Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
-                    IconColor="Color.Info">
-                        <MudNavLink Href="/all-library">Manage Library</MudNavLink>
-                </MudNavGroup>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MudNavLink Href="/all-users"
+                                    Icon="@Icons.Material.Filled.People"
+                                    IconColor="Color.Info">
+                            Users
+                        </MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
+               
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MudNavGroup Title="Enrollment"
+                                     Expanded="@isSelected"
+                                     Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                                     IconColor="Color.Info">
+                            <MudNavLink Href="/all-enrollment">Manage Enrollment</MudNavLink>
+                        </MudNavGroup>
+                    </Authorized>
+                </AuthorizeView>
+                
+     
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MudNavGroup Title="Library"
+                                     Expanded="@isSelected"
+                                     Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                                     IconColor="Color.Info">
+                            <MudNavLink Href="/all-library">Manage Library</MudNavLink>
+                        </MudNavGroup>
+                    </Authorized>
+                </AuthorizeView>
+
+                <AuthorizeView Roles="Student">
+                    <Authorized>
+                        <MudNavGroup Title="Enrollment"
+                                     Expanded="@isSelected"
+                                     Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                                     IconColor="Color.Info">
+                            <MudNavLink Href="/all-students-view">Manage Enrollment</MudNavLink>
+                        </MudNavGroup>
+                    </Authorized>
+                </AuthorizeView>
+               
 
             </MudNavMenu>
         </MudPaper>
@@ -91,10 +141,11 @@
     protected override async Task OnInitializedAsync()
     {
         avatar = await clientAuthService.GetSingleUser();
+
     }
 
     void ToggleEnrollment()
-    {
+    {  
         isSelected = !isSelected;
     }
 }

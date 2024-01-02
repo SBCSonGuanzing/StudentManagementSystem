@@ -5,6 +5,8 @@
         Task<string> GetSingleUser();
         Task<List<User>?> DeleteUser(int id);
         Task<List<User>> GetAllUsers();
+        Task<int> GetSingleStudent(int id);
+
 
     }
 }

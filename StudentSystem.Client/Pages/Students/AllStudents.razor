@@ -7,9 +7,9 @@
 @using StudentSystem.Shared.Models
 @inject IClientAuthService ClientAuthService
 @inject IClientStudentService clientStudentService
+
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
-
 
 <PageTitle>Students</PageTitle>
 <h1>Students</h1>
@@ -64,19 +64,23 @@
 
 @code {
 
-
     protected override async Task OnInitializedAsync()
     {
         await clientStudentService.GetAllStudents();
     }
 
-  
     void AddStudent()
     {
         NavigationManager.NavigateTo("/register");
     }
 
-    
-
     void editStudent(int id) => NavigationManager.NavigateTo($"/student/{id}");
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     avatar = await clientAuthService.GetSingleUser();
+
+    // }
+
+   
 }

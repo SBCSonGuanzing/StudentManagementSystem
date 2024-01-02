@@ -19,9 +19,17 @@
             <MudTextField Label="Email" @bind-Value="@user.Email" Variant="Variant.Outlined"
                               For="@(() => user.Email)">
                 </MudTextField>
-            <MudTextField Label="Password" @bind-Value="@user.Password" Variant="Variant.Outlined"
-                              For="@(() => user.Password)">
-                </MudTextField>
+
+            <MudTextField Label="Password" @bind-Value="@user.Password"
+                          Variant="Variant.Outlined"
+                          InputType="@PasswordInput"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@PasswordInputIcon"
+                          OnAdornmentClick="ButtonTestclick"
+                          AdornmentAriaLabel="Show Password"
+                          For="@(() => user.Password)">
+            </MudTextField>
+
             <MudSelect Label="Role" @bind-Value="user.Role" Variant="Variant.Outlined">
                     <MudSelectItem Value="@("Admin")" />
                     <MudSelectItem Value="@("Student")" />
@@ -119,7 +127,7 @@
     private async void HandleRegistration()
     {
         await ClientAuthService.Register(user);
-        NavigationManager.NavigateTo("/home");
+        NavigationManager.NavigateTo("/dashboard");
 
         Snackbar.Add(
             "Registration Successful",
@@ -141,5 +149,27 @@
         var imageData = $"data:{format}; base64, {Convert.ToBase64String(buffer)}";
         user.UserDetails.Image = imageData;
         user.Avatar = imageData;
+    }
+
+    public string Password { get; set; } = "superstrong123";
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
     }
 }

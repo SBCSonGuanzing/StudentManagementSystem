@@ -1,10 +1,12 @@
 ﻿@using StudentSystem.Client.Pages
+@using StudentSystem.Client.Services.AuthServices
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IClientAuthService ClientAuthService
 @inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu/>
     </div>
 
     <main>
@@ -21,3 +23,5 @@
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+
+

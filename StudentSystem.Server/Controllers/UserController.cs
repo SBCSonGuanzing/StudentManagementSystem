@@ -43,5 +43,15 @@ namespace StudentSystem.Server.Controllers
             var result = await _userService.GetAllUsers();
             return Ok(result);
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<int>> GetSingleStudent(int id)
+        {
+            var result = await _userService.GetSingleStudent(id);
+            //if (result is null)
+            //    return NotFound("Student not found.");
+            return Ok(result);
+        }
+
     }
 }
