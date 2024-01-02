@@ -15,7 +15,6 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
-
 <h3>Enrollment Details</h3>
 
 <MudTable Items="EnrolledSubjects">
@@ -45,7 +44,6 @@
     public int Id { get; set; }
 
     List<EnrolledSubjects> EnrolledSubjects = new List<EnrolledSubjects>();
-
 
     protected override async Task OnInitializedAsync()
     {

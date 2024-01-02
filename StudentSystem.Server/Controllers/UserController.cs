@@ -53,5 +53,12 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
+        [HttpGet("user-role")]
+        public async Task<ActionResult<string>> GetUserRole()
+        {
+            var result = await _userService.GetUserRole();
+
+            return Ok(result);
+        }
     }
 }

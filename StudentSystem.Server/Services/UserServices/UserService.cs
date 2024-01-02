@@ -55,5 +55,16 @@ namespace StudentSystem.Server.Services.UserServices
            
             return student;
         }
+
+        public async Task<string> GetUserRole()
+        {
+            var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+            var users = await _context.Users
+                    .Where(p => p.Role == userRole)
+                     .Select(p => p.Role)
+                    .FirstOrDefaultAsync();
+
+            return users;
+        }
     }
 }

@@ -4,16 +4,19 @@
 @using StudentSystem.Client.Services.EnrolledSubjectsService
 @using StudentSystem.Client.Services.StudentServices
 @using StudentSystem.Client.Services.SubjectServices
+@using StudentSystem.Client.Services.UserServices
 @using StudentSystem.Shared.DTOs
 @using StudentSystem.Shared.Models
 
 @inject IClientSubjectService clientSubjectService
 @inject IClientStudentService clientStudentService
+@inject IClientUserService ClientUserService
 @inject IClientEnrolledSubjectService clientEnrolledSubjectService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
 <h3>Enroll Subject</h3>
+@userRole
 
 <EditForm Model="enrollmentDTO" OnSubmit="HandleSubmit">
     <DataAnnotationsValidator />
@@ -111,12 +114,14 @@
     Professor professor = new Professor(); 
 
     Student student = new Student();
+    public string userRole;
 
     List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
 
     protected override async Task OnInitializedAsync()
     { 
         await clientSubjectService.GetAllSubjects();
+        userRole = await ClientUserService.GetUserRole();
 
     }
 

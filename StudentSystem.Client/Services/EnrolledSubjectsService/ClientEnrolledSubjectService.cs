@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using StudentSystem.Client.Services.UserServices;
 using StudentSystem.Shared.DTOs;
 using StudentSystem.Shared.Models;
 using System.Net;
@@ -13,12 +14,14 @@ namespace StudentSystem.Client.Services.EnrolledSubjectsService
         private readonly HttpClient _httpClient;
         private readonly NavigationManager _navigationManager;
         private readonly ISnackbar _snackbar;
+        private readonly IClientUserService _clientUserService;
 
-        public ClientEnrolledSubjectService(HttpClient httpClient, NavigationManager navigationManager, ISnackbar snackbar)
+        public ClientEnrolledSubjectService(HttpClient httpClient, NavigationManager navigationManager, ISnackbar snackbar, IClientUserService ClientUserService)
         {
             _httpClient = httpClient;
             _navigationManager = navigationManager;
             _snackbar = snackbar;
+            _clientUserService = ClientUserService;
         }
 
         public List<EnrolledSubjects> ClientEnrolledSubjects { get; set; } = new List<EnrolledSubjects>();
@@ -27,7 +30,8 @@ namespace StudentSystem.Client.Services.EnrolledSubjectsService
         public async Task<int> AddEnrolledSubject(EnrollmentDTO request)
         {
             HttpResponseMessage? status = await _httpClient.PostAsJsonAsync("api/EnrolledSubjects/add-enrolled-sub", request);
-            _navigationManager.NavigateTo("/all-enrollment");
+
+            var userRole = await _clientUserService.GetUserRole();
 
             if (status.IsSuccessStatusCode)
             {
@@ -41,7 +45,15 @@ namespace StudentSystem.Client.Services.EnrolledSubjectsService
                        config.VisibleStateDuration = 2500;
                    });
 
-                _navigationManager.NavigateTo("/all-enrollment");
+                if(userRole == "Student")
+                {
+                    _navigationManager.NavigateTo("/all-students-view");
+                }
+
+                if(userRole == "Admin")
+                { 
+                    _navigationManager.NavigateTo("/all-enrollment");
+                }
             }
             else
             {

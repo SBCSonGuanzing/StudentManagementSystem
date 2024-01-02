@@ -55,5 +55,11 @@ namespace StudentSystem.Client.Services.UserServices
             }
             return 0;
         }
+
+        public async Task<string> GetUserRole()
+        {
+            var result = await _httpClient.GetStringAsync("api/User/user-role");
+            return result;
+        }
     }
 }

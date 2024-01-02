@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using StudentSystem.Client.Services.UserServices;
 using StudentSystem.Shared.DTOs;
 using StudentSystem.Shared.Models;
 using System.Net.Http.Json;
@@ -12,18 +13,20 @@ namespace StudentSystem.Client.Services.BorrowedBooksServices
         private readonly HttpClient _httpClient;
         private readonly NavigationManager _navigationManager;
         private readonly ISnackbar _snackbar;
+        private readonly IClientUserService _clientUserService;
 
-        public ClientBorrowedBooksService(HttpClient httpClient, NavigationManager navigationManager, ISnackbar snackbar)
+        public ClientBorrowedBooksService(HttpClient httpClient, NavigationManager navigationManager, ISnackbar snackbar, IClientUserService ClientUserService)
         {
             _httpClient = httpClient;
             _navigationManager = navigationManager;
             _snackbar = snackbar;
+            _clientUserService = ClientUserService;
         }
         public List<BorrowedBooks> borrowedBooks { get; set; } = new List<BorrowedBooks>();
 
         public async Task<int> AddBorrowedBook(LibraryDTO request)
         {
-
+            var UserRole = await _clientUserService.GetUserRole();
             HttpResponseMessage? status = await _httpClient.PostAsJsonAsync("api/BorrowedBooks/add-borrowed-book", request);
             if(status.IsSuccessStatusCode)
             {
@@ -37,7 +40,15 @@ namespace StudentSystem.Client.Services.BorrowedBooksServices
                        config.VisibleStateDuration = 2500;
                    });
 
-                _navigationManager.NavigateTo("/all-enrollment");
+                if(UserRole == "Student")
+                {
+                    _navigationManager.NavigateTo("/all-library-student-view");
+                }
+                
+                if(UserRole == "Admin")
+                {
+                    _navigationManager.NavigateTo("/all-enrollment");
+                }
             } else
             {
                 _snackbar.Add(

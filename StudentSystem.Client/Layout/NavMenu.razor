@@ -119,8 +119,17 @@
                         </MudNavGroup>
                     </Authorized>
                 </AuthorizeView>
-               
 
+                <AuthorizeView Roles="Student">
+                    <Authorized>
+                        <MudNavGroup Title="Library"
+                                     Expanded="@isSelected"
+                                     Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                                     IconColor="Color.Info">
+                            <MudNavLink Href="/all-library-student-view">Manage Library</MudNavLink>
+                        </MudNavGroup>
+                    </Authorized>
+                </AuthorizeView>
             </MudNavMenu>
         </MudPaper>
 

@@ -7,6 +7,7 @@
         Task<List<User>> GetAllUsers();
         Task<int> GetSingleStudent(int id);
 
+        Task<string> GetUserRole();
 
     }
 }
