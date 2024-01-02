@@ -10,5 +10,7 @@ namespace StudentSystem.Shared.DTOs
     {
         public int SubjectId { get; set; }
         public int ProfessorId { get; set; }
+
+
     } 
 }

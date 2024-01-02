@@ -53,7 +53,17 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
-      
+
+        [HttpGet("single-professor")]
+        public async Task<ActionResult<Professor>?> GetSingleProfessor()
+        {
+            var result = await _userService.GetProfessorStudents();
+            if (result is null)
+                return NotFound();
+            return Ok(result);
+        }
+
+
 
         [HttpGet("user-role")]
         public async Task<ActionResult<string>> GetUserRole()

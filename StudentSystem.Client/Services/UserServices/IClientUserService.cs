@@ -9,6 +9,7 @@ namespace StudentSystem.Client.Services.UserServices
         Task<List<User>> GetAllUser();
         Task<string> GetSingleUser();
         Task<Student?> GetSingleStudent();
+        Task<Professor?> GetSingleProfessor();
 
         Task<string> GetUserRole();
 

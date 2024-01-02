@@ -61,17 +61,20 @@ namespace StudentSystem.Server.Services.UserServices
             return student;
         }
 
-        public async Task<Professor?> GetSingleProfessor()
+        public async Task<Professor?> GetProfessorStudents()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
             if (userId.IsNullOrEmpty()) return null;
 
-            var Professor = await _context.Users
-                     .Where(p => p.Id.ToString() == userId)
-                     .Select(p => p.Professor)
-                     .FirstOrDefaultAsync();
-            return Professor;
+            var professor = await _context.Professors
+            .Where(p => p.UserId.ToString() == userId)
+            .Include(p => p.EnrolledSubjects)
+                .ThenInclude(es => es.Enrollment)
+                    .ThenInclude(e => e.Student)
+            .FirstOrDefaultAsync();
+
+            return professor;
 
         }
 

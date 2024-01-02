@@ -62,5 +62,17 @@ namespace StudentSystem.Client.Services.UserServices
             var result = await _httpClient.GetStringAsync("api/User/user-role");
             return result;
         }
+
+        public async Task<Professor?> GetSingleProfessor()
+        {
+            var result = await _httpClient.GetAsync($"api/User/single-professor");
+            if (result.IsSuccessStatusCode)
+            {
+                return await result.Content.ReadFromJsonAsync<Professor>();
+            }
+            return null;
+        }
+
+        
     }
 }
