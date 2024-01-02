@@ -55,16 +55,14 @@
 @code
     {
 
-    Student student = new Student();
+    Student? student = new Student();
 
     public string userId;
     public int studentId;
 
     protected override async Task OnInitializedAsync()
     {
-        await ClientStudentService.GetAllStudents();
-
-        userId = await ClientUserService.GetSingleUser();
+        student = await ClientUserService.GetSingleStudent();
        @*  studentId = await ClientUserService.GetSingleStudent(int.Parse(userId));
         student = await ClientStudentService.GetSingleStudent(studentId); *@
 
