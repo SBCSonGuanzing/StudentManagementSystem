@@ -7,6 +7,6 @@ namespace StudentSystem.Server.Services.ProfessorServices
         Task<List<Professor>> UpdateProfessor(int id, UserDetailsDTO request);
         Task<Professor> GetSingleProfessor(int id);
         Task<List<Professor>> GetProfessors();
-
+        //Task<List<Student>> GetStudents(int id);
     }
 }

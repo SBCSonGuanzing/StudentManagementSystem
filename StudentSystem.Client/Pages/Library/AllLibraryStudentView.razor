@@ -8,7 +8,7 @@
 @inject ISnackbar Snackbar
 <PageTitle>Library</PageTitle>
 
-<h3>Library</h3>
+<h3>Manage Library</h3>
 
 <MudTable Items="new List<Student> { student }" Hover="true" Striped="true" Dense="true" Class="mb-2">
    
@@ -65,8 +65,8 @@
         await ClientStudentService.GetAllStudents();
 
         userId = await ClientUserService.GetSingleUser();
-        studentId = await ClientUserService.GetSingleStudent(int.Parse(userId));
-        student = await ClientStudentService.GetSingleStudent(studentId);
+       @*  studentId = await ClientUserService.GetSingleStudent(int.Parse(userId));
+        student = await ClientStudentService.GetSingleStudent(studentId); *@
 
     }
 

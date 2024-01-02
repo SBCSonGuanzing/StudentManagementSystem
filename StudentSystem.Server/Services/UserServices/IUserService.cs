@@ -5,9 +5,11 @@
         Task<string> GetSingleUser();
         Task<List<User>?> DeleteUser(int id);
         Task<List<User>> GetAllUsers();
-        Task<int> GetSingleStudent(int id);
+        Task<Student?> GetSingleStudent();
+        Task<int> GetSingleProfessor(int id);
 
         Task<string> GetUserRole();
 
+        
     }
 }

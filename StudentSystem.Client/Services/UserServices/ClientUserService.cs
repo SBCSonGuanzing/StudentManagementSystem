@@ -46,9 +46,19 @@ namespace StudentSystem.Client.Services.UserServices
             return result;
         }
 
-        public async Task<int> GetSingleStudent(int id)
+        public async Task<Student?> GetSingleStudent()
         {
-            var result = await _httpClient.GetAsync($"api/User/{id}");
+            var result = await _httpClient.GetAsync($"api/User/single-student");
+            if (result.IsSuccessStatusCode)
+            {
+                return await result.Content.ReadFromJsonAsync<Student>();
+            }
+            return null;
+        }
+        
+        public async Task<int> GetSingleProfessor(int id)
+        {
+            var result = await _httpClient.GetAsync($"api/User/professor-id/{id}");
             if (result.StatusCode == HttpStatusCode.OK)
             {
                 return await result.Content.ReadFromJsonAsync<int>();

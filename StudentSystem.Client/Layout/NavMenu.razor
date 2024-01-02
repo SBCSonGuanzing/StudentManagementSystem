@@ -130,6 +130,17 @@
                         </MudNavGroup>
                     </Authorized>
                 </AuthorizeView>
+
+                <AuthorizeView Roles="Professor">
+                    <Authorized>
+                        <MudNavGroup Title="Student"
+                                     Expanded="@isSelected"
+                                     Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                                     IconColor="Color.Info">
+                            <MudNavLink Href="/all-students-professor-view">Manage Students</MudNavLink>
+                        </MudNavGroup>
+                    </Authorized>
+                </AuthorizeView>
             </MudNavMenu>
         </MudPaper>
 

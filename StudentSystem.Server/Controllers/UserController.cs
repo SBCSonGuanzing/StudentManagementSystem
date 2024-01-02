@@ -44,10 +44,19 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<int>> GetSingleStudent(int id)
+        [HttpGet("single-student")]
+        public async Task<ActionResult<Student>?> GetSingleStudent()
         {
-            var result = await _userService.GetSingleStudent(id);
+            var result = await _userService.GetSingleStudent();
+            if (result is null)
+                return NotFound();
+            return Ok(result);
+        }
+
+        [HttpGet("professor-id/{id}")]
+        public async Task<ActionResult<int>> GetSingleProfessor(int id)
+        {
+            var result = await _userService.GetSingleProfessor(id);
             //if (result is null)
             //    return NotFound("Student not found.");
             return Ok(result);

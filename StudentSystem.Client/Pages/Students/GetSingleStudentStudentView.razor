@@ -118,13 +118,13 @@
     public int studentId;
     public string userRole;
 
-    protected override async Task OnInitializedAsync()
-    {
-        userId = await ClientUserService.GetSingleUser();
-        studentId = await ClientUserService.GetSingleStudent(int.Parse(userId));
-        student = await clientStudentService.GetSingleStudent(studentId);
-        userRole = await ClientUserService.GetUserRole();
-    }
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     userId = await ClientUserService.GetSingleUser();
+    //     studentId = await ClientUserService.GetSingleStudent(int.Parse(userId));
+    //     student = await clientStudentService.GetSingleStudent(studentId);
+    //     userRole = await ClientUserService.GetUserRole();
+    // }
 
     async Task HandleSubmit()
     {

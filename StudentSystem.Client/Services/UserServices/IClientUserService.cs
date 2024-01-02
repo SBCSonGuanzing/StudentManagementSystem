@@ -8,7 +8,9 @@ namespace StudentSystem.Client.Services.UserServices
         Task<List<User>> DeleteUser(int id);
         Task<List<User>> GetAllUser();
         Task<string> GetSingleUser();
-        Task<int> GetSingleStudent(int id);
+        Task<Student?> GetSingleStudent();
+        Task<int> GetSingleProfessor(int id);
+
         Task<string> GetUserRole();
 
     }

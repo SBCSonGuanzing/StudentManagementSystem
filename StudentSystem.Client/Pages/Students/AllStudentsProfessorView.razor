@@ -1,4 +1,4 @@
-﻿@page "/all-students-view"
+﻿@page "/all-students-professor-view"
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Client.Services.StudentServices
 @using StudentSystem.Client.Services.UserServices
@@ -13,16 +13,11 @@
 
 <h3>Manage Enrollment</h3>
 
-@if(student == null)
-{
-    
-}
-else
-{
-    
+@userId
+@professorId
 
-<MudTable Items="new List<Student> { student }" Hover="true" Striped="true" Dense="true" Class="mb-2">
-  
+@* <MudTable Items="new List<Student> { student }" Hover="true" Striped="true" Dense="true" Class="mb-2">
+
     <HeaderContent>
         <MudTh>Image</MudTh>
         <MudTh>Name</MudTh>
@@ -59,24 +54,24 @@ else
                 </Authorized>
             </AuthorizeView>
         </RowTemplate>
-    </MudTable>
+    </MudTable> *@
 
     <p style="height:500px;"></p>
-}
+
     @code
     {
 
-    public Student? student = new Student();
+    public Student student = new Student();
 
     public string userId;
-    public int studentId;
+    public int professorId;
 
     protected override async Task OnInitializedAsync()
     {
         userId = await ClientUserService.GetSingleUser();
-        student = await ClientUserService.GetSingleStudent();
-@*         student = await ClientStudentService.GetSingleStudent(studentId); *@
-    }
+        professorId = await ClientUserService.GetSingleProfessor(int.Parse(userId));
+@*         student = await ClientStudentService.GetSingleStudent(studentId);
+ *@    }
 
     void AddSubject(int id)
     {

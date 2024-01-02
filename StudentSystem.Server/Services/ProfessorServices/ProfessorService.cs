@@ -1,6 +1,8 @@
 ﻿
+using StudentSystem.Client.Services.StudentServices;
 using StudentSystem.Server.Data;
 using StudentSystem.Shared.DTOs;
+using StudentSystem.Shared.Models;
 
 namespace StudentSystem.Server.Services.ProfessorServices
 {
@@ -30,6 +32,12 @@ namespace StudentSystem.Server.Services.ProfessorServices
 
             return prof;
         }
+
+        //public async Task<List<Student>> GetStudents(int id)
+        //{
+        //    var students = await _contest.Professors
+        //        .Where
+        //}
 
         public async Task<List<Professor>> UpdateProfessor(int id, UserDetailsDTO request)
         {

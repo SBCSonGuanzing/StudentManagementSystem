@@ -1,4 +1,5 @@
-﻿using StudentSystem.Server.Data;
+﻿using Blazorise.Extensions;
+using StudentSystem.Server.Data;
 using System.Security.Claims;
 
 namespace StudentSystem.Server.Services.UserServices
@@ -46,14 +47,29 @@ namespace StudentSystem.Server.Services.UserServices
             return users;
         }
 
-        public async Task<int> GetSingleStudent(int id)
+        public async Task<Student?> GetSingleStudent()
         {
-            var student = await _context.Students
-                      .Where(p => p.UserId == id)
-                      .Select(p => p.Id)
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if(userId.IsNullOrEmpty()) return null;
+
+            var student = await _context.Users
+                      .Where(p => p.Id.ToString() == userId)
+                      .Include(p => p.Student.Library)
+                      .Select(p => p.Student)
                       .FirstOrDefaultAsync();
-           
+
             return student;
+        }
+
+        public async Task<int> GetSingleProfessor(int id)
+        {
+            var professor = await _context.Professors
+                    .Where(p => p.UserId == id)
+                    .Select(p => p.Id)
+                    .FirstOrDefaultAsync()z
+
+            return professor;
         }
 
         public async Task<string> GetUserRole()
@@ -66,5 +82,8 @@ namespace StudentSystem.Server.Services.UserServices
 
             return users;
         }
+
+        
+      
     }
 }

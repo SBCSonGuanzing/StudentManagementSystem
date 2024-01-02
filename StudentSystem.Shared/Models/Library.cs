@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StudentSystem.Shared.Models
 {
-    public class Library
+    public class BorrowedBooks
     {
         public int Id { get; set; }
         [JsonIgnore]
