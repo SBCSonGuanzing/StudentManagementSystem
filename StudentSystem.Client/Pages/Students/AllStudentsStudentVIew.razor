@@ -16,11 +16,9 @@
 @if(student == null)
 {
     <MudText Typo="Typo.h1">No Valid User</MudText>
-
 }
 else
 {
-    
 
 <MudTable Items="new List<Student> { student }" Hover="true" Striped="true" Dense="true" Class="mb-2">
   
@@ -64,12 +62,10 @@ else
 
     <p style="height:500px;"></p>
 }
-    @code
-    {
+@code
+{
 
     public Student? student = new Student();
-
-  
 
     protected override async Task OnInitializedAsync()
     {

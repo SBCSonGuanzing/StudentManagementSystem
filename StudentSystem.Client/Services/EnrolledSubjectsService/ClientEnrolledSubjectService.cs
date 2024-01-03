@@ -91,5 +91,27 @@ namespace StudentSystem.Client.Services.EnrolledSubjectsService
             }
             return result;
         }
+
+        public async Task<List<EnrolledSubjects>> GetProfessorStudents()
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<EnrolledSubjects>>("api/EnrolledSubjects/professor-students");
+            if (result != null)
+            {
+                ClientEnrolledSubjects = result;
+            }
+            return result;
+
+        }
+
+        public async Task<List<EnrolledSubjects>> GetProfessorStudentsId(int id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<EnrolledSubjects>>($"api/EnrolledSubjects/prof/{id}");
+            if (result != null)
+            {
+                ClientEnrolledSubjects = result;
+            }
+            return result;
+
+        }
     }
 }

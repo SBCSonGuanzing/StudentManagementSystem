@@ -13,7 +13,7 @@ namespace StudentSystem.Shared.DTOs
         public int SubjectId { get; set; }
         public EnrollmentStudentDTO Enrollment { get; set; }
         public int EnrollmentId { get; set; }
-        public Professor Professor { get; set; }
+        public ProfessorDTO Professor { get; set; }
         public int? ProfessorId { get; set; }
     }
 }

@@ -6,8 +6,6 @@
         Task<List<User>?> DeleteUser(int id);
         Task<List<User>> GetAllUsers();
         Task<Student?> GetSingleStudent();
-        Task<Professor?> GetProfessorStudents();
-
         Task<string> GetUserRole();
 
         

@@ -1,4 +1,6 @@
-﻿@page "/all-students-professor-view"
+﻿@page "/view-professor-students"
+@page "/view-professor-students/{id:int}"
+
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Client.Services.EnrolledSubjectsService
 @using StudentSystem.Client.Services.StudentServices
@@ -16,40 +18,41 @@
 
 <h3>Manage Students</h3>
 
-<MudTable Items="professorStudents" Hover="true" Striped="true" Dense="true" Class="mb-2">  
+<MudTable Items="professorStudents" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>
         <MudTh>Avatar</MudTh>
         <MudTh>Name</MudTh>
+        <MudTh>Enrollment Date</MudTh>
         <MudTh>Semester</MudTh>
         <MudTh>School Year</MudTh>
-        <MudTh>Date Enrolled</MudTh>
     </HeaderContent>
     <RowTemplate Context="Student">
-        <MudTd DataLabel="Avatar"><MudAvatar Image="@Student.Enrollment.Student.Image"/></MudTd>
+        <MudTd DataLabel="Avatar">
+            <MudAvatar>
+                <MudImage Src="@Student.Enrollment.Student.Image"></MudImage>
+            </MudAvatar>
+        </MudTd>
+
         <MudTd DataLabel="Name">@Student.Enrollment.Student.FirstName @Student.Enrollment.Student.LastName</MudTd>
-        <MudTd DataLabel="Contact">@Student.Enrollment.Semester</MudTd>
-        <MudTd DataLabel="Address">@Student.Enrollment.SchoolYear</MudTd>
-        <MudTd DataLabel="BirthDate">@Student.Enrollment.DateCreated</MudTd>
+        <MudTd DataLabel="Enrollment Date">@Student.Enrollment.DateCreated</MudTd>
+        <MudTd DataLabel="Address">@Student.Enrollment.Semester</MudTd>
+        <MudTd DataLabel="BirthDate">@Student.Enrollment.SchoolYear</MudTd>
     </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No Students Enrolled Yet</MudText>
+        </NoRecordsContent>
 </MudTable>
 
-<p style="height:500px;"></p>
+    <p style="height:500px;"></p>
 @code
 {
+    [Parameter]
+    public int id { get; set; }
+
     public List<EnrolledSubjects> professorStudents = new List<EnrolledSubjects>();
 
     protected override async Task OnInitializedAsync()
     {
-        professorStudents = await ClientEnrolledSubjectService.GetProfessorStudents();
-    }
-
-    void AddSubject(int id)
-    {
-        NavigationManager.NavigateTo($"single-enrollment/{id}");
-    }
-
-    void ViewDetails(int id)
-    {
-        NavigationManager.NavigateTo($"/enrollment-details/{id}");
+        professorStudents = await ClientEnrolledSubjectService.GetProfessorStudentsId(id);
     }
 }

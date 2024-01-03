@@ -15,8 +15,8 @@ namespace StudentSystem.Shared.DTOs
 
         public string? LastName { get; set; }
 
-        [Required (ErrorMessage = "Phone number is invalid!")]
-        [RegularExpression("^(09|\\+639)\\d{9}$")]
+        //[Required (ErrorMessage = "Phone number is invalid!")]
+        //[RegularExpression("^(09|\\+639)\\d{9}$")]
         public string? Contact { get; set; }
 
         public string? Address { get; set; }

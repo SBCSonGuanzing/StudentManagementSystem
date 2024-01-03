@@ -23,7 +23,7 @@ namespace StudentSystem.Shared.Models
 
         [JsonIgnore]
         public List<Subject> Subjects { get; set; }
-
+        [JsonIgnore]
         public List<EnrolledSubjects>? EnrolledSubjects { get; set; }
 
       

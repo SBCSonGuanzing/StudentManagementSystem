@@ -13,7 +13,7 @@
     async Task Logout()
     {
         bool? result = await DialogService.ShowMessageBox(
-          "Confirmation",
+          "Confirm",
           "Are you sure you want to Log Out?",
           yesText: "Logout", cancelText: "Cancel");
 

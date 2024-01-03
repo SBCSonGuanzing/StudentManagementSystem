@@ -45,6 +45,19 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
 
         }
-        
+
+        [HttpGet("professor-students")]
+        public async Task<ActionResult<List<EnrolledSubjects>>> GetProfessorStudents()
+        {
+            var result = await _enrolledSubjectsService.GetProfessorStudents();
+            return Ok(result);
+        }
+
+        [HttpGet("prof/{id}")]
+        public async Task<ActionResult<List<EnrolledSubjects>>> GetProfessorStudentsId(int id)
+        {
+            var result = await _enrolledSubjectsService.GetProfessorStudentId(id);
+            return Ok(result);
+        }
     }
 }

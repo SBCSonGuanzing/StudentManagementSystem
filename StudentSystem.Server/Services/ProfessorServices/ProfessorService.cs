@@ -33,12 +33,6 @@ namespace StudentSystem.Server.Services.ProfessorServices
             return prof;
         }
 
-        //public async Task<List<Student>> GetStudents(int id)
-        //{
-        //    var students = await _contest.Professors
-        //        .Where
-        //}
-
         public async Task<List<Professor>> UpdateProfessor(int id, UserDetailsDTO request)
         {
             var prof = await _context.Professors

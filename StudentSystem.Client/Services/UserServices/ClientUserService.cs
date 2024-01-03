@@ -15,6 +15,8 @@ namespace StudentSystem.Client.Services.UserServices
         }
         public List<User> users { get; set; } = new List<User>();
 
+        public List<EnrolledSubjects> professorStudents { get; set; } = new List<EnrolledSubjects>();
+
         public async Task<List<User>> DeleteUser(int id)
         {
             HttpResponseMessage? response = await _httpClient.DeleteAsync($"api/User/{id}");
@@ -73,6 +75,6 @@ namespace StudentSystem.Client.Services.UserServices
             return null;
         }
 
-        
+    
     }
 }

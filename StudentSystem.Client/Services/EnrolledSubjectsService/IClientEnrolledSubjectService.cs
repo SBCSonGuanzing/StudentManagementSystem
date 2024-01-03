@@ -9,6 +9,7 @@ namespace StudentSystem.Client.Services.EnrolledSubjectsService
         Task<int> AddEnrolledSubject(EnrollmentDTO request);
         Task<List<EnrolledSubjects>> GetAllEnrolledSubject();
         Task<List<EnrolledSubjects>> GetSingleEnrolledSubjects(int id);
-
+        Task<List<EnrolledSubjects>> GetProfessorStudents();
+        Task<List<EnrolledSubjects>> GetProfessorStudentsId(int id);
     }
 }

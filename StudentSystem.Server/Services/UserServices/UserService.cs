@@ -1,4 +1,5 @@
 ﻿using Blazorise.Extensions;
+using MudBlazor.Extensions;
 using StudentSystem.Server.Data;
 using System.Security.Claims;
 
@@ -61,23 +62,7 @@ namespace StudentSystem.Server.Services.UserServices
             return student;
         }
 
-        public async Task<Professor?> GetProfessorStudents()
-        {
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            if (userId.IsNullOrEmpty()) return null;
-
-            var professor = await _context.Professors
-            .Where(p => p.UserId.ToString() == userId)
-            .Include(p => p.EnrolledSubjects)
-                .ThenInclude(es => es.Enrollment)
-                    .ThenInclude(e => e.Student)
-            .FirstOrDefaultAsync();
-
-            return professor;
-
-        }
-
+        
         public async Task<string> GetUserRole()
         {
             var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;

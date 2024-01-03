@@ -1,5 +1,8 @@
-﻿using StudentSystem.Server.Data;
+﻿using Blazorise.Extensions;
+using StudentSystem.Server.Data;
 using StudentSystem.Shared.DTOs;
+using StudentSystem.Shared.Models;
+using System.Security.Claims;
 
 namespace StudentSystem.Server.Services.EnrolledSubjectsServices
 {
@@ -7,11 +10,13 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
     {
         // Dependency injection
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         // constructor to inject the DataContext again
-        public EnrolledSubjectsService(DataContext context)
+        public EnrolledSubjectsService(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<int> AddEnrolledSubjects(EnrollmentDTO request)
@@ -66,6 +71,34 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
                 return enrolled;
             }
 
+        public async Task<List<EnrolledSubjects>> GetProfessorStudentId(int id)
+        {
+            List<EnrolledSubjects> professorStudents = await _context.EnrolledSubjects
+               .Where(p => p.Professor.UserId == id)
+               .Include(p => p.Enrollment)
+                   .ThenInclude(p => p.Student)
+               .Include(p => p.Subject)
+               .ToListAsync();
+
+            return professorStudents;
+        }
+
+        public async Task<List<EnrolledSubjects>> GetProfessorStudents()
+        {
+            var professorId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (professorId.IsNullOrEmpty()) return null;
+
+            List<EnrolledSubjects> professorStudents = await _context.EnrolledSubjects
+                .Where(p => p.Professor.UserId.ToString() == professorId)
+                .Include(p => p.Enrollment)
+                    .ThenInclude(p => p.Student)
+                .Include(p => p.Subject)
+                .ToListAsync();
+
+            return professorStudents; 
+        }
+
         public async Task<List<EnrolledSubjects>> GetSingleEnrolledSubjects(int id)
         {
             var subject = await _context.EnrolledSubjects
@@ -73,13 +106,14 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
                     .ThenInclude(p=> p.Student)
                 .Include(p => p.Subject)   
                     .ThenInclude(p => p.Professors)
-                .Include(p => p.Enrollment)
-                .Where(p => p.Enrollment.StudentId== id)
+                .Where(p => p.Enrollment.StudentId == id)
                 .ToListAsync();
             if (subject == null)
                 return null;
 
             return subject;
         }
+
+    
     }
 }

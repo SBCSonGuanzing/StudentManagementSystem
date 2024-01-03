@@ -57,7 +57,7 @@ namespace StudentSystem.Server.Controllers
         [HttpGet("single-professor")]
         public async Task<ActionResult<Professor>?> GetSingleProfessor()
         {
-            var result = await _userService.GetProfessorStudents();
+            var result = await _userService.GetSingleStudent();
             if (result is null)
                 return NotFound();
             return Ok(result);
@@ -72,5 +72,8 @@ namespace StudentSystem.Server.Controllers
 
             return Ok(result);
         }
+
+        
+
     }
 }
