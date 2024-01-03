@@ -101,17 +101,47 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
 
         public async Task<List<EnrolledSubjects>> GetSingleEnrolledSubjects(int id)
         {
-            var subject = await _context.EnrolledSubjects
-                .Include(p=> p.Enrollment)
-                    .ThenInclude(p=> p.Student)
-                .Include(p => p.Subject)   
-                    .ThenInclude(p => p.Professors)
-                .Where(p => p.Enrollment.StudentId == id)
-                .ToListAsync();
-            if (subject == null)
-                return null;
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
 
-            return subject;
+            List<EnrolledSubjects> studentsDetails = new List<EnrolledSubjects> ();
+
+            var studentId = await _context.Students
+                .Where(p => p.UserId.ToString() == userId) 
+                .Select(p => p.Id)
+                .FirstOrDefaultAsync(); 
+            
+            var profId = await _context.Professors
+                .Where(p => p.UserId.ToString() == userId) 
+                .Select(p => p.Id)
+                .FirstOrDefaultAsync();
+
+
+            if(role == "Student")
+            {
+
+                studentsDetails = await _context.EnrolledSubjects
+                    .Include(p=> p.Enrollment)
+                        .ThenInclude(p=> p.Student)
+                    .Include(p => p.Subject)   
+                        .ThenInclude(p => p.Professors)
+                    .Where(p => p.Enrollment.StudentId == id && p.Enrollment.StudentId == studentId)
+                    .ToListAsync();
+            } 
+            else if(role == "Professor") 
+            {
+
+                studentsDetails = await _context.EnrolledSubjects
+               .Include(p => p.Enrollment)
+                   .ThenInclude(p => p.Student)
+               .Include(p => p.Subject)
+                   .ThenInclude(p => p.Professors)
+               .Where(p => p.Enrollment.StudentId == id && p.ProfessorId == profId)
+               .ToListAsync();
+            }
+
+
+            return studentsDetails;
         }
 
     
