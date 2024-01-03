@@ -1,15 +1,37 @@
 ﻿@inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService localStorage
+@inject ISnackbar Snackbar
 
 <MudButton ButtonType="ButtonType.Button" Color="Color.Error" Variant="Variant.Filled" OnClick="Logout">Logout</MudButton>
   
 @code {
 
+    [Inject] private IDialogService DialogService { get; set; }
+
+
     async Task Logout()
     {
-        await localStorage.RemoveItemAsync("token");
-        await AuthStateProvider.GetAuthenticationStateAsync();
-        NavigationManager.NavigateTo("/login");
+        bool? result = await DialogService.ShowMessageBox(
+          "Confirmation",
+          "Are you sure you want to Log Out?",
+          yesText: "Logout", cancelText: "Cancel");
+
+        string state = result == true ? "Yes" : "No";
+
+        if(state == "Yes")
+        {
+            await localStorage.RemoveItemAsync("token");
+            await AuthStateProvider.GetAuthenticationStateAsync();
+            NavigationManager.NavigateTo("/login");
+            StateHasChanged();
+
+            Snackbar.Add("Logout Succesfully", Severity.Error, config =>
+           {
+               config.ShowTransitionDuration = 200;
+               config.HideTransitionDuration = 400;
+               config.VisibleStateDuration = 2500;
+           });
+        }
     }
 }

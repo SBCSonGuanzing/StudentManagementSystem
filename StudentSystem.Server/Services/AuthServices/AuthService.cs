@@ -73,12 +73,12 @@ namespace StudentSystem.Server.Services.AuthServices
             {
                 Student student_details = new Student
                 {
-                    FirstName = request.UserDetails.FirstName,
-                    LastName = request.UserDetails.LastName,
-                    Contact = request.UserDetails.Contact,
-                    Address = request.UserDetails.Address,
-                    BirthDate = request.UserDetails.BirthDate,
-                    Image = request.UserDetails.Image,
+                    FirstName = request.UserDetails?.FirstName,
+                    LastName = request.UserDetails?.LastName,
+                    Contact = request.UserDetails?.Contact,
+                    Address = request.UserDetails?.Address,
+                    BirthDate = request.UserDetails?.BirthDate,
+                    Image = request.UserDetails?.Image,
                     User = new_user,
                     UserId = new_user.Id
                 };
@@ -88,12 +88,12 @@ namespace StudentSystem.Server.Services.AuthServices
             {
                 Professor professor_details = new Professor
                 {
-                    FirstName = request.UserDetails.FirstName,
-                    LastName = request.UserDetails.LastName,
-                    Contact = request.UserDetails.Contact,
-                    Address = request.UserDetails.Address,
-                    BirthDate = request.UserDetails.BirthDate,
-                    Image = request.UserDetails.Image,
+                    FirstName = request.UserDetails?.FirstName,
+                    LastName = request.UserDetails?.LastName,
+                    Contact = request.UserDetails?.Contact,
+                    Address = request.UserDetails?.Address,
+                    BirthDate = request.UserDetails?.BirthDate,
+                    Image = request.UserDetails?.Image,
                     User = new_user,
                     UserId = new_user.Id
                 };

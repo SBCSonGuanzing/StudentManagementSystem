@@ -9,16 +9,15 @@ namespace StudentSystem.Shared.DTOs
 {
     public class UserDetailsDTO
     {
-        [Required(ErrorMessage = "FirstName is required.")]
+
 
         public string? FirstName { get; set; }
-        [Required(ErrorMessage = "LastName is required.")]
 
         public string? LastName { get; set; }
-        [Required(ErrorMessage = "Contact is required.")]
 
+        [Required (ErrorMessage = "Phone number is invalid!")]
+        [RegularExpression("^(09|\\+639)\\d{9}$")]
         public string? Contact { get; set; }
-        [Required(ErrorMessage = "Address is required.")]
 
         public string? Address { get; set; }
 
