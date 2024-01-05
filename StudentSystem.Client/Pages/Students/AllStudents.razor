@@ -3,8 +3,6 @@
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Client.Services.StudentServices
 
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
 @inject IClientAuthService ClientAuthService
 @inject IClientStudentService clientStudentService
 
@@ -12,7 +10,7 @@
 @inject ISnackbar Snackbar
 
 <PageTitle>Students</PageTitle>
-<h1>Students</h1>
+<MudText Typo="Typo.h4">Students</MudText>
 <br />
 
 

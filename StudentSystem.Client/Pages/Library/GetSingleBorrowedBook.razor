@@ -4,8 +4,7 @@
 @using StudentSystem.Client.Services.BorrowedBooksServices
 @using StudentSystem.Client.Services.StudentServices
 @using StudentSystem.Client.Services.BookServices
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
+
 
 @inject IClientBookService clientBookService
 @inject IClientStudentService clientStudentService
@@ -134,9 +133,6 @@
     private void RemoveBook(int id)
     {
         var prodDelete = BorrowedBooksList.Find(c => c.BookId == id);
-
-        // var selectedProduct = EnrolledSubjectsList
-        //     .FirstOrDefault(product => product.SubjectId == id);
 
         if (prodDelete != null)
         {

@@ -1,12 +1,11 @@
 ﻿@page "/all-library"
 @using StudentSystem.Client.Services.StudentServices
-@using StudentSystem.Shared.Models
 @inject IClientStudentService clientStudentService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 <PageTitle>Library</PageTitle>
 
-<h3>Library</h3>
+<MudText Typo="Typo.h4">Library</MudText>
 
 <MudTable Items="clientStudentService.students" Hover="true" Striped="true" Dense="true" Class="mb-2" Filter="new Func<Student,bool>(FilterFunc1)">
     <ToolBarContent>

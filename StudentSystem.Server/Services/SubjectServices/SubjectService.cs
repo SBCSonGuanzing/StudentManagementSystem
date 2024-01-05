@@ -1,17 +1,22 @@
 ﻿using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using StudentSystem.Server.Data;
+using StudentSystem.Server.Services.BorrowedBooksServices;
 using StudentSystem.Shared.DTOs;
 using StudentSystem.Shared.Models;
+
 
 namespace StudentSystem.Server.Services.SubjectServices
 {
     public class SubjectService : ISubjectService
     {
         private readonly DataContext _context;
-        public SubjectService(DataContext context)
+        private readonly IBorrowedBooksService _borrowedBooksService;
+
+        public SubjectService(DataContext context, IBorrowedBooksService borrowedBooksService)
         {
             _context = context;
+            _borrowedBooksService = borrowedBooksService;
         }
         public async Task<List<Subject>> AddSubject(SubjectDTO request)
         {
@@ -21,14 +26,26 @@ namespace StudentSystem.Server.Services.SubjectServices
                 Professors = new List<Professor>()
             };
 
-            foreach (int id in request.ProfessorIds)
+            var subjectExisting = await _context.Subjects
+                   .Where(subject => subject.Name == request.Name)
+                   .Select(b => b.Name)
+                   .FirstOrDefaultAsync();
+
+            if(subjectExisting != request.Name)
             {
-                // TODO: Query Professor with selectectedProf.Id
-                Professor professor = _context.Professors.First(p => p.Id == id);        
+                foreach (int id in request.ProfessorIds)
+                {
+                    // TODO: Query Professor with selectectedProf.Id
+                    Professor professor = _context.Professors.First(p => p.Id == id);
 
-                newSubject.Professors.Add(professor);
+                    newSubject.Professors.Add(professor);
+                }
+            } 
+            else
+            {
+                return null;
             }
-
+           
             _context.Add(newSubject);
             await _context.SaveChangesAsync();
             return await GetAllSubjects();

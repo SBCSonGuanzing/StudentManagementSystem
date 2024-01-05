@@ -4,24 +4,32 @@
 @inject IClientAuthService ClientAuthService
 @inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
 
-    <main>
-        <div class="top-row px-4">
-            <LoginLogoutButton/>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudSpacer />
+        <LoginLogoutButton />
+    </MudAppBar>
+    <MudDrawer @bind-Open="@open" Elevation="1">
+        <MudDrawerHeader>
+            <NavMenu/>
+        </MudDrawerHeader>
+    </MudDrawer>
+    <MudMainContent Class="pt-16 px-16 mt-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
 
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
+@code {
+    bool open = false;
 
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+}

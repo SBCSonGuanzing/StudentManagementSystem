@@ -3,8 +3,7 @@
 
 @using StudentSystem.Client.Services.ProfessorServices
 @using StudentSystem.Client.Services.SubjectServices
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
+
 @inject HttpClient Http
 @inject IClientSubjectService clientSubjectService
 @inject IClientProfessorService ClientProfessorService
@@ -32,42 +31,23 @@ else
 
     <MudCard>
         <MudCardContent>
-
-
             <MudTextField Label="Name" @bind-Value="@subjects.Name"
                           For="@(() => subjects.Name)">
             </MudTextField>
 
             @* MudMultiSelect *@
+            
+            <MudSelect T="Professor"
+                        Label="Professors"
+                        MultiSelection="true"
+                        @bind-SelectedValues="options"
+                        ToStringFunc="@((Professor professor) => professor.LastName)">
 
-            @if(id == 0)
-            {
-                <MudSelect T="int"
-                           Label="Professors"
-                           MultiSelection="true"
-                           @bind-SelectedValues="options">
-
-                    @foreach (Professor professor in Professors)
-                    {
-                        <MudSelectItem T="int" Value="@professor.Id"    > @professor.LastName</MudSelectItem>
-                    }
-                </MudSelect>
-            } 
-            else
-            {
-                <MudSelect T="int"
-                           Label="Professors"
-                           MultiSelection="true"
-                           @bind-SelectedValues="options">
-
-                    @foreach (Professor professor in Professors)
-                    {
-                        <MudSelectItem T="int" Value="@professor.Id">@professor.LastName</MudSelectItem>
-                    }
-                </MudSelect>
-
-            }
-
+                @foreach (Professor professor in Professors)
+                {
+                    <MudSelectItem T="Professor" Value="@professor"> @professor.LastName</MudSelectItem>
+                }
+            </MudSelect>          
         </MudCardContent>
     </MudCard>
     <br />
@@ -91,10 +71,10 @@ else
     bool isNew = true;
     public SubjectDTO subjects = new SubjectDTO();
     public Subject subject = new Subject();
-
     public List<Professor> Professors = new List<Professor>();
-
     List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
+
+    public string result;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -129,30 +109,25 @@ else
     {
         if (id == 0)
         {
-            if(options != null)
+            if (options != null && options.Any())
             {
-                subjects.ProfessorIds = new List<int>();
-                foreach(int id in options)
-                {
-
-                    subjects.ProfessorIds.Add(id);
-                }
+                subjects.ProfessorIds = options.Select(professor => professor.Id).ToList();
                 await clientSubjectService.AddSubject(subjects);
                 Snackbar.Add(
-                "Added Subject Successfully",
-                Severity.Success,
-                config =>
-                {
-                    config.ShowTransitionDuration = 200;
-                    config.HideTransitionDuration = 400;
-                    config.VisibleStateDuration = 2500;
-                });
-            } 
+                    "Added Subject Successfully",
+                    Severity.Success,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+            }
             else
             {
                 Snackbar.Add(
                    "No Subject Added",
-                   Severity.Error, // Change Severity to Error for no subject added
+                   Severity.Warning, 
                    config =>
                    {
                        config.ShowTransitionDuration = 200;
@@ -164,23 +139,20 @@ else
         }
         else
         {
-
-            subjects.ProfessorIds = new List<int>();
-            foreach (int id in options)
+            if (options != null && options.Any())
             {
-                subjects.ProfessorIds.Add(id);
+                subjects.ProfessorIds = options.Select(professor => professor.Id).ToList();
+                await clientSubjectService.UpdateSubject((int)id, subjects);
+                Snackbar.Add(
+                    "Update Subject Successfully",
+                    Severity.Success,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
             }
-
-            await clientSubjectService.UpdateSubject((int)id, subjects);
-            Snackbar.Add(
-                "Update Subject Successfully",
-                Severity.Success,
-            config =>
-            {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
         }
     }
 
@@ -204,12 +176,12 @@ else
     // Code to Populate Multi Select
 
     private int value { get; set; } = 0;
-    private IEnumerable<int> options { get; set; } = new HashSet<int>();
+    private IEnumerable<Professor> options { get; set; } = new HashSet<Professor>();
 
-    private List<Professor> GetProf(int subjectId)
-    {
-        // Assuming clientSubjectService.subjects is a collection of subjects
-        List<Professor> professors = subject.Professors ?? new List<Professor>();
-        return professors;
-    }
+    // private List<Professor> GetProf(int subjectId)
+    // {
+    //     // Assuming clientSubjectService.subjects is a collection of subjects
+    //     List<Professor> professors = subject.Professors ?? new List<Professor>();
+    //     return professors;
+    // }
 }

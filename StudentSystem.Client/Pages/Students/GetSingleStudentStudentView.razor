@@ -3,8 +3,6 @@
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Client.Services.StudentServices
 @using StudentSystem.Client.Services.UserServices
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
 
 @inject HttpClient Http
 @inject IClientStudentService clientStudentService
@@ -57,51 +55,6 @@
     <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mr-2">Update Student</MudButton>
 
 </EditForm>
-
-
-@* <MudTable Items="clientStudentService.students" Hover="true" Striped="true" Dense="true" Class="mb-2">
-    <HeaderContent>
-        <MudTh>Image</MudTh>
-        <MudTh>First Name</MudTh>
-        <MudTh>Last Name</MudTh>
-        <MudTh>Contact</MudTh>
-        <MudTh>Address</MudTh>
-        <MudTh>Birth Date</MudTh>
-        <MudTh>Actions</MudTh>
-    </HeaderContent>
-    <RowTemplate Context="userDetails">
-        @if (userDetails != null)
-        {
-
-            <MudTd DataLabel="Image"><MudAvatar Image="@userDetails.Image"></MudAvatar></MudTd>
-            <MudTd DataLabel="FirstName">
-                @userDetails.FirstName
-            </MudTd>
-            <MudTd DataLabel="LastName">
-                @userDetails.LastName
-            </MudTd>
-            <MudTd DataLabel="Contact">
-                @userDetails.Contact
-            </MudTd>
-            <MudTd DataLabel="Address">
-                @userDetails.Address
-            </MudTd>
-            <MudTd DataLabel="Birth Date">
-                @userDetails.BirthDate
-            </MudTd>
-            @* <MudTd>
-                <MudIconButton OnClick="() => editStudent(userDetails.Id)"
-                               Icon="@Icons.Material.Filled.Edit"
-                               Color="Color.Primary"
-                               Variant="Variant.Filled"></MudIconButton>
-
-            </MudTd> *@
-        }
-
-   @*  </RowTemplate>
-
-</MudTable> *@
- 
 
 
 @code {

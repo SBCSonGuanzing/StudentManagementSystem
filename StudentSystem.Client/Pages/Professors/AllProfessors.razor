@@ -1,14 +1,13 @@
 ﻿@page "/all-professors"
 
 @using StudentSystem.Client.Services.ProfessorServices
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
+
 @inject IClientProfessorService ClientProfessorService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
 <PageTitle>Professors</PageTitle>
-<h1>Professors</h1>
+<MudText Typo="Typo.h4">Professors</MudText>
 <br />
 
 

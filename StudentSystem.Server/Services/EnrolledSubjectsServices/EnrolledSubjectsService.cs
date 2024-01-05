@@ -116,21 +116,18 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
                 .Select(p => p.Id)
                 .FirstOrDefaultAsync();
 
-
             if(role == "Student")
             {
-
                 studentsDetails = await _context.EnrolledSubjects
                     .Include(p=> p.Enrollment)
                         .ThenInclude(p=> p.Student)
-                    .Include(p => p.Subject)   
-                        .ThenInclude(p => p.Professors)
+                    .Include(p => p.Professor)   
+                    .Include(p => p.Subject)
                     .Where(p => p.Enrollment.StudentId == id && p.Enrollment.StudentId == studentId)
                     .ToListAsync();
             } 
             else if(role == "Professor") 
             {
-
                 studentsDetails = await _context.EnrolledSubjects
                .Include(p => p.Enrollment)
                    .ThenInclude(p => p.Student)
@@ -140,6 +137,16 @@ namespace StudentSystem.Server.Services.EnrolledSubjectsServices
                .ToListAsync();
             }
 
+            else if(role == "Admin")
+            {
+                studentsDetails = await _context.EnrolledSubjects
+                .Include(p => p.Enrollment)
+                .ThenInclude(p => p.Student)
+                .Include(p => p.Professor)
+                .Include(p => p.Subject)
+                .Where(p => p.Enrollment.StudentId == id)
+                .ToListAsync();
+            }
 
             return studentsDetails;
         }

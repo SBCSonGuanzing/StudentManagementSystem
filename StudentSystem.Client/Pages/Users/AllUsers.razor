@@ -2,15 +2,14 @@
 
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Client.Services.UserServices
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
+
 @inject IClientAuthService clientAuthService
 @inject IClientUserService clientUserService
 @inject NavigationManager NavigationManager
 @inject ISnackbar snackBar
 
 <PageTitle>Users</PageTitle>
-<h1>Users</h1>
+<MudText Typo="Typo.h4">Users</MudText>
 
 <MudTable Items="clientUserService.users" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>

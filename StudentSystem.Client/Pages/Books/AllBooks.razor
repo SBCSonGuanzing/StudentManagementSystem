@@ -2,14 +2,13 @@
 
 @using StudentSystem.Client.Services.AuthServices
 @using StudentSystem.Client.Services.BookServices
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
+
 @inject IClientBookService ClientBookService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
 <PageTitle>Books</PageTitle>
-<h1>Books</h1>
+<MudText Typo="Typo.h4">Books</MudText>
 
 <MudTable Items="ClientBookService.books" Hover="true" Striped="true" Dense="true" Class="mb-2">
     <HeaderContent>

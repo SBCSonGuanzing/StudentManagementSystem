@@ -5,8 +5,7 @@
 @using StudentSystem.Client.Services.EnrolledSubjectsService
 @using StudentSystem.Client.Services.StudentServices
 @using StudentSystem.Client.Services.UserServices
-@using StudentSystem.Shared.DTOs
-@using StudentSystem.Shared.Models
+
 
 @inject IClientStudentService ClientStudentService
 @inject IClientEnrolledSubjectService ClientEnrolledSubjectService
@@ -22,6 +21,7 @@
     <HeaderContent>
         <MudTh>Avatar</MudTh>
         <MudTh>Name</MudTh>
+        <MudTh>Subject</MudTh>
         <MudTh>Enrollment Date</MudTh>
         <MudTh>Semester</MudTh>
         <MudTh>School Year</MudTh>
@@ -34,6 +34,7 @@
         </MudTd>
 
         <MudTd DataLabel="Name">@Student.Enrollment.Student.FirstName @Student.Enrollment.Student.LastName</MudTd>
+        <MudTd Class="Subject">@Student.Subject.Name</MudTd>
         <MudTd DataLabel="Enrollment Date">@Student.Enrollment.DateCreated</MudTd>
         <MudTd DataLabel="Address">@Student.Enrollment.Semester</MudTd>
         <MudTd DataLabel="BirthDate">@Student.Enrollment.SchoolYear</MudTd>
