@@ -6,7 +6,7 @@ namespace StudentSystem.Server.Services.BookServices
     {
         Task<List<Book>> GetAllBooks();
         Task<Book> GetSingleBook(int id);
-        Task<List<Book>> AddBook(BookDTO book);
+        Task<int> AddBook(BookDTO book);
         Task<List<Book>> DeleteBook(int id);
         Task<List<Book>> UpdateBook(int id, BookDTO book);
     }

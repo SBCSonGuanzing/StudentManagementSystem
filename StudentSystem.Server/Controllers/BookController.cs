@@ -17,11 +17,27 @@ namespace StudentSystem.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Book>> AddBook(BookDTO book)
+        public async Task<ActionResult<int>> AddBook(BookDTO book)
         {
             var result =  await _bookService.AddBook(book);
-            return Ok(result);
+            if (result == 0)
+            {
+                return BadRequest(result);
+            } else
+            {
+                return Ok(result);
+            }   
         }
+
+        //[HttpPost]
+        //public async Task<ActionResult<int>> AddSubject(SubjectDTO subject)
+        //{
+        //    var result = await _subjectService.AddSubject(subject);
+
+        //    if (result == 0) return BadRequest(result);
+        //    return Ok(result);
+        //}
+
 
         [HttpGet]
 

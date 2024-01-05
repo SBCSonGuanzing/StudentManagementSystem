@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Blazorise.Extensions;
 using Microsoft.EntityFrameworkCore;
 using StudentSystem.Server.Data;
 using StudentSystem.Shared.DTOs;
@@ -12,18 +13,33 @@ namespace StudentSystem.Server.Services.BookServices
         {
             _context = context;
         }
-        public async Task<List<Book>> AddBook(BookDTO book)
+        public async Task<int> AddBook(BookDTO book)
         {
-            var newBook = new Book()
+            Book newBook = new Book()
             {
                 Name = book.Name,
             
             };
 
-            _context.Add(newBook);
+            var isAlreadyExistingBook = await _context.Books
+                .Where(book => book.Name == newBook.Name)
+                .Select(book => book.Name)
+                .FirstOrDefaultAsync();
+
+            if(isAlreadyExistingBook != book.Name)
+            {
+                _context.Add(newBook);
+            }
+            else
+            {
+                return 0;
+            }
+
             await _context.SaveChangesAsync();
-            return await GetAllBooks();
+            return newBook.Id;
         }
+
+
 
         public async Task<List<Book>> DeleteBook(int id)
         {

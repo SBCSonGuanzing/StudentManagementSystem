@@ -4,6 +4,8 @@ using System.Net.Http.Json;
 using System.Net.Http;
 using System.Net;
 using StudentSystem.Shared.DTOs;
+using MudBlazor;
+using Blazorise.Snackbar;
 
 namespace StudentSystem.Client.Services.BookServices
 {
@@ -11,19 +13,51 @@ namespace StudentSystem.Client.Services.BookServices
     {
         private readonly HttpClient _httpClient;
         private readonly NavigationManager _navigationManager;
-        public ClientBookService(HttpClient httpClient, NavigationManager navigationManager)
+        private readonly ISnackbar _snackbar;
+
+        public ClientBookService(HttpClient httpClient, NavigationManager navigationManager, ISnackbar snackbar)
         {
             _httpClient = httpClient;
             _navigationManager = navigationManager;
+            _snackbar = snackbar;
         }
 
         public List<Book> books { get; set; } = new List<Book>();
 
-        public async Task AddBook(Book book)
+        public async Task<int> AddBook(BookDTO book)
         {
-            await _httpClient.PostAsJsonAsync("api/Book", book);
-            _navigationManager.NavigateTo("/all-books");
+            HttpResponseMessage? status = await _httpClient.PostAsJsonAsync("api/Book", book);
+
+            if(status.IsSuccessStatusCode) 
+            {
+
+                _snackbar.Add(
+                         "Successfully Added Book",
+                         Severity.Success,
+                         config =>
+                         {
+                             config.ShowTransitionDuration = 200;
+                             config.HideTransitionDuration = 400;
+                             config.VisibleStateDuration = 2500;
+                         });
+                _navigationManager.NavigateTo("/all-books");
+            } else
+            {
+                _snackbar.Add(
+                   "Already Existing Book",
+                   Severity.Warning,
+                   config =>
+                   {
+                       config.ShowTransitionDuration = 200;
+                       config.HideTransitionDuration = 400;
+                       config.VisibleStateDuration = 2500;
+                   });
+                return 0;
+            }
+            return 0;
+
         }
+
 
         public async Task<List<Book>> DeleteBook(int id)
         {
@@ -61,7 +95,7 @@ namespace StudentSystem.Client.Services.BookServices
             return null;
         }
 
-        public async Task UpdateBook(int id, Book book)
+        public async Task UpdateBook(int id, BookDTO book)
         {
             await _httpClient.PutAsJsonAsync($"api/Book/update-book/{id}", book);
             _navigationManager.NavigateTo("/all-books");

@@ -8,7 +8,7 @@ namespace StudentSystem.Client.Services.SubjectServices
         List<Subject> subjects { get; set; }
         Task<List<Subject>> GetAllSubjects();
         Task<Subject> GetSingleSubject(int id);
-        Task AddSubject(SubjectDTO subject);
+        Task<int> AddSubject(SubjectDTO subject);
         Task UpdateSubject(int id, SubjectDTO subject);
         Task<List<Subject>> DeleteSubject(int id);
     }

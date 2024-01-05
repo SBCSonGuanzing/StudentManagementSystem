@@ -8,8 +8,8 @@ namespace StudentSystem.Client.Services.BookServices
         List<Book> books { get; set; }
         Task<List<Book>> GetAllBooks();
         Task<Book> GetSingleBook(int id);
-        Task AddBook(Book book);
-        Task UpdateBook(int id, Book book);
+        Task<int> AddBook(BookDTO book);
+        Task UpdateBook(int id, BookDTO book);
         Task<List<Book>> DeleteBook(int id);
 
     }

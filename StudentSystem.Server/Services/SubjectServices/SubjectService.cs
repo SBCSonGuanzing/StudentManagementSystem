@@ -18,7 +18,7 @@ namespace StudentSystem.Server.Services.SubjectServices
             _context = context;
             _borrowedBooksService = borrowedBooksService;
         }
-        public async Task<List<Subject>> AddSubject(SubjectDTO request)
+        public async Task<int> AddSubject(SubjectDTO request)
         {
             Subject newSubject = new Subject()
             {
@@ -37,18 +37,17 @@ namespace StudentSystem.Server.Services.SubjectServices
                 {
                     // TODO: Query Professor with selectectedProf.Id
                     Professor professor = _context.Professors.First(p => p.Id == id);
-
                     newSubject.Professors.Add(professor);
                 }
             } 
             else
             {
-                return null;
+                return 0;
             }
            
             _context.Add(newSubject);
             await _context.SaveChangesAsync();
-            return await GetAllSubjects();
+            return newSubject.Id;
         }
 
         public async Task<List<Subject>> DeleteSubject(int id)

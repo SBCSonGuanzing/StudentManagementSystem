@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using StudentSystem.Server.Services.BookServices;
 using StudentSystem.Server.Services.SubjectServices;
@@ -18,12 +20,16 @@ namespace StudentSystem.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Subject>> AddSubject(SubjectDTO subject)
+        public async Task<ActionResult<int>> AddSubject(SubjectDTO subject)
         {
             var result = await _subjectService.AddSubject(subject);
+
+            if(result == 0) return BadRequest(result);
             return Ok(result);
         }
 
+
+        
         [HttpGet]
 
         public async Task<ActionResult<List<Subject>>> GetAllSubjects()

@@ -3,6 +3,8 @@ using StudentSystem.Shared.Models;
 using System.Net.Http.Json;
 using System.Net;
 using StudentSystem.Shared.DTOs;
+using MudBlazor;
+using Blazorise.Snackbar;
 
 namespace StudentSystem.Client.Services.SubjectServices
 {
@@ -10,18 +12,52 @@ namespace StudentSystem.Client.Services.SubjectServices
     {
         private readonly HttpClient _httpClient;
         private readonly NavigationManager _navigationManager;
-        public ClientSubjectService(HttpClient httpClient, NavigationManager navigationManager)
+        private readonly ISnackbar _snackbar;
+
+        public ClientSubjectService(HttpClient httpClient, NavigationManager navigationManager, ISnackbar snackbar)
         {
             _httpClient = httpClient;
             _navigationManager = navigationManager;
+            _snackbar = snackbar;
         }
 
         public List<Subject> subjects { get; set; } = new List<Subject>();
 
-        public async Task AddSubject(SubjectDTO subject)
+        public async Task<int> AddSubject(SubjectDTO subject)
         {
-            await _httpClient.PostAsJsonAsync("api/Subject", subject);
+            HttpResponseMessage? status = await _httpClient.PostAsJsonAsync("api/Subject", subject);
+
+            if (status.IsSuccessStatusCode)
+            {
+            _snackbar.Add(
+                        "Successfully Added Subject",
+                        Severity.Success,
+                        config =>
+                        {
+                            config.ShowTransitionDuration = 200;
+                            config.HideTransitionDuration = 400;
+                            config.VisibleStateDuration = 2500;
+                        });
             _navigationManager.NavigateTo("/all-subjects");
+
+            }
+            else
+            {
+                _snackbar.Add(
+                   "Already Existing Subject",
+                   Severity.Warning,
+                   config =>
+                   {
+                       config.ShowTransitionDuration = 200;
+                       config.HideTransitionDuration = 400;
+                       config.VisibleStateDuration = 2500;
+                   });
+                return 0;
+            }
+
+
+
+            return 0;
         }
 
         public async Task<List<Subject>> DeleteSubject(int id)

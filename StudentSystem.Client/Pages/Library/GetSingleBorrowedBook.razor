@@ -148,7 +148,7 @@
 
     async Task HandleSubmit()
     {
-        if (Id != null)
+        if (Id != 0)
         {
             libraryDTO.StudentId = Id;
         }
@@ -165,7 +165,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id != null)
+        if (Id != 0)
         {
             var result = await clientStudentService.GetSingleStudent((int)Id);
             if (result is not null)

@@ -113,15 +113,7 @@ else
             {
                 subjects.ProfessorIds = options.Select(professor => professor.Id).ToList();
                 await clientSubjectService.AddSubject(subjects);
-                Snackbar.Add(
-                    "Added Subject Successfully",
-                    Severity.Success,
-                    config =>
-                    {
-                        config.ShowTransitionDuration = 200;
-                        config.HideTransitionDuration = 400;
-                        config.VisibleStateDuration = 2500;
-                    });
+                
             }
             else
             {

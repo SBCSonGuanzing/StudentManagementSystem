@@ -13,7 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
-@if (id is null)
+@if (id == 0)
 {
     <PageTitle>New Book</PageTitle>
     <h2>Create a New Book</h2>
@@ -26,7 +26,7 @@ else {
 
 <EditForm Model="book" OnValidSubmit="HandleSubmit">
 
-    @if (id is null)
+    @if (id == 0)
     {
         <DataAnnotationsValidator />
     }
@@ -57,32 +57,33 @@ else {
 
 @code {
     [Parameter]
-    public int? id { get; set; }
+    public int id { get; set; }
 
     string btnText = string.Empty;
 
     bool isNew = true;
 
     public Book book = new Book();
-
-        List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
+    public BookDTO books = new BookDTO();
+    List<EnrolledSubjectsDTO> EnrolledSubjectsList = new List<EnrolledSubjectsDTO>();
 
 
     protected override async void OnInitialized()
     {
-        btnText = id == null ? "Save New Book" : "Update Book";
+        btnText = id == 0 ? "Save New Book" : "Update Book";
 
         await clientSubjectService.GetAllSubjects();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (id is not null)
+        if (id != 0)
         {
             var result = await clientBookService.GetSingleBook((int)id);
             if (result != null)
             {
                 book = result;
+                books.Name = book.Name;
                 isNew = false;
             }
             else
@@ -94,28 +95,10 @@ else {
 
     async Task HandleSubmit()
     {
-        if (id is null)
+        if (id == 0)
         {
 
-            if(!string.IsNullOrEmpty(book.Name))
-            {
-                await clientBookService.AddBook(book);
-                Snackbar.Add(
-
-                "Added Book Successfully",
-
-                Severity.Success,
-
-                config =>
-
-                {
-                    config.ShowTransitionDuration = 200;
-                    config.HideTransitionDuration = 400;
-                    config.VisibleStateDuration = 2500;
-                });
-                return;
-            }
-            else
+            if (string.IsNullOrEmpty(book.Name))
             {
                 Snackbar.Add(
                    "No Books Added",
@@ -127,12 +110,17 @@ else {
                        config.VisibleStateDuration = 2500;
                    });
                 NavigationManager.NavigateTo("/all-books");
+        
+            }
+            else
+            {
+                await clientBookService.AddBook(books);
             }
 
         }
         else
         {
-            await clientBookService.UpdateBook((int)id, book);
+            await clientBookService.UpdateBook((int)id, books);
             Snackbar.Add(
                 "Update Book Successfully",
                 Severity.Success,
