@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StudentSystem.Server.Data;
 using StudentSystem.Server.Hubs;
+using StudentSystem.Server.Services.AnnouncementServices;
 using StudentSystem.Server.Services.AuthServices;
 using StudentSystem.Server.Services.BookServices;
 using StudentSystem.Server.Services.BorrowedBooksServices;
@@ -59,6 +60,7 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IEnrolledSubjectsService, EnrolledSubjectsService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IBorrowedBooksService, BorrowedBooksService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<IUserService,  UserService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDbContext<DataContext>();   
@@ -80,6 +82,7 @@ app.UseStaticFiles();
 
 app.UseAuthorization();
 app.MapHub<AnnouncementHub>("announcementhub");
+app.MapHub<ChatHub>("chat-hub");
 
 app.MapRazorPages();
 app.MapControllers();

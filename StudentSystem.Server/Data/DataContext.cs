@@ -17,6 +17,6 @@ namespace StudentSystem.Server.Data
         public DbSet<EnrolledSubjects> EnrolledSubjects { get; set; }
         public DbSet<Library> Libraries { get; set; }
         public DbSet<BorrowedBooks> BorrowedBooks { get; set;}
-
+        public DbSet<Announcement> Announcements { get; set; }
     }
 }

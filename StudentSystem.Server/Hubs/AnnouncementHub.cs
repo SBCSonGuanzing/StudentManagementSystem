@@ -6,7 +6,7 @@ namespace StudentSystem.Server.Hubs
     {
         public async Task SendAnnouncement(string Message)
         {
-            await Clients.All.SendAsync($"ReceiveMessage", Message);
+            await Clients.All.SendAsync($"ReceiveAnnouncement", Message);
         }
     }
 }

@@ -8,9 +8,9 @@
     <MudCardContent>
         @if (isConnected)
         {
-            <MudTextField @bind-Value="@announcementInput" Label="Message" />
+            <MudTextField @bind-Value="@announcementInput" Label="Message" AutoGrow="true"/>
             <br />
-            <MudButton OnClick="@Send" Variant="Variant.Filled">Send</MudButton>
+            <MudButton OnClick="@Send" Variant="Variant.Filled" Color="Color.Secondary">Send</MudButton>
                 
         }
         else
@@ -49,7 +49,7 @@
         .WithUrl(NavigationManager.ToAbsoluteUri("/announcementhub"))
         .Build();
 
-        hubConnection.On<string>("ReceiveMessage", (message) =>
+        hubConnection.On<string>("ReceiveAnnouncement", (message) =>
         {
             var encodedMessage = $"{message}";
             messages.Add(encodedMessage);

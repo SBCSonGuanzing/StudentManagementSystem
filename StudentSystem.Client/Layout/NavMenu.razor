@@ -147,9 +147,19 @@
         <Authorized>
             <MudNavGroup Title="Announcement"
                          Expanded="@isSelected"
-                         Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                         Icon="@Icons.Material.Filled.Announcement" @onclick="ToggleEnrollment"
                          IconColor="Color.Info">
                 <MudNavLink Href="/announcement">Announcement</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavGroup Title="Chat"
+                         Expanded="@isSelected"
+                         Icon="@Icons.Material.Filled.Chat" @onclick="ToggleEnrollment"
+                         IconColor="Color.Info">
+                <MudNavLink Href="/chat">Chat</MudNavLink>
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>
