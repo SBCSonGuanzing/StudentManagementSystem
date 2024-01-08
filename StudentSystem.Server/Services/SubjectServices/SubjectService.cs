@@ -91,7 +91,7 @@ namespace StudentSystem.Server.Services.SubjectServices
                 .Where(subject => subject.Id == id)
                 .FirstOrDefaultAsync();
 
-            if (subjects == null)
+            if (subjects == null) 
                 return null;
 
             subjects.Name = request.Name;

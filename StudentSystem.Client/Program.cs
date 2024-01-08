@@ -3,6 +3,7 @@ using BlazorPlayGround.Client;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor.Services;
 using StudentSystem.Client;
 using StudentSystem.Client.Services.AuthServices;
@@ -13,6 +14,8 @@ using StudentSystem.Client.Services.ProfessorServices;
 using StudentSystem.Client.Services.StudentServices;
 using StudentSystem.Client.Services.SubjectServices;
 using StudentSystem.Client.Services.UserServices;
+
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

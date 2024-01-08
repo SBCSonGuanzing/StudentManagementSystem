@@ -46,7 +46,7 @@
 @code {
 
     LoginDTO user = new LoginDTO();  
-    private string errorMessage;
+    private string? errorMessage;
 
     private async void login()
     {
@@ -68,14 +68,8 @@
                 config.VisibleStateDuration = 2500;
             });
 
-            if (auth_state.User.IsInRole("Admin"))
-            {
-                NavigationManager.NavigateTo("/dashboard");
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/dashboard");
-            }
+            NavigationManager.NavigateTo("/dashboard");
+            
         } else
         {
             errorMessage = response;

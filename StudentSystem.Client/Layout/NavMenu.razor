@@ -142,6 +142,17 @@
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>
+
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <MudNavGroup Title="Announcement"
+                         Expanded="@isSelected"
+                         Icon="@Icons.Material.Outlined.FolderOpen" @onclick="ToggleEnrollment"
+                         IconColor="Color.Info">
+                <MudNavLink Href="/announcement">Announcement</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
 </MudNavMenu>
       
 @code {
