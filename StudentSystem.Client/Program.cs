@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor.Services;
 using StudentSystem.Client;
+using StudentSystem.Client.Services.AnnouncementServices;
 using StudentSystem.Client.Services.AuthServices;
 using StudentSystem.Client.Services.BookServices;
 using StudentSystem.Client.Services.BorrowedBooksServices;
@@ -34,6 +35,7 @@ builder.Services.AddScoped<IClientStudentService, ClientStudentService>();
 builder.Services.AddScoped<IClientEnrolledSubjectService, ClientEnrolledSubjectService>();
 builder.Services.AddScoped<IClientBorrowedBooksService, ClientBorrowedBooksService>();
 builder.Services.AddScoped<IClientUserService, ClientUserService>();
+builder.Services.AddScoped<IClientAnnouncementService , ClientAnnouncementService>();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();

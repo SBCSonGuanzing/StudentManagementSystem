@@ -1,5 +1,7 @@
 ﻿@page "/announcement";
+@using StudentSystem.Client.Services.AnnouncementServices
 @inject NavigationManager NavigationManager;
+@inject IClientAnnouncementService ClientAnnouncementService;
 
 <h3>Announcement</h3>
 
@@ -39,6 +41,10 @@
 
     private List<string> messages = new List<string>();
 
+    private List<Announcement> annoucements = new List<Announcement>();
+
+    private Announcement input = new Announcement();
+
     private string? announcementInput;
 
     protected override async Task OnInitializedAsync()
@@ -48,6 +54,14 @@
         hubConnection = new HubConnectionBuilder()
         .WithUrl(NavigationManager.ToAbsoluteUri("/announcementhub"))
         .Build();
+
+        annoucements = await ClientAnnouncementService.GetAllAnnoucements();
+
+        // Add the fetched announcements to the messages list
+        foreach (var announcement in annoucements)
+        {
+            messages.Add(announcement.Message);
+        }
 
         hubConnection.On<string>("ReceiveAnnouncement", (message) =>
         {
@@ -64,6 +78,13 @@
         if (hubConnection is not null)
         {
             await hubConnection.SendAsync("SendAnnouncement", announcementInput);
+
+            Announcement input = new Announcement()
+                {
+                    Message = announcementInput
+                };
+
+            await ClientAnnouncementService.AddAnnouncement(input);
         }
 
     }

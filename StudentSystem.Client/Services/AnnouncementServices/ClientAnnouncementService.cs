@@ -30,12 +30,16 @@ namespace StudentSystem.Client.Services.AnnouncementServices
         }
         public async Task<List<Announcement>> AddAnnouncement(Announcement context)
         {
-            var result = await _httpClient.GetFromJsonAsync<List<Announcement>>($"api/Announcement");
-            if (result != null)
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"api/Announcement", context);
+            if (response.IsSuccessStatusCode)
             {
-                announcements = result;
+                announcements = await response.Content.ReadFromJsonAsync<List<Announcement>>();
+                return announcements;
             }
-            return result;
+            else
+            {
+                return new List<Announcement>() { };
+            }
         }
 
       
