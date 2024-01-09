@@ -7,6 +7,7 @@ namespace StudentSystem.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;

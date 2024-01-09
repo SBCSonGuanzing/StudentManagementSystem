@@ -11,6 +11,7 @@ namespace StudentSystem.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class AuthController : ControllerBase
     {
         public static User user = new User();

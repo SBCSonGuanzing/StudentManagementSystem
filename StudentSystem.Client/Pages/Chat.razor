@@ -2,49 +2,49 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveWebAssembly
 
-<h3>Chat</h3>
 
 @if (isConnected)
 {
     <MudContainer>
-        <MudPaper Elevation="2" Class="chat-container" Style="height: 500px; overflow-y: auto; padding: 16px;">
+        <MudPaper Elevation="2" Class="chat-container" Style="height: 450px; overflow-y: auto; padding: 16px;">
             @foreach (var message in messages)
             {
-                <div class="message-container">
-                    <div class="message-content">
-                        <MudText Typo="Typo.h6">@message</MudText>
-                            <MudText>@message</MudText>
-                        </div>
-                    </div>
+               
+                <MudText>@message</MudText>
+                
             }
         </MudPaper>
 
-        <MudContainer Class="input-container" Style="margin-top: 16px;">
-            <MudGrid>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="User"
-                                  @bind-Value="@userInput"
-                                  Variant="Variant.Outlined">
-                    </MudTextField>
-                </MudItem>
+        <MudPaper>
+            <MudContainer Class="input-container" Style="margin-top: 16px;">
+                <MudGrid>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="User"
+                                      @bind-Value="@userInput"
+                                      Variant="Variant.Outlined">
+                        </MudTextField>
+                    </MudItem>
 
-                <MudItem xs="12" md="6">
-                    <MudTextField Label="Message"
-                                  @bind-Value="@messageInput"
-                                  Variant="Variant.Text">
-                    </MudTextField>
-                </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField Label="Message"
+                                      @bind-Value="@messageInput"
+                                      Variant="Variant.Text">
+                        </MudTextField>
+                    </MudItem>
 
-                <MudItem xs="12" md="2" Class="send-button d-md-flex justify-content-center">
-                    <MudButton ButtonType="ButtonType.Submit"
-                               Color="Color.Primary"
-                               Variant="Variant.Filled"
-                               OnClick="Send">
-                        Send
-                    </MudButton>
-                </MudItem>
-            </MudGrid>
-        </MudContainer>
+                    <MudItem xs="12" md="2" Class="send-button d-md-flex">
+                        <MudButton ButtonType="ButtonType.Submit"
+                                   Color="Color.Primary"
+                                   Variant="Variant.Text"
+                                   OnClick="Send">
+                            <MudIcon Icon="@Icons.Material.Filled.Send" Margin="Margin.Right" Class="mr-2"/>
+                            Send 
+                        </MudButton>
+
+                    </MudItem>
+                </MudGrid>
+            </MudContainer>
+        </MudPaper>
     </MudContainer>
 }
 else
@@ -69,6 +69,8 @@ else
     protected override async Task OnInitializedAsync()
     {
 
+
+
         // Build a Hub Connection using HubConnectionBuilder
         hubConnection = new HubConnectionBuilder()
         .WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub"))
@@ -88,7 +90,7 @@ else
     }
 
     // Method to Send a Message
-    private async Task Send() => hubConnection.SendAsync("SendMessage", userInput, messageInput);
+    private async Task Send() => await hubConnection.SendAsync("SendMessage", userInput, messageInput);
 
     public bool isConnected => hubConnection.State == HubConnectionState.Connected;
 }

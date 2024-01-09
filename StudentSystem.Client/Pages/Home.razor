@@ -1,6 +1,8 @@
 ﻿@page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
+@using StudentSystem.Client.Services.AnnouncementServices
 @inject NavigationManager NavigationManager 
+@inject IClientAnnouncementService ClientAnnouncementService
 <PageTitle>Home</PageTitle>
 
 <AuthorizeView>
@@ -25,11 +27,13 @@
 }
 
 @code {
-
-
     private HubConnection? hubConnection;
 
     private List<string> messages = new List<string>();
+
+    private List<Announcement> annoucements = new List<Announcement>();
+
+    private Announcement input = new Announcement();
 
     private string? announcementInput;
 
@@ -41,7 +45,15 @@
         .WithUrl(NavigationManager.ToAbsoluteUri("/announcementhub"))
         .Build();
 
-        hubConnection.On<string>("ReceiveMessage", (message) =>
+        annoucements = await ClientAnnouncementService.GetAllAnnoucements();
+
+        // Add the fetched announcements to the messages list
+        foreach (var announcement in annoucements)
+        {
+            messages.Add(announcement.Message);
+        }
+
+        hubConnection.On<string>("ReceiveAnnouncement", (message) =>
         {
             var encodedMessage = $"{message}";
             messages.Add(encodedMessage);
@@ -51,14 +63,6 @@
         await hubConnection.StartAsync();
     }
 
-    private async Task Send()
-    {
-        if (hubConnection is not null)
-        {
-            await hubConnection.SendAsync("SendAnnouncement", announcementInput);
-        }
-
-    }
 
     public bool isConnected =>
         hubConnection?.State == HubConnectionState.Connected;

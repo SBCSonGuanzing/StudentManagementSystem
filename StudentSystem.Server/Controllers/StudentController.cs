@@ -7,6 +7,7 @@ namespace StudentSystem.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class StudentController : ControllerBase
     {
         private readonly IStudentService _studentService;

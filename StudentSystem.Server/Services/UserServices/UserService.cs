@@ -65,6 +65,7 @@ namespace StudentSystem.Server.Services.UserServices
         
         public async Task<string> GetUserRole()
         {
+            //TODO: Get this role
             var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
             var users = await _context.Users
                     .Where(p => p.Role == userRole)

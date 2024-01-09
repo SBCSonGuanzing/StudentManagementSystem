@@ -8,6 +8,7 @@ namespace StudentSystem.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class EnrolledSubjectsController : ControllerBase
     {
         private readonly IEnrolledSubjectsService _enrolledSubjectsService;

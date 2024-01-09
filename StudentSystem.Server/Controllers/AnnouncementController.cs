@@ -7,6 +7,7 @@ namespace StudentSystem.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class AnnouncementController : ControllerBase
     {
         private readonly IAnnouncementService _announcementService;
