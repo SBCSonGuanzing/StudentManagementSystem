@@ -7,6 +7,7 @@ using StudentSystem.Server.Services.AnnouncementServices;
 using StudentSystem.Server.Services.AuthServices;
 using StudentSystem.Server.Services.BookServices;
 using StudentSystem.Server.Services.BorrowedBooksServices;
+using StudentSystem.Server.Services.ChatServices;
 using StudentSystem.Server.Services.EnrolledSubjectsServices;
 using StudentSystem.Server.Services.ProfessorServices;
 using StudentSystem.Server.Services.StudentServices;
@@ -62,7 +63,9 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IBorrowedBooksService, BorrowedBooksService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<IUserService,  UserService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 builder.Services.AddDbContext<DataContext>();   
 
 var app = builder.Build();

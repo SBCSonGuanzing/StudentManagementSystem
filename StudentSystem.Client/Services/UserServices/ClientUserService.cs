@@ -1,5 +1,4 @@
-﻿
-using StudentSystem.Shared.Models;
+﻿using StudentSystem.Shared.Models;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -74,7 +73,5 @@ namespace StudentSystem.Client.Services.UserServices
             }
             return null;
         }
-
-    
     }
 }

@@ -9,12 +9,13 @@ namespace StudentSystem.Shared.Models
 {
     public class ChatMessage
     {
-        public int Id { get; set; } 
-        public string Content {  get; set; }
+        public int Id { get; set; }
+        public int FromUserId { get; set; }
+        public int ToUserId { get; set; }
         public DateTime Timestamp { get; set; }
-        [JsonIgnore]
-        public User User { get; set; }
+        public string Content { get; set; }
+        public User user { get; set; }
         public int UserId { get; set; }
-
     }
 }
+
