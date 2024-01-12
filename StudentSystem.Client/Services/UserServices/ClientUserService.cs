@@ -1,5 +1,4 @@
-﻿
-using StudentSystem.Shared.Models;
+﻿using StudentSystem.Shared.Models;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -58,7 +57,6 @@ namespace StudentSystem.Client.Services.UserServices
             return null;
         }
         
-     
         public async Task<string> GetUserRole()
         {
             var result = await _httpClient.GetStringAsync("api/User/user-role");
@@ -67,7 +65,7 @@ namespace StudentSystem.Client.Services.UserServices
 
         public async Task<Professor?> GetSingleProfessor()
         {
-            var result = await _httpClient.GetAsync($"api/User/single-professor");
+            HttpResponseMessage result = await _httpClient.GetAsync($"api/User/single-professor");
             if (result.IsSuccessStatusCode)
             {
                 return await result.Content.ReadFromJsonAsync<Professor>();
@@ -75,6 +73,16 @@ namespace StudentSystem.Client.Services.UserServices
             return null;
         }
 
-    
+        public async Task<string> GetUserId()
+        {
+            var result = await _httpClient.GetStringAsync("api/User/user-id");
+            return result;
+        }
+
+        public async Task<string> GetUserEmail()
+        {
+            var result = await _httpClient.GetStringAsync("api/User/user-email");
+            return result;
+        }
     }
 }

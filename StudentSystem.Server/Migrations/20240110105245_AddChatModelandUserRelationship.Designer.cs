@@ -12,8 +12,8 @@ using StudentSystem.Server.Data;
 namespace StudentSystem.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240108102727_AnnouncementModel")]
-    partial class AnnouncementModel
+    [Migration("20240110105245_AddChatModelandUserRelationship")]
+    partial class AddChatModelandUserRelationship
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,6 +98,37 @@ namespace StudentSystem.Server.Migrations
                     b.HasIndex("LibraryId");
 
                     b.ToTable("BorrowedBooks");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FromUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ToUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatMessages");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
@@ -368,6 +399,17 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("Library");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.ChatMessage", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.User", "user")
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("user");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
                 {
                     b.HasOne("StudentSystem.Shared.Models.Enrollment", "Enrollment")
@@ -461,6 +503,8 @@ namespace StudentSystem.Server.Migrations
 
             modelBuilder.Entity("StudentSystem.Shared.Models.User", b =>
                 {
+                    b.Navigation("ChatMessages");
+
                     b.Navigation("Professor");
 
                     b.Navigation("Student");

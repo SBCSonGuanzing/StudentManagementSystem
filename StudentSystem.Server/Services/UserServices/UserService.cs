@@ -74,6 +74,26 @@ namespace StudentSystem.Server.Services.UserServices
             return users;
         }
 
-       
+        public async Task<string> GetUserId()
+        {
+            var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var users = await _context.Users
+                    .Where(p => p.Id.ToString() == userRole)
+                     .Select(p => p.Id.ToString())
+                    .FirstOrDefaultAsync();
+
+            return users;
+        }
+
+        public async Task<string> GetUserEmail()
+        {
+            var userEmail = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
+            var users = await _context.Users
+                    .Where(p => p.Id.ToString() == userEmail)
+                     .Select(p => p.Email)
+                    .FirstOrDefaultAsync();
+
+            return users;
+        }
     }
 }

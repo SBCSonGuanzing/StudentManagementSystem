@@ -14,6 +14,9 @@ namespace StudentSystem.Client.Services.UserServices
         Task<Professor?> GetSingleProfessor();
 
         Task<string> GetUserRole();
+        Task<string> GetUserId();
+        Task<string> GetUserEmail();
+
 
     }
 }

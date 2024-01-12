@@ -153,16 +153,16 @@
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>
-    <AuthorizeView>
-        <Authorized>
+
+
             <MudNavGroup Title="Chat"
                          Expanded="@isSelected"
                          Icon="@Icons.Material.Filled.Chat" @onclick="ToggleEnrollment"
                          IconColor="Color.Info">
-                <MudNavLink Href="/chat">Chat</MudNavLink>
+                <MudNavLink Href="chat">Chat</MudNavLink>
             </MudNavGroup>
-        </Authorized>
-    </AuthorizeView>
+      
+
 </MudNavMenu>
       
 @code {

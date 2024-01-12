@@ -1,18 +1,12 @@
-﻿@page "/chat"
-@page "/chat/{ContactId:int}"
-
-@using StudentSystem.Client.Services.ChatServices
-@using StudentSystem.Client.Services.UserServices
-@using Microsoft.JSInterop;
-
-@inject IClientChatService ClientChatService
-@inject IClientUserService ClientUserService
+﻿@* @page "/chat"
+@page "/chat/{ContactId}"
 @inject NavigationManager NavigationManager
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IClientChatMessageService ClientChatMessageService
+@inject IClientUserService ClientUserService
 @rendermode InteractiveWebAssembly
 
-<h1>Chat</h1>
-
+<h3>Chat</h3>
 <div class="d-flex flex-grow-1 flex-row">
 
     <MudPaper Elevation="25" Class="py-4 flex-grow-1">
@@ -46,22 +40,22 @@
 
                         <MudAvatar Color="Color.Secondary"
                                    Style="height:50px; width:50px;">
-                            <MudImage Src="@message.User.Avatar"></MudImage>           
+                            @message.Users.Email.ToUpper().FirstOrDefault()
                         </MudAvatar>
 
                     </div>
 
                     <div>
-                        <MudText Typo="Typo.body1">@message.User.Email</MudText>
+                        <MudText Typo="Typo.body1">@message.Users.Email</MudText>
 
                             <MudText Typo="Typo.caption"
                                      Style="font-size: xx-small!important;">
-                                @message.Timestamp
+                                @message.CreatedDate
                         </MudText>
 
                         <MudText Typo="Typo.body2"
                                  Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">
-                            @message.Content
+                            @message.Message
                         </MudText>
 
                     </div>
@@ -132,59 +126,18 @@
     </MudPaper>
 </div>
 
-@code {
-
-    [Parameter]
-    public int ContactId { get; set; } 
-
+@code
+{
     [CascadingParameter]
     private HubConnection hubConnection { get; set; }
-
     public string CurrentMessage { get; set; }
     public string CurrentUserId { get; set; }
     public string CurrentUserEmail { get; set; }
-
     private List<ChatMessage> messages = new List<ChatMessage>();
     public List<User> ChatUsers = new List<User>();
-
     public string ContactEmail { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-
-        ChatUsers = await ClientChatService.GetUsersAsync();
-        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub")).Build();
-
-
-        hubConnection.On<ChatMessage, string>("ReceiveMessage", async (message, userName) =>
-        {
-            if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId.ToString()) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId.ToString()))
-            {
-
-                if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId.ToString()))
-                {
-                    messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = CurrentUserEmail } });
-                    await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
-                }
-                else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId.ToString()))
-                {
-                    messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = ContactEmail } });
-                }
-            }
-
-            StateHasChanged();
-        });
-
-        await hubConnection.StartAsync();
-
-        CurrentUserId = await ClientUserService.GetUserId();
-        CurrentUserEmail = await ClientUserService.GetUserEmail();
-
-        if (!string.IsNullOrEmpty(ContactId.ToString()))
-        {
-            await LoadUserChat(ContactId);
-        }
-    }
+    [Parameter]
+    public int ContactId { get; set; }
 
     public async Task SubmitAsync()
     {
@@ -193,35 +146,61 @@
             //Save Message to DB
             var chatHistory = new ChatMessage()
                 {
-                    Content = CurrentMessage,
-                    ToUserId = ContactId,
-                    Timestamp = DateTime.Now,
-                    FromUserId = int.Parse(CurrentUserId),
-                    
-                };
+                    Message = CurrentMessage,
+                    ToUserId = ContactId.ToString(),
+                    CreatedDate = DateTime.Now
 
-            await ClientChatService.SaveMessageAsync(chatHistory);
+                };
+            await ClientChatMessageService.SaveMessage(chatHistory);
+            chatHistory.FromUserId = CurrentUserId;
             await hubConnection.SendAsync("SendMessage", chatHistory, CurrentUserEmail);
             CurrentMessage = string.Empty;
         }
     }
-    async Task LoadUserChat(int userId)
+    protected override async Task OnInitializedAsync()
     {
-        var contact = await ClientChatService.GetUserDetailsAsync(userId);
+        ChatUsers = await ClientChatMessageService.GetAllUsers();
+        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chathub")).Build();
 
-        if (contact != null)
+
+        hubConnection.On<ChatMessage, string>("ReceiveMessage", async (message, userName) =>
         {
-            ContactId = contact.Id;
-            ContactEmail = contact.Email;
-            NavigationManager.NavigateTo($"chat/{ContactId}");
-            messages = new List<ChatMessage>();
-            messages = await ClientChatService.GetConversationAsync(ContactId);
-        }
-        else
+            if ((ContactId.ToString() == message.ToUserId && CurrentUserId == message.FromUserId) || (ContactId.ToString() == message.FromUserId && CurrentUserId == message.ToUserId))
+            {
+
+                if ((ContactId.ToString() == message.ToUserId && CurrentUserId == message.FromUserId))
+                {
+                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, Users = new User() { Email = CurrentUserEmail } });
+                    await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
+                }
+                else if ((ContactId.ToString() == message.FromUserId && CurrentUserId == message.ToUserId))
+                {
+                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, Users = new User() { Email = ContactEmail } });
+                }
+                //await _jSRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
+            }
+
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+
+        CurrentUserId = await ClientUserService.GetSingleUserId();
+        CurrentUserEmail = await ClientUserService.GetSingleUserName();
+
+        if (!string.IsNullOrEmpty(ContactId.ToString()))
         {
-            // Handle the case where GetUserDetailsAsync returned null
-            // You might want to log the issue or show an error message.
+            await LoadUserChat(ContactId);
         }
     }
 
-}
+    async Task LoadUserChat(int userId)
+    {
+        var contact = await ClientChatMessageService.GetSingleUser(userId);
+        ContactId = contact.Id;
+        ContactEmail = contact.Email;
+        NavigationManager.NavigateTo($"chat/{ContactId}");
+        messages = new List<ChatMessage>();
+        messages = await ClientChatMessageService.GetConversation(ContactId);
+    }
+} *@

@@ -1,9 +1,14 @@
 ﻿@using StudentSystem.Client.Pages
 @using StudentSystem.Client.Services.AuthServices
+@using StudentSystem.Client.Services.UserServices
 @inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager _navigationManager
+@inject ISnackbar _snackbar
+@inject IClientUserService ClientUserService
 @inject IClientAuthService ClientAuthService
 @inherits LayoutComponentBase
 
+@rendermode InteractiveWebAssembly
 
 <MudLayout>
     <MudAppBar Elevation="1">
@@ -32,4 +37,41 @@
     {
         open = !open;
     }
+
+    private string CurrentUserId { get; set; }
+
+    private HubConnection hubConnection;
+    public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentUserId = await ClientUserService.GetUserId();
+
+        hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/chat-hub")).Build();
+
+        await hubConnection.StartAsync();
+
+        hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
+        {
+            // if (CurrentUserId == receiverUserId)
+            // {
+                // _jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
+                _snackbar.Add(message, Severity.Info, config =>
+                                {
+                                    config.VisibleStateDuration = 10000;
+                                    config.HideTransitionDuration = 500;
+                                    config.ShowTransitionDuration = 500;
+                                    config.Action = "Chat?";
+                                    config.ActionColor = Color.Info;
+                                    config.Onclick = snackbar =>
+                            {
+                                _navigationManager.NavigateTo($"chat/{senderUserId}");
+                                return Task.CompletedTask;
+                            };
+                                });
+            // }
+        });
+
+    }
+   
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudentSystem.Server.Services.UserServices;
+using System.Security.Claims;
 
 namespace StudentSystem.Server.Controllers
 {
@@ -53,7 +55,6 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
-
         [HttpGet("single-professor")]
         public async Task<ActionResult<Professor>?> GetSingleProfessor()
         {
@@ -63,8 +64,6 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
-
-
         [HttpGet("user-role")]
         public async Task<ActionResult<string>> GetUserRole()
         {
@@ -73,7 +72,21 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
-        
+        [HttpGet("user-id")]
+        public async Task<ActionResult<string>> GetUserId()
+        {
+            var result = await _userService.GetUserId();
+
+            return Ok(result);
+        }
+
+        [HttpGet("user-email")]
+        public async Task<ActionResult<string>> GetUserEmail()
+        {
+            var result = await _userService.GetUserEmail();
+
+            return Ok(result);
+        }
 
     }
 }

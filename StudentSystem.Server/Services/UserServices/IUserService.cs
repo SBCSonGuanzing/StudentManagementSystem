@@ -7,7 +7,9 @@
         Task<List<User>> GetAllUsers();
         Task<Student?> GetSingleStudent();
         Task<string> GetUserRole();
+        Task<string> GetUserId();
+        Task<string> GetUserEmail();
 
-        
+
     }
 }
