@@ -121,15 +121,7 @@ else {
         else
         {
             await clientBookService.UpdateBook((int)id, books);
-            Snackbar.Add(
-                "Update Book Successfully",
-                Severity.Success,
-            config =>
-            {
-                config.ShowTransitionDuration = 200;
-                config.HideTransitionDuration = 400;
-                config.VisibleStateDuration = 2500;
-            });
+            
         }
     }
 

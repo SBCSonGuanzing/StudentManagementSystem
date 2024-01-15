@@ -22,6 +22,7 @@ namespace StudentSystem.Server.Services.ChatServices
 
             List<User> users = await _context.Users
               .Where(user => user.Id.ToString() != userId)
+           
               .ToListAsync();
 
             return users;
@@ -38,10 +39,12 @@ namespace StudentSystem.Server.Services.ChatServices
 
                     .OrderBy(a => a.Timestamp)            
                     .Include(a => a.User)
+                        
+
                     .Select(x => new ChatMessage
                     {
                         FromUserId = x.FromUserId,
-                        ToUserId = x.ToUserId,
+                        ToUserId = x.ToUserId,  
                         Content = x.Content,
                         Timestamp = x.Timestamp,
                         Id = x.Id,

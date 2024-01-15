@@ -8,30 +8,25 @@
 @inject IClientChatService ClientChatService
 @inject IClientUserService ClientUserService
 @inject NavigationManager NavigationManager
+@inject ISnackbar _snackbar
 
 @rendermode InteractiveWebAssembly
 
 <h1>Chat</h1>
 
 <div class="d-flex flex-grow-1 flex-row">
-
     <MudPaper Elevation="25" Class="py-4 flex-grow-1">
-
         <MudToolBar Dense="true">
-
             @if (string.IsNullOrEmpty(ContactId.ToString()))
             {
                 <MudIcon Icon="@Icons.Material.Outlined.Person"
                          Style="margin-right:10px" />
-
                 <MudText Typo="Typo.h6">chat</MudText>
             }
-
             else
             {
                 <MudIcon Icon="@Icons.Material.Outlined.ChatBubble"
                          Style="margin-right:10px" />
-
                 <MudText Typo="Typo.h6">@ContactEmail</MudText>
             }
 
@@ -40,32 +35,45 @@
         <div class="d-flex flex-column px-4" style="max-height:65vh;min-height:65vh; overflow:scroll;" id="chatContainer">
             @foreach (var message in messages)
             {
+                if (message.User.Id.ToString() == CurrentUserId)
+                {   
                 <div class="d-flex flex-row my-4">
-
-                    <div class="mr-4">
-
-                        <MudAvatar Color="Color.Secondary"
-                                   Style="height:50px; width:50px;">
-                            <MudImage Src="@message.User.Avatar"></MudImage>           
+                    <div class="ml-auto mr-4">
+                        <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
+                            <MudImage Src="@message.User.Avatar"></MudImage>
                         </MudAvatar>
-
                     </div>
-
-                    <div>
+                    <div class="text-right">
                         <MudText Typo="Typo.body1">@message.User.Email</MudText>
-
-                            <MudText Typo="Typo.caption"
-                                     Style="font-size: xx-small!important;">
-                                @message.Timestamp
+                            <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.Timestamp</MudText>
+                            <MudText Typo="Typo.body2" Style="padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">
+                                @message.Content
                         </MudText>
-
-                        <MudText Typo="Typo.body2"
-                                 Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">
-                            @message.Content
-                        </MudText>
-
                     </div>
                 </div>
+                } else
+                {
+                    <div class="d-flex flex-row my-4">
+                        <div class="mr-4">
+
+                            <MudAvatar Color="Color.Secondary"
+                                       Style="height:50px; width:50px;">
+                                <MudImage Src="@message.User.Avatar"></MudImage>
+                            </MudAvatar>
+                        </div>
+                        <div>
+                            <MudText Typo="Typo.body1">@message.User.Email</MudText>
+                                <MudText Typo="Typo.caption"
+                                         Style="font-size: xx-small!important;">
+                                    @message.Timestamp
+                            </MudText>
+                            <MudText Typo="Typo.body2"
+                                     Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">
+                                @message.Content
+                            </MudText>
+                        </div>
+                    </div>
+                }
             }
         </div>
         <MudPaper Elevation="25" Class="d-flex flex-row px-2 mx-4" Style="">
@@ -101,12 +109,12 @@
                     <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.Id))">
                         <div class="d-flex flex-row mt-n1 mb-n1">
                             <div class="mr-4">
-                                <MudBadge Class="my-2">
+                                <MudBadge Content="3" Overlap="true" Class="my-4">
                                     @if (user.Id == ContactId)
                                     {
                                         <MudAvatar Color="Color.Secondary"
                                                    Style="height:50px; width:50px;">
-                                            @user.Email.ToUpper().FirstOrDefault()
+                                            <MudImage Src="@user.Avatar"></MudImage>
                                         </MudAvatar>
                                     }
                                     else
@@ -118,12 +126,10 @@
                                     }
                                 </MudBadge>
                             </div>
-
                             <div>
                                 <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
                                     <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@user.Id</MudText>
                                 </div>
-
                             </div>
                         </MudListItem>
                 }
@@ -149,18 +155,23 @@
 
     public string ContactEmail { get; set; }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
+    }
+
     protected override async Task OnInitializedAsync()
     {
 
         ChatUsers = await ClientChatService.GetUsersAsync();
         hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub")).Build();
 
+        await hubConnection.StartAsync();
 
         hubConnection.On<ChatMessage, string>("ReceiveMessage", async (message, userName) =>
         {
             if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId.ToString()) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId.ToString()))
             {
-
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId.ToString()))
                 {
                     messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = CurrentUserEmail } });
@@ -171,11 +182,8 @@
                     messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = ContactEmail } });
                 }
             }
-
             StateHasChanged();
         });
-
-        await hubConnection.StartAsync();
 
         CurrentUserId = await ClientUserService.GetUserId();
         CurrentUserEmail = await ClientUserService.GetUserEmail();
