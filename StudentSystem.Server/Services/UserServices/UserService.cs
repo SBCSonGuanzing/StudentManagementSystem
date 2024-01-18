@@ -89,7 +89,7 @@ namespace StudentSystem.Server.Services.UserServices
         {
             var userEmail = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
             var users = await _context.Users
-                    .Where(p => p.Id.ToString() == userEmail)
+                    .Where(p => p.Email == userEmail)
                      .Select(p => p.Email)
                     .FirstOrDefaultAsync();
 

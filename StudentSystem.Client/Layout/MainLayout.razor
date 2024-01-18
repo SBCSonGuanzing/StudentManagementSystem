@@ -19,15 +19,15 @@
         <MudSpacer />
         <LoginLogoutButton />
     </MudAppBar>
-    <MudDrawer @bind-Open="@open" Elevation="1">
-        <MudDrawerHeader>
+    <MudDrawer @bind-Open="@open" ClipMode="clipMode" Elevation="1" Variant="@DrawerVariant.Responsive" PreserveOpenState="@preserveOpenState" Breakpoint="@breakpoint">
             <NavMenu/>
-        </MudDrawerHeader>
     </MudDrawer>
-    <MudMainContent Class="pt-16 px-16 mt-4" >
-        <CascadingValue Value="hubConnection">
-            @Body
-        </CascadingValue>
+    <MudMainContent Class="pt-16 px-16" >
+        <MudContainer Class="mt-6">
+            <CascadingValue Value="hubConnection">
+                @Body
+            </CascadingValue>
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 
@@ -39,11 +39,14 @@
 
 @code {
     bool open = false;
-
+    bool dense = true;
+    bool preserveOpenState = false;
+    Breakpoint breakpoint = Breakpoint.Lg;
     void ToggleDrawer()
     {
         open = !open;
     }
+    DrawerClipMode clipMode = DrawerClipMode.Never;
 
     private string CurrentUserId { get; set; }
     private HubConnection hubConnection;
@@ -55,7 +58,7 @@
 
         CurrentUserId = await ClientUserService.GetUserId();
 
-        hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/chat-hub")).Build();
+        hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/chat-hub")).WithAutomaticReconnect().Build();
 
         await hubConnection.StartAsync();
 

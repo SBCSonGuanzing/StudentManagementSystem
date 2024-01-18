@@ -22,9 +22,7 @@ namespace StudentSystem.Server.Services.ChatServices
 
             List<User> users = await _context.Users
               .Where(user => user.Id.ToString() != userId)
-           
               .ToListAsync();
-
             return users;
         }
 

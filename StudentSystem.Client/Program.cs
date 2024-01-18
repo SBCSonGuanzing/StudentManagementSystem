@@ -12,6 +12,7 @@ using StudentSystem.Client.Services.BookServices;
 using StudentSystem.Client.Services.BorrowedBooksServices;
 using StudentSystem.Client.Services.ChatServices;
 using StudentSystem.Client.Services.EnrolledSubjectsService;
+using StudentSystem.Client.Services.GroupChatServices;
 using StudentSystem.Client.Services.ProfessorServices;
 using StudentSystem.Client.Services.StudentServices;
 using StudentSystem.Client.Services.SubjectServices;
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IClientBorrowedBooksService, ClientBorrowedBooksServi
 builder.Services.AddScoped<IClientUserService, ClientUserService>();
 builder.Services.AddScoped<IClientAnnouncementService , ClientAnnouncementService>();
 builder.Services.AddScoped<IClientChatService, ClientChatService>();
+builder.Services.AddScoped<IClientGroupChatService, ClientGroupChatService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();
 

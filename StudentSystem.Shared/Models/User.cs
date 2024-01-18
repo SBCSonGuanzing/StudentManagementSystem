@@ -19,6 +19,10 @@ namespace StudentSystem.Shared.Models
 
         [JsonIgnore]
         public List<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
+
+        [JsonIgnore]
+        public List<GroupChat> GroupChats { get; set; } = new List<GroupChat>();
+
         // Reference Student Model
         public Student? Student { get; set; }
         public Professor? Professor { get; set; }

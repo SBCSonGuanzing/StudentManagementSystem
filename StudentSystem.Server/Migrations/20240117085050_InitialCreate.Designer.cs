@@ -12,7 +12,7 @@ using StudentSystem.Server.Data;
 namespace StudentSystem.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240110104702_InitialCreate")]
+    [Migration("20240117085050_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,6 +24,21 @@ namespace StudentSystem.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("GroupChatUser", b =>
+                {
+                    b.Property<int>("GroupChatsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MembersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupChatsId", "MembersId");
+
+                    b.HasIndex("MembersId");
+
+                    b.ToTable("GroupChatUser");
+                });
 
             modelBuilder.Entity("ProfessorSubject", b =>
                 {
@@ -100,6 +115,37 @@ namespace StudentSystem.Server.Migrations
                     b.ToTable("BorrowedBooks");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FromUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ToUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
                 {
                     b.Property<int>("Id")
@@ -154,6 +200,53 @@ namespace StudentSystem.Server.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("Enrollments");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.GroupChat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GroupChats");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.GroupChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GroupChatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupChatId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GroupChatMessages");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Library", b =>
@@ -334,6 +427,21 @@ namespace StudentSystem.Server.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("GroupChatUser", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.GroupChat", null)
+                        .WithMany()
+                        .HasForeignKey("GroupChatsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentSystem.Shared.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("MembersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ProfessorSubject", b =>
                 {
                     b.HasOne("StudentSystem.Shared.Models.Professor", null)
@@ -366,6 +474,17 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("Library");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.ChatMessage", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.User", "User")
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.EnrolledSubjects", b =>
@@ -402,6 +521,25 @@ namespace StudentSystem.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("StudentSystem.Shared.Models.GroupChatMessage", b =>
+                {
+                    b.HasOne("StudentSystem.Shared.Models.GroupChat", "GroupChat")
+                        .WithMany("Messages")
+                        .HasForeignKey("GroupChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentSystem.Shared.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupChat");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("StudentSystem.Shared.Models.Library", b =>
@@ -442,6 +580,11 @@ namespace StudentSystem.Server.Migrations
                     b.Navigation("EnrolledSubjects");
                 });
 
+            modelBuilder.Entity("StudentSystem.Shared.Models.GroupChat", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("StudentSystem.Shared.Models.Library", b =>
                 {
                     b.Navigation("BorrowedBooks");
@@ -461,6 +604,8 @@ namespace StudentSystem.Server.Migrations
 
             modelBuilder.Entity("StudentSystem.Shared.Models.User", b =>
                 {
+                    b.Navigation("ChatMessages");
+
                     b.Navigation("Professor");
 
                     b.Navigation("Student");

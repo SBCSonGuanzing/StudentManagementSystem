@@ -39,6 +39,19 @@ namespace StudentSystem.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GroupChats",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupChats", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Subjects",
                 columns: table => new
                 {
@@ -79,6 +92,81 @@ namespace StudentSystem.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChatMessages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FromUserId = table.Column<int>(type: "int", nullable: false),
+                    ToUserId = table.Column<int>(type: "int", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ChatMessages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupChatMessages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    GroupChatId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupChatMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GroupChatMessages_GroupChats_GroupChatId",
+                        column: x => x.GroupChatId,
+                        principalTable: "GroupChats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupChatMessages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupChatUser",
+                columns: table => new
+                {
+                    GroupChatsId = table.Column<int>(type: "int", nullable: false),
+                    MembersId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupChatUser", x => new { x.GroupChatsId, x.MembersId });
+                    table.ForeignKey(
+                        name: "FK_GroupChatUser_GroupChats_GroupChatsId",
+                        column: x => x.GroupChatsId,
+                        principalTable: "GroupChats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupChatUser_Users_MembersId",
+                        column: x => x.MembersId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -268,6 +356,11 @@ namespace StudentSystem.Server.Migrations
                 column: "LibraryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChatMessages_UserId",
+                table: "ChatMessages",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EnrolledSubjects_EnrollmentId",
                 table: "EnrolledSubjects",
                 column: "EnrollmentId");
@@ -286,6 +379,21 @@ namespace StudentSystem.Server.Migrations
                 name: "IX_Enrollments_StudentId",
                 table: "Enrollments",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupChatMessages_GroupChatId",
+                table: "GroupChatMessages",
+                column: "GroupChatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupChatMessages_UserId",
+                table: "GroupChatMessages",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupChatUser_MembersId",
+                table: "GroupChatUser",
+                column: "MembersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Libraries_StudentId",
@@ -320,7 +428,16 @@ namespace StudentSystem.Server.Migrations
                 name: "BorrowedBooks");
 
             migrationBuilder.DropTable(
+                name: "ChatMessages");
+
+            migrationBuilder.DropTable(
                 name: "EnrolledSubjects");
+
+            migrationBuilder.DropTable(
+                name: "GroupChatMessages");
+
+            migrationBuilder.DropTable(
+                name: "GroupChatUser");
 
             migrationBuilder.DropTable(
                 name: "ProfessorSubject");
@@ -336,6 +453,9 @@ namespace StudentSystem.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Enrollments");
+
+            migrationBuilder.DropTable(
+                name: "GroupChats");
 
             migrationBuilder.DropTable(
                 name: "Professors");

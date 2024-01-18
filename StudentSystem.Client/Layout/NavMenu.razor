@@ -154,6 +154,7 @@
         </Authorized>
     </AuthorizeView>
 
+    <AuthorizeView Roles="Admin, Student, Professor">
 
             <MudNavGroup Title="Chat"
                          Expanded="@isSelected"
@@ -161,7 +162,16 @@
                          IconColor="Color.Info">
                 <MudNavLink Href="chat">Chat</MudNavLink>
             </MudNavGroup>
-      
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Admin, Student, Professor">
+        <MudNavGroup Title="Chat Rooms"
+                     Expanded="@isSelected"
+                     Icon="@Icons.Material.Filled.Chat" @onclick="ToggleEnrollment"
+                     IconColor="Color.Info">
+            <MudNavLink Href="group-chat">Chat Rooms</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 
 </MudNavMenu>
       

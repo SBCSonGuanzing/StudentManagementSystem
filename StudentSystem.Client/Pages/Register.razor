@@ -127,7 +127,7 @@
     private async void HandleRegistration()
     {
         await ClientAuthService.Register(user);
-        NavigationManager.NavigateTo("/dashboard");
+        NavigationManager.NavigateTo("/login");
 
         Snackbar.Add(
             "Registration Successful",
