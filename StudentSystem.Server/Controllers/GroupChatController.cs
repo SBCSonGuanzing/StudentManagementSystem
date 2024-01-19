@@ -24,7 +24,7 @@ namespace StudentSystem.Server.Controllers
             List<GroupChatMessage> result = await _chatService.GetConversationAsync(groupChatId);
             if (result is null)
             {
-                return BadRequest("No Conversation Found");
+                return NotFound("No Conversation Found");
             }
             return Ok(result);
         }
@@ -52,17 +52,38 @@ namespace StudentSystem.Server.Controllers
         [HttpPost]
         public async Task SaveMessagesAsyc(GroupChatMessage message)
         {
-            await _chatService.SaveMessagesAsyc(message);
+            await _chatService.SaveMessagesAsync(message);
         }
 
         [HttpPost("create-group")]
         public async Task<ActionResult<List<GroupChat>>> CreateGroupChat(GroupChatDTO request)
         {
             List<GroupChat> result = await _chatService.CreateGroupChat(request);
-            if (result is null)
+
+            if (result == null)
+            {
+                return Conflict("Group chat already exists.");
+            }
+            else if (result.Count == 0)
+            {
                 return NotFound("User not found.");
+            }
+
             return Ok(result);
         }
+
+        [HttpGet("get-group-name/{groupChatId}")]
+        public async Task<ActionResult<string>> GetGroupName(int groupChatId)
+        {
+            var result = await _chatService.GetGroupName(groupChatId);
+            if(result == null)
+            {
+                return NotFound("Group None Existing");
+            }
+
+            return Ok(result);
+        }
+
 
         [HttpPost("add-user-to-group")]
         public async Task<ActionResult<bool>> AddUserToGroup(int userId, int groupChatId)
@@ -73,6 +94,7 @@ namespace StudentSystem.Server.Controllers
             {
                 return BadRequest("Failed to add user to the group.");
             }
+
             return Ok(true);
         }
 
@@ -95,7 +117,7 @@ namespace StudentSystem.Server.Controllers
 
             if (result.Count == 0)
             {
-                return BadRequest("No Group Chat Members Found");
+                return NotFound("No Group Chat Members Found");
             }
 
             return Ok(result);
@@ -105,7 +127,7 @@ namespace StudentSystem.Server.Controllers
         public async Task<ActionResult<List<GroupChat>>> GetAllGroup()
         {
             var result = await _chatService.GetAllGroup();
-            if(result.Count == 0)
+            if(result == null)
             {
                 return BadRequest("No Group Chat Found");
             }

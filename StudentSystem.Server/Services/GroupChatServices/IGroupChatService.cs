@@ -5,8 +5,9 @@ namespace StudentSystem.Server.Services.GroupChatServices
     public interface IGroupChatService
     {
         Task<List<GroupChatMessage>> GetConversationAsync(int groupChatId);
-        Task SaveMessagesAsyc(GroupChatMessage message);
+        Task SaveMessagesAsync(GroupChatMessage message);
         Task<List<User>> GetUsersAsync();
+        Task<string> GetGroupName(int groupChatId); 
         Task<List<GroupChat>> GetAllGroup();
         Task<User> GetUserDetailsAsync(int userId);
         Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request);

@@ -6,6 +6,7 @@
 @using StudentSystem.Client.Services.UserServices
 @using Microsoft.JSInterop;
 
+@inject IDialogService DialogService
 @inject IClientChatService ClientChatService
 @inject IClientUserService ClientUserService
 @inject IClientGroupChatService ClientGroupChatService
@@ -16,17 +17,17 @@
 @rendermode InteractiveWebAssembly
 
 <div class="d-flex flex-grow-1 flex-row">
-    <MudPaper Elevation="25" Class="pa-4 ml-6 mud-theme-primary" MinWidth="350px">
+
+    <!--Group Chat Rooms-->
+
+    <MudPaper Elevation="25" Class="pa-4 ml-6 mud-theme-primary col-md-3">
         <MudToolBar Dense="true">
             <MudIcon Icon="@Icons.Material.Filled.Groups" Style="margin-right:10px" />
             <MudText Typo="Typo.h6">Chat Rooms</MudText>
-            <MudSpacer />
-          @*   <MudButton OnClick="SubmitAsync"
-                       StartIcon="@Icons.Material.Filled.AddCircleOutline"
-                       Color="Color.Secondary"
-                       ButtonType="ButtonType.Button">
-                
-            </MudButton> *@
+            <MudSpacer />           
+            <MudButton OnClick="OpenDialog" Variant="Variant.Filled" Color="Color.Secondary">
+                <MudIcon Icon="@Icons.Material.Filled.AddCircle" Margin="Margin.MarginEnd" />            
+            </MudButton>        
         </MudToolBar>
         <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
             <MudList Clickable="true">
@@ -36,11 +37,12 @@
                     <MudDivider />
                 }
             </MudList>
-
         </div>
     </MudPaper>
 
-    <MudPaper Elevation="25" Class="py-4 flex-grow-1">
+    <!--Group Chat Convo-->
+
+    <MudPaper Elevation="25" Class="py-4 flex-grow-1 col-md-5">
         <MudToolBar Dense="true">
             @if (string.IsNullOrEmpty(GroupChatId.ToString()))
             {
@@ -100,7 +102,7 @@
                 }
             }
         </div>
-       @*  <MudPaper Elevation="25" Class="d-flex flex-row px-2 mx-4" Style="">
+        <MudPaper Elevation="25" Class="d-flex flex-row px-2 mx-4" Style="">
             <MudTextField T="string"
                           Placeholder="Enter your message..."
                           DisableUnderLine="true"
@@ -108,38 +110,34 @@
                           @bind-Value="CurrentMessage"
                           For="@(()=> CurrentMessage)" />
 
-            <MudButton OnClick="SubmitAsync"
+            <MudButton OnClick="SendMessageAsync"
                        StartIcon="@Icons.Material.Outlined.Send"
                        Color="Color.Secondary"
                        ButtonType="ButtonType.Button">
                 Send
             </MudButton>
-        </MudPaper> *@
+        </MudPaper>
     </MudPaper>
-    <MudPaper Elevation="25" Class="pa-3 ml-6" MinWidth="350px">
 
+    <!--Group Chat Members-->
+     
+    <MudPaper Elevation="25" Class="pa-3 ml-6 col-md-4">
         <MudToolBar Dense="true">
             <MudText Typo="Typo.h6" Inline="true" Class="mr-2">#</MudText>
             <MudText Typo="Typo.h6">contacts</MudText>
         </MudToolBar>
-
         <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
-
             <MudList Clickable="true">
                 @foreach (var user in Members)
                 {
                     <MudListItem Class="pa-0 px-2" >
                         <div class="d-flex flex-row mt-n1 mb-n1">
                             <div class="mr-4">
-                                <MudBadge Content="3" Overlap="true" Class="my-4">
-                                   
-                                       
-                                   
+                                <MudBadge Content="3" Overlap="true" Class="my-4">                                                                                                
                                         <MudAvatar Color="Color.Dark"
                                                    Style="height:50px; width:50px;">
                                             <MudImage Src="@user.Avatar"></MudImage>
-                                        </MudAvatar>
-                                    
+                                        </MudAvatar>                                  
                                 </MudBadge>
                             </div>
                             <div>
@@ -152,6 +150,7 @@
             </MudList>
         </div> 
     </MudPaper>
+
 </div>
 
 @code {
@@ -165,93 +164,136 @@
     public string CurrentMessage { get; set; }
     public string CurrentUserId { get; set; }
     public string CurrentUserEmail { get; set; }
+    public string ContactEmail { get; set; }
+
+    private string userInput;
+    private string groupInput;
+
+    private List<GroupChatMessage> messages = new List<GroupChatMessage>();
+    public List<GroupChat> Groups = new List<GroupChat>();
+    public List<User> Members = new List<User>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
     }
 
-    private List<GroupChatMessage> messages = new List<GroupChatMessage>();
-    public List<GroupChat> Groups = new List<GroupChat>();
-    public List<User> Members = new List<User>();
-
-
-    public string ContactEmail { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    private async Task OpenDialog()
     {
-        Groups = await ClientGroupChatService.GetAllGroup();
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
 
+        var parameters = new DialogParameters();
+        var result = await DialogService.Show<Dialog>("Create Room", parameters, closeOnEscapeKey).Result;
 
-        CurrentUserId = await ClientUserService.GetUserId();
-
-       
+        if (result != null && !result.Cancelled)
+        {
+            groupInput = result.Data?.ToString();
+            Console.WriteLine(groupInput);
+            await CreateGroupAsync(groupInput);
+        }
+        else
+        {
+            Console.WriteLine("Dialog was closed or canceled.");
+        }
     }
 
-
-    // protected override async Task OnInitializedAsync()
-    // {
-
-    //     hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub")).WithAutomaticReconnect().Build();
-
-    //     await hubConnection.StartAsync();
-
-    //     hubConnection.On<ChatMessage, string>("ReceiveMessage", async (message, userName) =>
-    //     {
-    //         Console.WriteLine("Connected: Connection ID: " + hubConnection.ConnectionId);
-
-    //         if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId.ToString()) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId.ToString()))
-    //         {
-    //             if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId.ToString()))
-    //             {
-    //                 messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = CurrentUserEmail } });
-    //                 Console.Write(userName);
-    //                 await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
-    //             }
-    //             else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId.ToString()))
-    //             {
-    //                 messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = ContactEmail } });
-    //             }
-    //         }
-    //         StateHasChanged();
-    //     });
-
-    //     CurrentUserId = await ClientUserService.GetUserId();
-    //     CurrentUserEmail = await ClientUserService.GetUserEmail();
-
-    //     if (!string.IsNullOrEmpty(ContactId.ToString()))
-    //     {
-    //         await LoadUserChat(ContactId);
-    //     }
-    // }
-
-    // public async Task SubmitAsync()
-    // {
-    //     if (!string.IsNullOrEmpty(CurrentMessage) && !string.IsNullOrEmpty(ContactId.ToString()))
-    //     {
-    //         //Save Message to DB
-    //         var chatHistory = new ChatMessage()
-    //             {
-    //                 Content = CurrentMessage,
-    //                 ToUserId = ContactId,
-    //                 Timestamp = DateTime.Now,
-    //                 FromUserId = int.Parse(CurrentUserId),
-
-    //             };
-
-    //         await ClientChatService.SaveMessageAsync(chatHistory);
-    //         Console.WriteLine(CurrentUserEmail);
-    //         await hubConnection.SendAsync("SendMessage", chatHistory, CurrentUserEmail);
-    //         CurrentMessage = string.Empty;
-    //     }
-    // }
     async Task LoadUserChat(int groupChatId)
     {
-        NavigationManager.NavigateTo($"group-chat/{groupChatId}");
+        string groupName = await ClientGroupChatService.GetGroupName(GroupChatId);
+
+        Console.WriteLine(groupName);
+
+        if (GroupChatId != 0)
+        {
+            await hubConnection.SendAsync("RemoveGroup", groupName);
+        }
+
+        GroupChatId = groupChatId;
+
+        string passGroupName = await ClientGroupChatService.GetGroupName(GroupChatId);
+
+        await hubConnection.SendAsync("JoinGroup", passGroupName);
+        NavigationManager.NavigateTo($"group-chat/{GroupChatId}");
+
         messages = new List<GroupChatMessage>();
         messages = await ClientGroupChatService.GetConversationAsync(groupChatId);
         Members = await ClientGroupChatService.GetGroupChatMembers(groupChatId);
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        Groups = await ClientGroupChatService.GetAllGroup();
+        CurrentUserEmail = await ClientUserService.GetUserEmail();
 
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        await hubConnection.StartAsync();
+
+        // Register hub methods only when the connection is active
+        hubConnection.On<GroupChat>("ReceivedGroupName", async (input) =>
+        {
+            Console.WriteLine("Connected: Connection ID: " + hubConnection.ConnectionId);
+            Groups.Add(input);
+            StateHasChanged();
+        });
+
+        hubConnection.On<GroupChatMessage>("ReceivedGroupMessage", async (message) =>
+        {
+            Console.WriteLine("Received Message Connected: Connection ID: " + hubConnection.ConnectionId);
+
+            messages.Add(new GroupChatMessage
+                    {
+                        Content = message.Content,
+                        Timestamp = message.Timestamp,
+                        User = new User() { Email = CurrentUserEmail }
+                    });
+            StateHasChanged();        
+        });
+    }
+
+    public async Task SendMessageAsync()
+    {
+        string currentGroup = await ClientGroupChatService.GetGroupName(GroupChatId);
+
+        if (hubConnection.State == HubConnectionState.Connected)
+        {
+            if (!string.IsNullOrEmpty(CurrentMessage) && GroupChatId != 0)
+            {
+                // Save Message to DB
+                var chatHistory = new GroupChatMessage()
+                    {
+                        Timestamp = DateTime.Now,
+                        Content = CurrentMessage,
+                        GroupChatId = GroupChatId
+                    };
+
+                await ClientGroupChatService.SaveMessagesAsync(chatHistory);
+
+                // Call the hub method to send the message to the group
+                await hubConnection.SendAsync("SendMessageToGroup", currentGroup, chatHistory);
+
+                CurrentMessage = string.Empty;
+            }
+        }
+        else
+        {
+            // Handle the case when the connection is not active
+            Console.WriteLine("Connection is not active.");
+        }
+    }
+
+    // Method to Create a Group Chat
+    private async Task CreateGroupAsync(string groupName)
+    {
+        GroupChatDTO input = new GroupChatDTO()
+            {
+                Name = groupName
+            };
+
+        await ClientGroupChatService.CreateGroupChat(input);
+        await hubConnection.SendAsync("CreateGroup", input);
+    }
 }

@@ -8,6 +8,6 @@ namespace StudentSystem.Shared.DTOs
 {
     public class GroupChatDTO
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }
