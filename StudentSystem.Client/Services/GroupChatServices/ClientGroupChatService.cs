@@ -19,11 +19,61 @@ namespace StudentSystem.Client.Services.GroupChatServices
             _snackbar = snackbar;
             _navigationManager = navigationManager;
         }
-        public Task<bool> AddUserToGroup(int userId, int groupChatId)
+        public async Task<int> AddUserToGroup(int userId, int groupChatId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var userToAdd = new AddUserToGroupDTO 
+                { 
+                    UserId = userId, 
+                    GroupChatId = groupChatId
+                };
 
+                var response = await _httpClient.PostAsJsonAsync($"api/GroupChat/add-user-to-group", userToAdd);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _snackbar.Add(
+                        "Successfully Added User to Group",
+                        Severity.Success,
+                        config =>
+                        {
+                            config.ShowTransitionDuration = 200;
+                            config.HideTransitionDuration = 400;
+                            config.VisibleStateDuration = 2500;
+                        });
+                    return 1; // Assuming 1 represents success
+                }
+                else
+                {
+                    _snackbar.Add(
+                        "User Already Added",
+                        Severity.Warning,
+                        config =>
+                        {
+                            config.ShowTransitionDuration = 200;
+                            config.HideTransitionDuration = 400;
+                            config.VisibleStateDuration = 2500;
+                        });
+                    return 0; // 0 represents failure
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception as needed
+                _snackbar.Add(
+                    "An error occurred while adding user to group",
+                    Severity.Error,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+                return 0; // 0 represents failure
+            }
         }
+
 
         public async Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request)
         {

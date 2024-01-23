@@ -13,7 +13,7 @@ namespace StudentSystem.Client.Services.GroupChatServices
         Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request);
         Task<List<GroupChat>> RemoveGroupChat(int groupChatId);
         Task<List<User>> GetGroupChatMembers(int groupChatId);
-        Task<bool> AddUserToGroup(int userId, int groupChatId);
+        Task<int> AddUserToGroup(int userId, int groupChatId);
         Task<bool> RemoveUserToGroup(int userId, int groupChatId);
         Task<string> GetGroupName(int groupChatId);
     }

@@ -10,12 +10,8 @@ namespace StudentSystem.Server.Hubs
 {
     public class ChatHub : Hub
     {
-        
         public async Task JoinGroup(string group)
         {           
-            // TODO: Query Groups of Currently LoggedIn User 
-            // Foreach JoinGroup Method 
-
             await Groups.AddToGroupAsync(Context.ConnectionId, group);
         }
 
@@ -34,10 +30,14 @@ namespace StudentSystem.Server.Hubs
             await Clients.All.SendAsync("ReceivedGroupName", group);
         }     
 
+        public async Task AddToGroup(string groupName, User request)
+        {
+            await Clients.Group(groupName).SendAsync("ReceiveUserToAdd", request);
+        }
+
         public async Task RemoveGroup(string groupName)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-            //await Clients.Group(groupName).SendAsync("ReceiveMessage", $"{Context.ConnectionId} has left the group {groupName}");
         }
 
         public async Task SendMessageToGroup(string groupName, GroupChatMessage message)
@@ -45,7 +45,5 @@ namespace StudentSystem.Server.Hubs
             // Append the message to the group chat
             await Clients.Group(groupName).SendAsync("ReceivedGroupMessage", message);
         }
-
     }
-
 }

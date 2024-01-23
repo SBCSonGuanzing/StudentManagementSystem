@@ -50,9 +50,16 @@ namespace StudentSystem.Server.Controllers
         }
 
         [HttpPost]
-        public async Task SaveMessagesAsyc(GroupChatMessage message)
+        public async Task<ActionResult<List<GroupChatMessage>>> SaveMessagesAsyc(GroupChatMessage message)
         {
-            await _chatService.SaveMessagesAsync(message);
+            var result = await _chatService.SaveMessagesAsync(message);
+
+            if(result == null)
+            {
+                return BadRequest("No Messages Save");
+            }
+            return Ok(result);
+
         }
 
         [HttpPost("create-group")]
@@ -86,16 +93,17 @@ namespace StudentSystem.Server.Controllers
 
 
         [HttpPost("add-user-to-group")]
-        public async Task<ActionResult<bool>> AddUserToGroup(int userId, int groupChatId)
-        {
-            var result = await _chatService.AddUserToGroup(userId, groupChatId);
+        public async Task<ActionResult<int>> AddUserToGroup(AddUserToGroupDTO request)
+        { 
+            var result = await _chatService.AddUserToGroup(request.UserId, request.GroupChatId);
 
-            if (!result)
+            if (result == 0) 
             {
                 return BadRequest("Failed to add user to the group.");
             }
 
-            return Ok(true);
+            return Ok(result);
+          
         }
 
         [HttpDelete("remove-user-to-group")]

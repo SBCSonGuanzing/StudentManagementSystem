@@ -18,7 +18,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
             _contextAccessor = contextAccessor;
         }
 
-        public async Task<bool> AddUserToGroup(int userId, int groupChatId)
+        public async Task<int> AddUserToGroup(int userId, int groupChatId)
         {
             try
             {
@@ -27,36 +27,33 @@ namespace StudentSystem.Server.Services.GroupChatServices
 
                 if (user == null || groupChat == null)
                 {
-                    return false;
+                    return 0;
                 }
 
                 if (groupChat.Members.Any(m => m.Id == userId))
                 {
-                    return false;
+                    return 0;
                 }
 
                 groupChat.Members.Add(user);
                 await _dataContext.SaveChangesAsync();
 
-                return true;
+                return user.Id;
             }
             catch (Exception ex)
             {
-                return false;
+                return 0;
             }
         }
-
+     
         public async Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request)
         {
-            // Check if a group chat with the same name already exists
             var groupExisting = await _dataContext.GroupChats
                 .Where(group => group.Name == request.Name)
                 .FirstOrDefaultAsync();
 
             if (groupExisting != null)
             {
-                // Group chat with the same name already exists, handle accordingly
-                // You may want to return an error or take appropriate action
                 return null;
             }
 
@@ -64,7 +61,15 @@ namespace StudentSystem.Server.Services.GroupChatServices
             var newGroup = new GroupChat()
             {
                 Name = request.Name,
+                Members = new List<User>()
             };
+
+            foreach (int id in request.MembersId)
+            {
+                // TODO: Query User with selectedUser.Id
+                User member = _dataContext.Users.First(p => p.Id == id);
+                newGroup.Members.Add(member);
+            }
 
             // Add the new group chat to the database
             _dataContext.GroupChats.Add(newGroup);
@@ -88,7 +93,6 @@ namespace StudentSystem.Server.Services.GroupChatServices
             // Return the updated list of group chats
             return await _dataContext.GroupChats.ToListAsync();
         }
-
 
         public async Task<List<GroupChat>> GetAllGroup()
         {
@@ -219,11 +223,11 @@ namespace StudentSystem.Server.Services.GroupChatServices
             }
         }
 
-        public async Task SaveMessagesAsync(GroupChatMessage message)
+        public async Task<List<GroupChatMessage>> SaveMessagesAsync(GroupChatMessage message)
         {
             var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId == null) return;
+            if (userId == null) return null;
 
             message.Timestamp = DateTime.Now;
             message.Content = message.Content;
@@ -231,6 +235,11 @@ namespace StudentSystem.Server.Services.GroupChatServices
             message.GroupChatId = message.GroupChatId;
             await _dataContext.GroupChatMessages.AddAsync(message);
             await _dataContext.SaveChangesAsync();
+
+            var GroupChats = await _dataContext.GroupChatMessages
+                                .Where(m => m.GroupChatId == message.GroupChatId )
+                                .ToListAsync();
+            return GroupChats;
         }
     }
 }

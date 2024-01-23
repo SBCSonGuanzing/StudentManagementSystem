@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace StudentSystem.Shared.DTOs
 {
-    public class GroupChatDTO
+    public class AddUserToGroupDTO
     {
-        public string Name { get; set; } = string.Empty;
-        public List<int> MembersId { get; set; } = new List<int>();
+        public int UserId {  get; set; }
+        public int GroupChatId { get; set; }
     }
 }
+ 
