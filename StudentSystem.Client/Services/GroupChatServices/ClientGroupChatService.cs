@@ -4,6 +4,7 @@ using StudentSystem.Shared.DTOs;
 using StudentSystem.Shared.Models;
 using System.Net;
 using System.Net.Http.Json;
+using static System.Net.WebRequestMethods;
 
 namespace StudentSystem.Client.Services.GroupChatServices
 {
@@ -19,20 +20,16 @@ namespace StudentSystem.Client.Services.GroupChatServices
             _snackbar = snackbar;
             _navigationManager = navigationManager;
         }
-        public async Task<int> AddUserToGroup(int userId, int groupChatId)
+        public async Task<GroupChat> AddUserToGroup(AddUserToGroupDTO request)
         {
             try
             {
-                var userToAdd = new AddUserToGroupDTO 
-                { 
-                    UserId = userId, 
-                    GroupChatId = groupChatId
-                };
-
-                var response = await _httpClient.PostAsJsonAsync($"api/GroupChat/add-user-to-group", userToAdd);
+                var response = await _httpClient.PostAsJsonAsync("api/GroupChat/add-user-to-group/", request);
 
                 if (response.IsSuccessStatusCode)
                 {
+                    var addedGroup = await response.Content.ReadFromJsonAsync<GroupChat>();
+
                     _snackbar.Add(
                         "Successfully Added User to Group",
                         Severity.Success,
@@ -42,27 +39,39 @@ namespace StudentSystem.Client.Services.GroupChatServices
                             config.HideTransitionDuration = 400;
                             config.VisibleStateDuration = 2500;
                         });
-                    return 1; // Assuming 1 represents success
+
+                    return addedGroup;
                 }
-                else
+                else if (response.StatusCode == HttpStatusCode.BadRequest)
                 {
                     _snackbar.Add(
-                        "User Already Added",
-                        Severity.Warning,
+                        "User already a Member",
+                        Severity.Error,
                         config =>
                         {
                             config.ShowTransitionDuration = 200;
                             config.HideTransitionDuration = 400;
                             config.VisibleStateDuration = 2500;
                         });
-                    return 0; // 0 represents failure
+                }
+                else
+                {
+                    _snackbar.Add(
+                        "Failed to add user to the group",
+                        Severity.Error,
+                        config =>
+                        {
+                            config.ShowTransitionDuration = 200;
+                            config.HideTransitionDuration = 400;
+                            config.VisibleStateDuration = 2500;
+                        });
                 }
             }
             catch (Exception ex)
             {
                 // Log or handle the exception as needed
                 _snackbar.Add(
-                    "An error occurred while adding user to group",
+                    "An error occurred while adding user to the group",
                     Severity.Error,
                     config =>
                     {
@@ -70,10 +79,10 @@ namespace StudentSystem.Client.Services.GroupChatServices
                         config.HideTransitionDuration = 400;
                         config.VisibleStateDuration = 2500;
                     });
-                return 0; // 0 represents failure
             }
-        }
 
+            return null; // Return null in case of an exception or failure
+        }
 
         public async Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request)
         {
@@ -131,23 +140,30 @@ namespace StudentSystem.Client.Services.GroupChatServices
 
         }
 
+        public async Task<List<User>> GetNotMembers(int groupId)
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<User>>($"api/GroupChat/get-notgroup-members/{groupId}");
+
+            return result;
+        }
+
         public async Task<List<GroupChatMessage>> GetConversationAsync(int groupChatId)
         {
             return await _httpClient.GetFromJsonAsync<List<GroupChatMessage>>($"api/GroupChat/get-convo/{groupChatId}");
 
         }
 
-        public async Task<List<User>> GetGroupChatMembers(int groupChatId)
+        public async Task<GetChatMembersDTO> GetGroupChatMembers(int groupChatId)
         {
             var result = await _httpClient.GetAsync($"api/GroupChat/users-from-group/{groupChatId}");
 
             if (result.StatusCode == HttpStatusCode.OK)
             {
-                var users = await result.Content.ReadFromJsonAsync<List<User>>();
+                var users = await result.Content.ReadFromJsonAsync<GetChatMembersDTO>();
                 return users;
             }
-           
-            return new List<User>();
+
+            return new GetChatMembersDTO();
         }
 
         public async Task<string> GetGroupName(int groupChatId)
@@ -188,19 +204,115 @@ namespace StudentSystem.Client.Services.GroupChatServices
             return data;
         }
 
-        public Task<List<GroupChat>> RemoveGroupChat(int groupChatId)
+        public async Task<List<GroupChat>> RemoveGroupChat(int groupChatId)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.DeleteAsync($"api/GroupChat/delete-group/{groupChatId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _snackbar.Add(
+                    "User Deleted Succesfully",
+                    Severity.Warning,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+
+                return await response.Content.ReadFromJsonAsync<List<GroupChat>>();
+            }
+            else
+            {
+                // Handle other error cases if needed
+                _snackbar.Add(
+                    "User does not Exist",
+                    Severity.Error,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+
+                return null;
+            }
         }
 
-        public Task<bool> RemoveUserToGroup(int userId, int groupChatId)
+        public async Task<bool> RemoveUserToGroup(int userId, int groupChatId)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.DeleteAsync($"api/GroupChat/remove-user-to-group/{userId}/{groupChatId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _snackbar.Add(
+                    "User Deleted Succesfully",
+                    Severity.Warning,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+
+                return await response.Content.ReadFromJsonAsync<bool>();
+            }
+            else
+            {
+                // Handle other error cases if needed
+                _snackbar.Add(
+                    "User does not Exist",
+                    Severity.Error,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+
+                return false;
+            }
         }
 
         public async Task SaveMessagesAsync(GroupChatMessage message)
         {
             await _httpClient.PostAsJsonAsync("api/GroupChat", message);
+        }
+
+        public async Task<GroupChat> UpdateGroup(int groupId, GroupToUpdate groupName)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/GroupChat/update-group/{groupId}", groupName);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                _snackbar.Add(
+                    "Group Renamed Succesfully",
+                    Severity.Success,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+
+                return await response.Content.ReadFromJsonAsync<GroupChat>();
+            }
+            else
+            {
+                // Handle other error cases if needed
+                _snackbar.Add(
+                    "Group does not Exist",
+                    Severity.Error,
+                    config =>
+                    {
+                        config.ShowTransitionDuration = 200;
+                        config.HideTransitionDuration = 400;
+                        config.VisibleStateDuration = 2500;
+                    });
+
+                return null;
+            }
         }
     }
 }

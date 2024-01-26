@@ -10,11 +10,12 @@ namespace StudentSystem.Server.Services.GroupChatServices
         Task<string> GetGroupName(int groupChatId); 
         Task<List<GroupChat>> GetAllGroup();
         Task<User> GetUserDetailsAsync(int userId);
-        Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request);
+        Task<List<GroupChat>?> CreateGroupChat(GroupChatDTO request);
         Task<List<GroupChat>> RemoveGroupChat(int groupChatId);
-        Task<List<User>> GetGroupChatMembers(int groupChatId);
-        Task<int> AddUserToGroup(int userId, int groupChatId);
+        Task <GetChatMembersDTO> GetGroupChatMembers(int groupChatId);
+        Task<GroupChat> AddUserToGroup(int userId, int groupChatId);
         Task<bool> RemoveUserToGroup(int userId, int groupChatId);
-
+        Task<List<User>> GetNotMembers(int groupId);
+        Task<GroupChat?> UpdateGroupName(int id, GroupToUpdate groupName);
     }
 }

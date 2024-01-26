@@ -110,16 +110,20 @@ else {
                        config.VisibleStateDuration = 2500;
                    });
                 NavigationManager.NavigateTo("/all-books");
-        
+
             }
             else
             {
+                books.Name = book.Name;
+                Console.WriteLine(books.Name);
                 await clientBookService.AddBook(books);
             }
 
         }
         else
         {
+            books.Name = book.Name;
+            Console.WriteLine(books.Name);
             await clientBookService.UpdateBook((int)id, books);
             
         }

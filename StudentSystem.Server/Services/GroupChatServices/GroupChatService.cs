@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using StudentSystem.Server.Data;
 using StudentSystem.Shared.DTOs;
@@ -11,42 +12,53 @@ namespace StudentSystem.Server.Services.GroupChatServices
     {
         private readonly DataContext _dataContext;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly NavigationManager _navigationManager;
 
-        public GroupChatService(DataContext dataContext, IHttpContextAccessor contextAccessor)
+        public GroupChatService(DataContext dataContext, IHttpContextAccessor contextAccessor, NavigationManager navigationManager)
         {
             _dataContext = dataContext;
             _contextAccessor = contextAccessor;
+            _navigationManager = navigationManager;
         }
 
-        public async Task<int> AddUserToGroup(int userId, int groupChatId)
+        public async Task<GroupChat> AddUserToGroup(int userId, int groupChatId)
         {
             try
             {
-                var user = await _dataContext.Users.FindAsync(userId);
-                var groupChat = await _dataContext.GroupChats.FindAsync(groupChatId);
+                var groupExisting = await _dataContext.GroupChats
+                    .Where(group => group.Id == groupChatId)
+                    .Include(group => group.Members)
+                    .FirstOrDefaultAsync();
 
-                if (user == null || groupChat == null)
+                if (groupExisting == null)
                 {
-                    return 0;
+                    return null; 
                 }
 
-                if (groupChat.Members.Any(m => m.Id == userId))
+                if (groupExisting.Members.Any(member => member.Id == userId))
                 {
-                    return 0;
+                    return null; 
                 }
 
-                groupChat.Members.Add(user);
-                await _dataContext.SaveChangesAsync();
-
-                return user.Id;
+                User user = await _dataContext.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    groupExisting.Members.Add(user);
+                    await _dataContext.SaveChangesAsync();
+                    return groupExisting;
+                }
+                else
+                {
+                    return null; 
+                }
             }
             catch (Exception ex)
             {
-                return 0;
+                return null; 
             }
         }
-     
-        public async Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request)
+
+        public async Task<List<GroupChat>?> CreateGroupChat(GroupChatDTO request)
         {
             var groupExisting = await _dataContext.GroupChats
                 .Where(group => group.Name == request.Name)
@@ -57,40 +69,38 @@ namespace StudentSystem.Server.Services.GroupChatServices
                 return null;
             }
 
-            // Create a new group chat
-            var newGroup = new GroupChat()
+            var UserId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if(UserId == null)
             {
+                return null;
+            }
+            var newGroup = new GroupChat()
+            {             
                 Name = request.Name,
+                OwnerId = int.Parse(UserId),
                 Members = new List<User>()
             };
 
             foreach (int id in request.MembersId)
             {
-                // TODO: Query User with selectedUser.Id
                 User member = _dataContext.Users.First(p => p.Id == id);
                 newGroup.Members.Add(member);
             }
 
-            // Add the new group chat to the database
             _dataContext.GroupChats.Add(newGroup);
             await _dataContext.SaveChangesAsync();
 
-            // Get the current user's ID
-            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            // Retrieve the user from the database
             var user = await _dataContext.Users
                 .Include(u => u.GroupChats)
-                .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+                .FirstOrDefaultAsync(u => u.Id.ToString() == UserId);
 
             if (user != null)
             {
-                // Add the user to the newly created group chat
                 user.GroupChats.Add(newGroup);
                 await _dataContext.SaveChangesAsync();
             }
 
-            // Return the updated list of group chats
             return await _dataContext.GroupChats.ToListAsync();
         }
 
@@ -129,17 +139,27 @@ namespace StudentSystem.Server.Services.GroupChatServices
             return groupChatMessages;
         }
 
-        public async Task<List<User>> GetGroupChatMembers(int groupChatId)
+        public async Task<GetChatMembersDTO> GetGroupChatMembers(int groupChatId)
         {
-            GroupChat myGroupChat = await _dataContext.GroupChats
-                                    .Include(gc => gc.Members)
+            GroupChat? myGroupChat = await _dataContext.GroupChats
+                                    .Include(gc => gc.Members) 
                                     .FirstOrDefaultAsync(gc => gc.Id == groupChatId);
 
             if (myGroupChat != null && myGroupChat.Members != null)
             {
-                return myGroupChat.Members;
+                GetChatMembersDTO response = new GetChatMembersDTO();
+                response.OwnerId = myGroupChat.OwnerId;
+                response.users = myGroupChat.Members.Select(user => new User
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Avatar = user.Avatar,
+
+                }).ToList();
+
+                return response;
             }
-            return new List<User>();
+            return new GetChatMembersDTO();
         }
 
         public async Task<string> GetGroupName(int groupChatId)
@@ -150,6 +170,20 @@ namespace StudentSystem.Server.Services.GroupChatServices
                         .FirstOrDefaultAsync();
 
             return result;
+        }
+
+        public async Task<List<User>> GetNotMembers(int groupId)
+        {
+            var groupMembers = await GetGroupChatMembers(groupId);
+
+            var allUsers = await _dataContext.Users
+                .ToListAsync();
+
+            var usersNotInGroup = allUsers
+                .Where(user => !groupMembers.users.Any(groupUser => groupUser.Id == user.Id))
+                .ToList();
+
+            return usersNotInGroup;
         }
 
         public async Task<User> GetUserDetailsAsync(int userId)
@@ -188,7 +222,6 @@ namespace StudentSystem.Server.Services.GroupChatServices
             await _dataContext.SaveChangesAsync();
 
             return await _dataContext.GroupChats.ToListAsync();
-
         }
 
         public async Task<bool> RemoveUserToGroup(int userId, int groupChatId)
@@ -203,7 +236,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
                 if (user == null || groupChat == null)
                 {
                     return false;
-                }
+                } 
 
                 var memberToRemove = groupChat.Members.FirstOrDefault(m => m.Id == userId);
 
@@ -241,5 +274,22 @@ namespace StudentSystem.Server.Services.GroupChatServices
                                 .ToListAsync();
             return GroupChats;
         }
+
+        public async Task<GroupChat?> UpdateGroupName(int groupId, GroupToUpdate groupName)
+        {
+            var groupToRename = await _dataContext.GroupChats.FindAsync(groupId);
+            if (groupToRename != null)
+            {
+                groupToRename.Name = groupName.Name;
+                _dataContext.SaveChanges();
+            }else
+            {
+                return null;
+            }
+
+            return await _dataContext.GroupChats
+                        .Where(m => m.Name == groupName.Name)
+                        .FirstOrDefaultAsync();
+        }
     }
-}
+} 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using StudentSystem.Server.Hubs;
 using StudentSystem.Server.Services.GroupChatServices;
 using StudentSystem.Shared.DTOs;
 using StudentSystem.Shared.Models;
@@ -12,10 +14,12 @@ namespace StudentSystem.Server.Controllers
     public class GroupChatController : ControllerBase
     {
         private readonly IGroupChatService _chatService;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public GroupChatController(IGroupChatService chatService)
+        public GroupChatController(IGroupChatService chatService, IHubContext<ChatHub> hubContext)
         {
             _chatService = chatService;
+            _hubContext = hubContext;
         }
 
         [HttpGet("get-convo/{groupChatId}")]
@@ -65,11 +69,11 @@ namespace StudentSystem.Server.Controllers
         [HttpPost("create-group")]
         public async Task<ActionResult<List<GroupChat>>> CreateGroupChat(GroupChatDTO request)
         {
-            List<GroupChat> result = await _chatService.CreateGroupChat(request);
+            List<GroupChat>? result = await _chatService.CreateGroupChat(request);
 
             if (result == null)
             {
-                return Conflict("Group chat already exists.");
+                return Unauthorized("Group chat already exists.");
             }
             else if (result.Count == 0)
             {
@@ -93,20 +97,23 @@ namespace StudentSystem.Server.Controllers
 
 
         [HttpPost("add-user-to-group")]
-        public async Task<ActionResult<int>> AddUserToGroup(AddUserToGroupDTO request)
-        { 
+        public async Task<ActionResult<GroupChat>> AddUserToGroup(AddUserToGroupDTO request)
+        {
             var result = await _chatService.AddUserToGroup(request.UserId, request.GroupChatId);
 
-            if (result == 0) 
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
             {
                 return BadRequest("Failed to add user to the group.");
             }
-
-            return Ok(result);
-          
         }
 
-        [HttpDelete("remove-user-to-group")]
+
+
+        [HttpDelete("remove-user-to-group/{userId}/{groupChatId}")]
         public async Task<ActionResult<bool>> RemoveUserToGroup(int userId, int groupChatId)
         {
             var result = await _chatService.RemoveUserToGroup(userId, groupChatId);
@@ -119,11 +126,11 @@ namespace StudentSystem.Server.Controllers
         }
 
         [HttpGet("users-from-group/{groupChatId}")]
-        public async Task<ActionResult<List<User>>> GetGroupChatMembers(int groupChatId)
+        public async Task<ActionResult<GetChatMembersDTO>> GetGroupChatMembers(int groupChatId)
         {
             var result = await _chatService.GetGroupChatMembers(groupChatId);
 
-            if (result.Count == 0)
+            if (result.users.Count == 0)
             {
                 return NotFound("No Group Chat Members Found");
             }
@@ -142,7 +149,18 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);  
         }
 
-        [HttpDelete("delete-group/{id}")]
+        [HttpGet("get-notgroup-members/{groupId}")]
+        public async Task<ActionResult<List<User>>> GetNotMembers(int groupId)
+        {
+            var result = await _chatService.GetNotMembers(groupId);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return NotFound("No members found");
+        }
+
+        [HttpDelete("delete-group/{groupChatId}")]
         public async Task<ActionResult<List<GroupChat>>> RemoveGroupChat(int groupChatId)
         {
             var result = await _chatService.RemoveGroupChat(groupChatId);
@@ -153,5 +171,19 @@ namespace StudentSystem.Server.Controllers
 
             return NotFound("No Group Chat Deleted");
         }
+
+        [HttpPut("update-group/{id}")]
+
+        public async Task<ActionResult<GroupChat?>> UpdateGroup(int id, GroupToUpdate groupName)
+        {
+            var result = await _chatService.UpdateGroupName(id, groupName);
+            if(result != null)
+            {
+                return Ok(result);
+            }
+
+            return NotFound("No Group Chat Exist");
+        }
+
     }
 }

@@ -2,10 +2,12 @@
 @page "/chat/{ContactId:int}"
 
 @using StudentSystem.Client.Services.ChatServices
+@using StudentSystem.Client.Services.GroupChatServices
 @using StudentSystem.Client.Services.UserServices
 @using Microsoft.JSInterop;
 
 @inject IClientChatService ClientChatService
+@inject IClientGroupChatService ClientGroupChatService
 @inject IClientUserService ClientUserService
 @inject NavigationManager NavigationManager
 @inject ISnackbar _snackbar
@@ -14,7 +16,7 @@
 @rendermode InteractiveWebAssembly
 
 <div class="d-flex flex-grow-1 flex-row">
-    <MudPaper Elevation="25" Class="py-4 flex-grow-1 col-md-8">
+    <MudPaper Elevation="25" Class="py-4 flex-grow-1 col-md-8 ">
         <MudToolBar Dense="true">
             @if (string.IsNullOrEmpty(ContactId.ToString()))
             {
@@ -34,7 +36,13 @@
             @foreach (var message in messages)
             {
                 if (message.User.Id.ToString() == CurrentUserId)
-                {   
+                {
+                    Console.WriteLine("Right Side");
+
+                    Console.WriteLine("Current User: ", message.User.Email, "Current UserId: ", message.User.Id);
+                    Console.WriteLine(CurrentUserId);
+                    Console.WriteLine(message.Content);
+
                 <div class="d-flex flex-row my-4">
                     <div class="ml-auto mr-4">
                         <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
@@ -51,6 +59,9 @@
                 </div>
                 } else
                 {
+                    Console.WriteLine("Left Side");
+                    Console.WriteLine(CurrentUserId);
+                    Console.WriteLine(message.Content);
                     <div class="d-flex flex-row my-4">
                         <div class="mr-4">
                             <MudAvatar Color="Color.Secondary"
@@ -89,7 +100,7 @@
             </MudButton>
         </MudPaper>
     </MudPaper>
-    <MudPaper Elevation="25" Class="pa-3 ml-6 col-md-4">
+    <MudPaper Elevation="25" Class="pa-3 ml-6 col-md-4 mud-theme-primary">
 
         <MudToolBar Dense="true">
             <MudText Typo="Typo.h6" Inline="true" Class="mr-2">#</MudText>
@@ -161,7 +172,7 @@
         hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub")).WithAutomaticReconnect().Build();
 
         await hubConnection.StartAsync();
-         
+
         hubConnection.On<ChatMessage, string>("ReceiveMessage", async (message, userName) =>
         {
             Console.WriteLine("Connected: Connection ID: " + hubConnection.ConnectionId);
@@ -171,13 +182,15 @@
             {
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId.ToString()))
                 {
-                    messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = CurrentUserEmail } });
+                    messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = message.User});
                     Console.Write(userName);
                     await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                 }
                 else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId.ToString()))
                 {
-                    messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = new User() { Email = ContactEmail } });
+                    messages.Add(new ChatMessage { Content = message.Content, Timestamp = message.Timestamp, User = message.User });
+                    await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
+
                 }
             }
             StateHasChanged();
@@ -206,8 +219,11 @@
 
                 };
 
+            var user = await ClientGroupChatService.GetUserDetailsAsync(int.Parse(CurrentUserId));
+
             await ClientChatService.SaveMessageAsync(chatHistory);
-            Console.WriteLine(CurrentUserEmail);
+
+            chatHistory.User = user;
             await hubConnection.SendAsync("SendMessage", chatHistory, CurrentUserEmail);
             CurrentMessage = string.Empty;
         }

@@ -33,7 +33,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Users = await ClientUserService.GetAllUser();
+        Users = await ClientGroupChatService.GetUsersAsync();
     }
 
     void Submit() => MudDialog.Close(DialogResult.Ok(new GroupChatDTO { Name = groupName, MembersId = selectedUserIds.Select(user => user.Id).ToList() }));
