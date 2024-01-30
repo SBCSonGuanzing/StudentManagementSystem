@@ -27,7 +27,7 @@ namespace StudentSystem.Server.Services.UserServices
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<string> GetSingleUser()
+        public async Task<string?> GetSingleUser()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -63,7 +63,7 @@ namespace StudentSystem.Server.Services.UserServices
         }
 
         
-        public async Task<string> GetUserRole()
+        public async Task<string?> GetUserRole()
         {
             var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
             var users = await _context.Users
@@ -74,7 +74,7 @@ namespace StudentSystem.Server.Services.UserServices
             return users;
         }
 
-        public async Task<string> GetUserId()
+        public async Task<string?> GetUserId()
         {
             var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var users = await _context.Users
@@ -84,8 +84,7 @@ namespace StudentSystem.Server.Services.UserServices
 
             return users;
         }
-
-        public async Task<string> GetUserEmail()
+        public async Task<string?> GetUserEmail()
         {
             var userEmail = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
             var users = await _context.Users
@@ -95,5 +94,15 @@ namespace StudentSystem.Server.Services.UserServices
 
             return users;
         }
+
+        //public async Task<string> GetToken()
+        //{
+
+        //    var userClaims = _httpContextAccessor.HttpContext?.User?.Claims;
+
+        //    var token = userClaims;
+
+        //    return token;
+        //}
     }
 }

@@ -84,5 +84,11 @@ namespace StudentSystem.Client.Services.UserServices
             var result = await _httpClient.GetStringAsync("api/User/user-email");
             return result;
         }
+
+        //public async Task<string> GetToken()
+        //{
+        //    var result = await _httpClient.GetStringAsync("api/User/get-token");
+        //    return result;
+        //}
     }
 }

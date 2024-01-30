@@ -17,6 +17,6 @@ namespace StudentSystem.Client.Services.UserServices
         Task<string> GetUserId();
         Task<string> GetUserEmail();
 
-
+        //Task<string> GetToken();
     }
 }

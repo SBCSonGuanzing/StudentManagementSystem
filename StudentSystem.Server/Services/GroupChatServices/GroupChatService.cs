@@ -122,26 +122,38 @@ namespace StudentSystem.Server.Services.GroupChatServices
         }
 
         public async Task<List<GroupChatMessage>> GetConversationAsync(int groupChatId)
-        {         
-            List<GroupChatMessage> groupChatMessages = await _dataContext.GroupChatMessages
-                .Where(message => message.GroupChatId == groupChatId)
-                .OrderBy(message => message.Timestamp)
-                .Include(a => a.User)
-                .Select(x => new GroupChatMessage
-                {
-                    Content = x.Content,
-                    Timestamp = x.Timestamp,
-                    UserId = x.UserId,
-                    GroupChatId = x.GroupChatId,
-                    Id = x.Id,
-                    User = x.User
-                }).ToListAsync();
-            return groupChatMessages;
+        {
+
+            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+          
+                List<GroupChatMessage> groupChatMessages = await _dataContext.GroupChatMessages
+                    .Include(a => a.User)
+                    .Include(message => message.GroupChat)
+                        .ThenInclude(message => message.Members)
+                    .Where(message => message.GroupChatId == groupChatId && message.GroupChat.Members.Any(m => m.Id == int.Parse(userId)))
+                    .OrderBy(message => message.Timestamp)
+                    .Select(x => new GroupChatMessage
+                    {
+                        Content = x.Content,
+                        Timestamp = x.Timestamp,
+                        UserId = x.UserId,
+                        GroupChatId = x.GroupChatId,
+                        Id = x.Id,
+                        User = x.User
+                    }).ToListAsync();
+                return groupChatMessages;
+
+           
         }
 
         public async Task<GetChatMembersDTO> GetGroupChatMembers(int groupChatId)
         {
+
+            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             GroupChat? myGroupChat = await _dataContext.GroupChats
+                                    .Where(gc => gc.Members.Any(m => m.Id == int.Parse(userId)))
                                     .Include(gc => gc.Members) 
                                     .FirstOrDefaultAsync(gc => gc.Id == groupChatId);
 
@@ -164,8 +176,10 @@ namespace StudentSystem.Server.Services.GroupChatServices
 
         public async Task<string> GetGroupName(int groupChatId)
         {
+            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var result = await _dataContext.GroupChats
-                        .Where(group => group.Id == groupChatId)
+                        .Where(group => group.Id == groupChatId && group.Members.Any(m => m.Id == int.Parse(userId)))
                         .Select(group => group.Name)
                         .FirstOrDefaultAsync();
 
@@ -174,9 +188,12 @@ namespace StudentSystem.Server.Services.GroupChatServices
 
         public async Task<List<User>> GetNotMembers(int groupId)
         {
+              var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var groupMembers = await GetGroupChatMembers(groupId);
 
             var allUsers = await _dataContext.Users
+                
                 .ToListAsync();
 
             var usersNotInGroup = allUsers
@@ -259,19 +276,42 @@ namespace StudentSystem.Server.Services.GroupChatServices
         public async Task<List<GroupChatMessage>> SaveMessagesAsync(GroupChatMessage message)
         {
             var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if(userId == null)
+            {
+                return null;
+            }
 
-            if (userId == null) return null;
+            var userIsInGroup = await _dataContext.GroupChats
+                            .Where(g => g.Id == message.GroupChatId)
+                            .Include(g => g.Members)
+                            .Select(g => g.Members)
+                            .FirstOrDefaultAsync();
+          
+            if(userIsInGroup == null)
+            {
+                return null;
+            }
 
-            message.Timestamp = DateTime.Now;
-            message.Content = message.Content;
-            message.User = await _dataContext.Users.FindAsync(int.Parse(userId));
-            message.GroupChatId = message.GroupChatId;
-            await _dataContext.GroupChatMessages.AddAsync(message);
-            await _dataContext.SaveChangesAsync();
+            if(userIsInGroup.Any(m => m.Id == int.Parse(userId)))
+            {
+                message.Timestamp = DateTime.Now;
+                message.Content = message.Content;
+                message.User = await _dataContext.Users.FindAsync(int.Parse(userId));
+                message.GroupChatId = message.GroupChatId;
+                await _dataContext.GroupChatMessages.AddAsync(message);
+                await _dataContext.SaveChangesAsync();
+
+                
+            } else
+            {
+                return null; 
+            }
 
             var GroupChats = await _dataContext.GroupChatMessages
-                                .Where(m => m.GroupChatId == message.GroupChatId )
-                                .ToListAsync();
+                                    .Where(m => m.GroupChatId == message.GroupChatId)
+                                    .ToListAsync();
+
             return GroupChats;
         }
 

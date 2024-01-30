@@ -276,7 +276,31 @@ namespace StudentSystem.Client.Services.GroupChatServices
 
         public async Task SaveMessagesAsync(GroupChatMessage message)
         {
-            await _httpClient.PostAsJsonAsync("api/GroupChat", message);
+            var result = await _httpClient.PostAsJsonAsync("api/GroupChat", message);
+
+            if(result.IsSuccessStatusCode)
+            {
+                _snackbar.Add(
+                   "Save Message Succesfully!",
+                   Severity.Success,
+                   config =>
+                   {
+                       config.ShowTransitionDuration = 200;
+                       config.HideTransitionDuration = 400;
+                       config.VisibleStateDuration = 2500;
+                   });
+            } else
+            {
+                _snackbar.Add(
+                   "Something, went wrong!, Refresh Page",
+                   Severity.Error,
+                   config =>
+                   {
+                       config.ShowTransitionDuration = 200;
+                       config.HideTransitionDuration = 400;
+                       config.VisibleStateDuration = 2500;
+                   });
+            }            
         }
 
         public async Task<GroupChat> UpdateGroup(int groupId, GroupToUpdate groupName)

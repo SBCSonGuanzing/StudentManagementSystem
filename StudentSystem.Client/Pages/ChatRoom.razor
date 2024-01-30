@@ -7,12 +7,16 @@
 @using Microsoft.JSInterop;
 
 @inject IDialogService DialogService
+
 @inject IClientChatService ClientChatService
 @inject IClientUserService ClientUserService
 @inject IClientGroupChatService ClientGroupChatService
+@inject ILocalStorageService _localStorage
 @inject NavigationManager NavigationManager
 @inject ISnackbar _snackbar
 @inject IJSRuntime _jsRuntime
+@inject HttpClient httpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @rendermode InteractiveWebAssembly
 
@@ -263,6 +267,8 @@
 
             string passGroupName = await ClientGroupChatService.GetGroupName(GroupChatId);
 
+
+
             await hubConnection.SendAsync("JoinGroup", passGroupName);
             NavigationManager.NavigateTo($"group-chat/{GroupChatId}");
 
@@ -270,6 +276,8 @@
             messages = await ClientGroupChatService.GetConversationAsync(groupChatId);
             Members = await ClientGroupChatService.GetGroupChatMembers(groupChatId);
             Users = await ClientGroupChatService.GetNotMembers(GroupChatId);
+
+            // Console.WriteLine(await GetAccessTokenAsync());
 
             GroupName = await ClientGroupChatService.GetGroupName(groupChatId);
             StateHasChanged();
@@ -294,23 +302,33 @@
 
         StateHasChanged();
 
+        string token = await _localStorage.GetItemAsStringAsync("token");
+        string foo = "Bearer " + token.Replace("\"", "");
+
         if (hubConnection == null)
         {
-            hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub")).Build();
+            hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub"), options =>
+            {
+                options.AccessTokenProvider = async () => options.Headers["Foo"] = "Bar";
+
+            }).WithAutomaticReconnect().Build();
 
         }
 
         if (hubConnection.State == HubConnectionState.Disconnected)
-        {
+        {  
             await hubConnection.StartAsync();
-        }
+        } 
+
+        await hubConnection.SendAsync("GetEmail", CurrentUserEmail);
 
         hubConnection.On<GroupChat>("ReceivedGroupName", async (input) =>
         {
             Groups.Add(input);
             StateHasChanged();
         });
-
+        
         hubConnection.On<GroupChatMessage>("ReceivedGroupMessage", async (message) =>
         {
 
@@ -394,11 +412,14 @@
                         Timestamp = DateTime.Now,
                         Content = CurrentMessage,
                         GroupChatId = GroupChatId,
+                        UserId = int.Parse(CurrentUserId)
                     };
 
-                await ClientGroupChatService.SaveMessagesAsync(chatHistory);
 
+                await ClientGroupChatService.SaveMessagesAsync(chatHistory);
+                StateHasChanged();
                 var user = await ClientGroupChatService.GetUserDetailsAsync(int.Parse(CurrentUserId));
+
                 chatHistory.User = user;
 
                 await hubConnection.SendAsync("SendMessageToGroup", currentGroup, chatHistory);
@@ -496,7 +517,7 @@
             Console.WriteLine("Group Name: " + groupName);
             Console.WriteLine("User ID: " + userId);
 
-            await hubConnection.SendAsync("RemoveUserGroup", groupName, userId);
+            await hubConnection.SendAsync("RemoveUserGroup", groupName, user);
         }
 
         await Task.Delay(1000); 

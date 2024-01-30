@@ -88,5 +88,12 @@ namespace StudentSystem.Server.Controllers
             return Ok(result);
         }
 
+        //[HttpGet("get-token")]
+        //public async Task<ActionResult<string>> GetToken()
+        //{
+        //    var result = await _userService.GetToken();
+        //    return Ok(result);
+        //}
+
     }
 }
