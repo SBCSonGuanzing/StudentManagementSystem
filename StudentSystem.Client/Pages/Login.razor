@@ -10,37 +10,43 @@
 @layout AuthLayout 
 @page "/login"
 
-<MudText Typo="Typo.h4">Login</MudText>
 @if (errorMessage != null)
 {
-    <p class="text-danger">@errorMessage</p>
+    <p class="text-danger text-center">@errorMessage</p>
 }
 <EditForm Model="user" OnValidSubmit="login">
-    <DataAnnotationsValidator/>
-        <MudCard>
-            <MudCardContent>
-            <MudTextField Label="Email" @bind-Value="@user.Email" Variant="Variant.Outlined"
-                          For="@(() => user.Email)">
+    <DataAnnotationsValidator />
+    <MudContainer Class="login-container d-flex flex-column justify-content-center " MaxWidth="MaxWidth.Small">
+        <MudPaper Class="login-paper p-4 ">
+            <div class="login-header">
+                <h2>Login</h2>
+            </div>
+            <div class="login-body">
+                <MudTextField Label="Email" @bind-Value="@user.Email" Variant="Variant.Outlined"
+                              For="@(() => user.Email)">
                 </MudTextField>
 
+                <MudTextField Label="Password" @bind-Value="@user.Password"
+                              Variant="Variant.Outlined"
+                              InputType="@PasswordInput"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@PasswordInputIcon"
+                              OnAdornmentClick="ButtonTestclick"
+                              AdornmentAriaLabel="Show Password"
+                              For="@(() => user.Password)">
+                </MudTextField>
 
-            <MudTextField Label="Password" @bind-Value="@user.Password" 
-                Variant="Variant.Outlined" 
-                InputType="@PasswordInput"
-                Adornment="Adornment.End" 
-                AdornmentIcon="@PasswordInputIcon" 
-                OnAdornmentClick="ButtonTestclick" 
-                AdornmentAriaLabel="Show Password"
-                                For="@(() => user.Password)">
-            </MudTextField>
-
-
-            </MudCardContent>
-        </MudCard>
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mt-5 mb-2">Login</MudButton>
+                <div class="register-link">
+                    <span>Don't have an account? </span>
+                    <MudButton ButtonType="ButtonType.Button" Color="Color.Success" Variant="Variant.Text" OnClick="HandleRegister">Register</MudButton>
+                </div>
+            </div>
+        </MudPaper>
+    </MudContainer>
     <br />
-    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Login</MudButton>
-    <MudButton ButtonType="ButtonType.Button" Color="Color.Success" Variant="Variant.Filled" OnClick="HandleRegister">Register</MudButton>
 </EditForm>
+
 <br />
 
 @code {

@@ -84,7 +84,7 @@ namespace StudentSystem.Client.Services.GroupChatServices
             return null; // Return null in case of an exception or failure
         }
 
-        public async Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request)
+        public async Task<int> CreateGroupChat(GroupChatDTO request)
         {
             HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/GroupChat/create-group", request);
 
@@ -100,7 +100,7 @@ namespace StudentSystem.Client.Services.GroupChatServices
                         config.VisibleStateDuration = 2500;
                     });
 
-                return await response.Content.ReadFromJsonAsync<List<GroupChat>>();
+                return await response.Content.ReadFromJsonAsync<int>();
             }
             else if (response.StatusCode == HttpStatusCode.Conflict)
             {
@@ -114,7 +114,7 @@ namespace StudentSystem.Client.Services.GroupChatServices
                         config.VisibleStateDuration = 2500;
                     });
 
-                return null;
+                return 0;
             }
             else
             {
@@ -129,14 +129,14 @@ namespace StudentSystem.Client.Services.GroupChatServices
                         config.VisibleStateDuration = 2500;
                     });
 
-                return null;
+                return 0;
             }
         }
 
 
         public async Task<List<GroupChat>> GetAllGroup()
         {
-            return await _httpClient.GetFromJsonAsync<List<GroupChat>>($"api/GroupChat/all-groups/");
+            return await _httpClient.GetFromJsonAsync<List<GroupChat>>($"api/GroupChat/all-groups");
 
         }
 
@@ -280,15 +280,7 @@ namespace StudentSystem.Client.Services.GroupChatServices
 
             if(result.IsSuccessStatusCode)
             {
-                _snackbar.Add(
-                   "Save Message Succesfully!",
-                   Severity.Success,
-                   config =>
-                   {
-                       config.ShowTransitionDuration = 200;
-                       config.HideTransitionDuration = 400;
-                       config.VisibleStateDuration = 2500;
-                   });
+                Console.WriteLine("Success");
             } else
             {
                 _snackbar.Add(
@@ -337,6 +329,18 @@ namespace StudentSystem.Client.Services.GroupChatServices
 
                 return null;
             }
+        }
+
+        public async Task<bool?> UpdateOnlineStatus(int userId, bool onlineStatus)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/GroupChat/update-status/{userId}", onlineStatus);
+            if(response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<bool>();
+            } 
+
+            return null;
+
         }
     }
 }

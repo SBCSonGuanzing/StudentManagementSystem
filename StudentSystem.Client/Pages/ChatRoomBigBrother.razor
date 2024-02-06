@@ -1,7 +1,8 @@
-﻿@page "/group-chat"
-@page "/group-chat/{GroupChatId:int}"
+﻿@page "/big-group-chat"
+@page "/big-group-chat/{GroupChatId:int}/{UserId:int}"
 
 @using MudBlazor
+@using StudentSystem.Client.Services.BigBrotherServices
 @using StudentSystem.Client.Services.ChatServices
 @using StudentSystem.Client.Services.GroupChatServices
 @using StudentSystem.Client.Services.UserServices
@@ -12,6 +13,7 @@
 @inject IClientChatService ClientChatService
 @inject IClientUserService ClientUserService
 @inject IClientGroupChatService ClientGroupChatService
+@inject IClientBigBrotherService ClientBigBrotherService
 @inject ILocalStorageService _localStorage
 @inject NavigationManager NavigationManager
 @inject ISnackbar _snackbar
@@ -21,26 +23,26 @@
 
 @rendermode InteractiveWebAssembly
 
-@if(isLoading)
+@if (isLoading)
 {
-    
-}else
+
+}
+else
 {
-    
-<div class="d-flex flex-grow-1 flex-row">
 
-    <!--Group Chat Rooms-->
+      
+    <div class="d-flex flex-grow-1 flex-row">
 
-    <MudPaper Elevation="25" Class="pa-4 ml-6 mud-theme-primary col-md-3">
-        <MudToolBar Dense="true" Class="d-flex justify-content-around">
-            <MudIcon Icon="@Icons.Material.Filled.Groups" />
-            <MudText Typo="Typo.h6">Chat Rooms</MudText>
-            <MudButton OnClick="OpenDialog" Variant="Variant.Filled" Color="Color.Secondary">
-                <MudIcon Icon="@Icons.Material.Filled.AddCircle"/>            
-            </MudButton>        
-        </MudToolBar>
-        <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
-            <MudList Clickable="true">
+        <!--Group Chat Rooms-->
+
+        <MudPaper Elevation="25" Class="pa-4 ml-6 mud-theme-primary col-md-3">
+            <MudToolBar Dense="true" Class="d-flex justify-content-around">
+                <MudIcon Icon="@Icons.Material.Filled.Groups" />
+                <MudText Typo="Typo.h6">Chat Rooms</MudText>
+               
+            </MudToolBar>
+            <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
+                <MudList Clickable="true">
                     <MudList Clickable="true">
                         @foreach (var group in Groups)
                         {
@@ -49,138 +51,78 @@
                         }
                     </MudList>
 
-            </MudList>
-        </div>
-    </MudPaper>
-
-    <!--Group Chat Convo-->
-
-    <MudPaper Elevation="25" Class="py-4 flex-grow-1 col-md-5">
-            <MudToolBar Dense="true" Class="d-flex justify-content-between">
-                @if (string.IsNullOrEmpty(GroupChatId.ToString()))
-                {
-                    <MudIcon Icon="@Icons.Material.Outlined.Person" Style="margin-right:10px" />
-                    <MudText Typo="Typo.h6">chat</MudText>
-                }
-                else
-                {
-                    <MudIcon Icon="@Icons.Material.Outlined.ChatBubble" Style="margin-right:10px" />
-
-                    @if (!IsEditing)
-                    {
-                        <MudText Typo="Typo.h6">@GroupName</MudText>
-                    }
-                    else
-                    {
-                        <MudTextField @bind-Value="@GroupName" />
-                    }
-
-                    <div>
-
-                        @if (int.Parse(CurrentUserId) == OwnerId)
-                        {
-                            <MudButton OnClick="ToggleEditMode" StartIcon="@Icons.Material.Filled.Edit" ButtonType="ButtonType.Button"></MudButton>
-                            <MudButton OnClick="@(() => DeleteGroupAsync(GroupChatId))" StartIcon="@Icons.Material.Filled.Delete" ButtonType="ButtonType.Button"></MudButton>
-                        }
-                    </div>
-                }
-            </MudToolBar>
-
-
-        <div class="d-flex flex-column px-4" style="max-height: 65vh; min-height: 65vh; overflow: scroll;" id="chatContainer">
-            @foreach (var message in messages)
-            {
-                    Console.WriteLine(message.Id);
-                    <div class="d-flex flex-row my-4 @((message?.User?.Id.ToString() == CurrentUserId) ? "justify-content-end" : "")">
-                    <div class="mr-4">
-                        <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
-                            <MudImage Src="@message.User.Avatar"></MudImage>
-                        </MudAvatar>
-                    </div>
-                    <div class="@((message?.User?.Id.ToString() == CurrentUserId) ? "text-right" : "")">
-                        <MudText Typo="Typo.body1">@message.User.Email</MudText>
-                            <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.Timestamp</MudText>
-                            <MudText Typo="Typo.body2" Style="padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">
-                                @message.Content
-                            </MudText>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <MudPaper Elevation="25" Class="d-flex flex-row px-2 mx-4" Style="">
-            <MudTextField T="string"
-                          Placeholder="Enter your message..."
-                          DisableUnderLine="true"
-                          Class="mt-n2 mx-4"
-                          @bind-Value="CurrentMessage"
-                          For="@(()=> CurrentMessage)" />
-
-            <MudButton OnClick="SendMessageAsync"
-                       StartIcon="@Icons.Material.Outlined.Send"
-                       Color="Color.Secondary"
-                       ButtonType="ButtonType.Button"
-                        Disabled = "@isSelected">
-                Send
-            </MudButton>
+                </MudList>
+            </div>
         </MudPaper>
 
-    </MudPaper>
+        <!--Group Chat Convo-->
 
-    <!--Group Chat Members-->
-     
-    <MudPaper Elevation="25" Class="pa-3 ml-6 col-md-4">
-        <MudToolBar Dense="true" Class="d-flex">
-        <MudIcon Icon="@Icons.Material.Filled.PermContactCalendar" Style="margin-right:10px" />
-        <MudText Typo="Typo.h6">Members</MudText>
-    </MudToolBar>
+        <MudPaper Elevation="25" Class="py-4 flex-grow-1 col-md-5">
+           
 
-        <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
-            <div class="d-flex">
-                <MudSelect T="int" Label="Users" MultiSelection="true" @bind-SelectedValues="selectedUserIds">@foreach (User user in Users) 
-                      { <MudSelectItem T="int" Value="@user.Id">@user.Email</MudSelectItem> } 
-                </MudSelect>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => AddUser(selectedUserIds, GroupChatId))">
-                    <MudIcon Icon="@Icons.Material.Filled.Add" />
-                </MudButton>
+
+            <div class="d-flex flex-column px-4" style="max-height: 80vh; min-height: 80vh; overflow: scroll;" id="chatContainer">
+                @foreach (var message in messages)
+                {
+                    Console.WriteLine(message.Id);
+                    <div class="d-flex flex-row my-4 @((message?.User?.Id.ToString() == UserId.ToString()) ? "justify-content-end" : "")">
+                        <div class="mr-4">
+                            <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
+                                <MudImage Src="@message.User.Avatar"></MudImage>
+                            </MudAvatar>
+                        </div>
+                        <div class="@((message?.User?.Id == UserId) ? "text-right" : "")">
+                            <MudText Typo="Typo.body1">@message.User.Email</MudText>
+                                <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.Timestamp</MudText>
+                                <MudText Typo="Typo.body2" Style="padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">
+                                    @message.Content
+                            </MudText>
+                        </div>
+                    </div>
+                }
             </div>
 
-            <MudList Clickable="true">
-                @foreach (var user in Members.users)
-                {
-                    @if (user.Id == Members.OwnerId) continue;
+  
 
-                    
-                    <MudListItem Class="pa-2">
-                        <div class="d-flex align-items-center">
-                            <div class="mr-3">
+        </MudPaper>
+
+        <!--Group Chat Members-->
+
+        <MudPaper Elevation="25" Class="pa-3 ml-6 col-md-4">
+            <MudToolBar Dense="true" Class="d-flex">
+                <MudIcon Icon="@Icons.Material.Filled.PermContactCalendar" Style="margin-right:10px" />
+                <MudText Typo="Typo.h6">Members</MudText>
+            </MudToolBar>
+
+            <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
+               
+
+                <MudList Clickable="true">
+                    @foreach (var user in Members.users)
+                    {
+                        @if (user.Id == Members.OwnerId) continue;
+
+
+                        <MudListItem Class="pa-2">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3">
                                     <MudBadge Color="@GetAvatarColor(user.ActiveStatus)" Overlap="true" Class="my-4">
-                                    <MudAvatar Style="height:50px; width:50px;">
-                                        <MudImage Src="@user.Avatar"></MudImage>
-                                    </MudAvatar>
-                                </MudBadge>
-                            </div>
-                            <div>
-                            <MudText Typo="Typo.body2" Class="mb-2">@user.Email</MudText>
-                                <MudText Typo="Typo.caption" Style="font-size: x-small!important;">@user.Id</MudText>
-                            </div>
-
-                                @if (int.Parse(CurrentUserId) == Members.OwnerId)
-                                {
-                                    <div class="ml-auto">
-                                        <MudButton Variant="Variant.Filled" Color="Color.Surface" OnClick="@(() => DeleteUser(user.Id, GroupChatId))" >
-                                            <MudIcon Icon="@Icons.Material.Filled.Delete" />
-                                        </MudButton>
+                                        <MudAvatar Style="height:50px; width:50px;">
+                                            <MudImage Src="@user.Avatar"></MudImage>
+                                        </MudAvatar>
+                                    </MudBadge>
+                                </div>
+                                <div>
+                                    <MudText Typo="Typo.body2" Class="mb-2">@user.Email</MudText>
+                                        <MudText Typo="Typo.caption" Style="font-size: x-small!important;">@user.Id</MudText>
                                     </div>
-                                
-                                }
-                        </div>
-                    </MudListItem>
-                }
-            </MudList>
-        </div> 
-    </MudPaper>
-</div>
+                            </div>
+                        </MudListItem>
+                    }
+                </MudList>
+            </div>
+        </MudPaper>
+    </div>
 }
 
 @code {
@@ -188,24 +130,27 @@
     [Parameter]
     public int GroupChatId { get; set; }
 
+    [Parameter]
+    public int UserId { get; set; }
+
+
     [CascadingParameter]
     private HubConnection hubConnection { get; set; }
 
-
-
     private bool isLoading { get; set; } = true;
-    private string onl= "Color.Dark";
+    private string onl = "Color.Dark";
     public string CurrentMessage { get; set; }
     public string CurrentUserId { get; set; }
     public string CurrentUserEmail { get; set; }
     public string GroupName { get; set; }
     private IEnumerable<int> selectedUserIds { get; set; } = new HashSet<int>();
-    public int userId;
 
     public int OwnerId { get; set; }
     public bool isSelected;
     private string userInput;
     private string groupInput;
+    public int userId;
+
 
     public List<User> Users = new List<User>();
     private int selectedUserId = 0;
@@ -247,32 +192,9 @@
         }
     }
 
-    private async Task OpenDialog()
-    {
-        var parameters = new DialogParameters();
-        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        DialogResult? result = await DialogService.Show<Dialog>("Create Room", parameters, closeOnEscapeKey).Result;
-
-
-        if (result != null && !result.Cancelled)
-        {
-            var data = result.Data as GroupChatDTO;
-
-            groupInput = data?.Name;
-            Console.WriteLine(groupInput);
-
-            var selectedIds = data?.MembersId;
-            await CreateGroupAsync(groupInput, selectedIds);
-        }
-        else
-        {
-            Console.WriteLine("Dialog was closed or canceled.");
-        }
-    }
-
     async Task LoadUserChat(int groupChatId)
     {
-        if(GroupChatId != 0)
+        if (GroupChatId != 0)
         {
             isSelected = false;
         }
@@ -281,8 +203,8 @@
         {
             Console.WriteLine($"Connected: Connection ID: {hubConnection.ConnectionId}");
 
-            var groupName = await ClientGroupChatService.GetGroupName(GroupChatId);
-            StateHasChanged();
+            string groupName = await ClientGroupChatService.GetGroupName(GroupChatId);
+
 
             if (GroupChatId != 0)
             {
@@ -294,12 +216,13 @@
             string passGroupName = await ClientGroupChatService.GetGroupName(GroupChatId);
             await hubConnection.SendAsync("JoinGroup", passGroupName);
 
-            NavigationManager.NavigateTo($"group-chat/{GroupChatId}");
+            NavigationManager.NavigateTo($"big-group-chat/{GroupChatId}/{UserId}");
 
             messages = new List<GroupChatMessage>();
+            messages = await ClientBigBrotherService.GetConversationAsync(groupChatId, UserId);
+            Members = await ClientBigBrotherService.GetGroupChatMembers(groupChatId, UserId);
+            StateHasChanged();
 
-            messages = await ClientGroupChatService.GetConversationAsync(groupChatId);
-            Members = await ClientGroupChatService.GetGroupChatMembers(groupChatId);
             var user = Members.users.First(user => user.Email == CurrentUserEmail);
             if (user != null && user.ActiveStatus == false)
             {
@@ -309,7 +232,7 @@
 
             }
             // Invoke StateHasChanged only if the user is not the current user
-            if (user.Id != int.Parse(CurrentUserId))
+            if (user.Id != UserId)
             {
                 InvokeAsync(StateHasChanged);
             }
@@ -318,34 +241,33 @@
             Users = await ClientGroupChatService.GetNotMembers(GroupChatId);
 
             GroupName = await ClientGroupChatService.GetGroupName(groupChatId);
-            StateHasChanged(); 
+            StateHasChanged();
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-
         // Retrieve the user ID from the query parameters
-        // var uri = new Uri(NavigationManager.Uri);
-        // var queryParams = QueryHelpers.ParseQuery(uri.Query);
+        var uri = new Uri(NavigationManager.Uri);
+        var queryParams = QueryHelpers.ParseQuery(uri.Query);
 
-        // if (queryParams.ContainsKey("userId") && int.TryParse(queryParams["userId"], out int id))
-        // {
-        //     userId = id;
-        // }
+        if (queryParams.ContainsKey("userId") && int.TryParse(queryParams["userId"], out int id))
+        {
+            userId = id;
+        } 
 
-
-        if(GroupChatId == 0)
+        if (GroupChatId == 0)
         {
             isSelected = true;
-        } else
+        }
+        else
         {
             Users = await ClientGroupChatService.GetNotMembers(GroupChatId);
             isSelected = false;
         }
 
         CurrentUserId = await ClientUserService.GetUserId();
-        Groups = await ClientGroupChatService.GetAllGroup();
+        Groups = await ClientBigBrotherService.GetAllGroup(UserId);
         CurrentUserEmail = await ClientUserService.GetUserEmail();
 
         InvokeAsync(StateHasChanged);
@@ -365,9 +287,9 @@
         }
 
         if (hubConnection.State == HubConnectionState.Disconnected)
-        {  
+        {
             await hubConnection.StartAsync();
-        } 
+        }
 
         await hubConnection.SendAsync("GetEmail", CurrentUserEmail);
 
@@ -389,16 +311,16 @@
                         Content = message.Content,
                         Timestamp = message.Timestamp,
                         User = message.User
-                }); 
+                    });
 
             }
-            StateHasChanged(); 
+            StateHasChanged();
             await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
         });
 
         hubConnection.On<GroupChatMessage>("ReceiveGroupChatNotification", async (request) =>
         {
-            _jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
+                _jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
 
             _snackbar.Add($"{request.User.Email} has send a message", Severity.Info, config =>
                {
@@ -409,7 +331,7 @@
                    config.ActionColor = Color.Info;
                    config.Onclick = snackbar =>
                {
-                   NavigationManager.NavigateTo($"group-chat/{request.GroupChatId}");
+                   NavigationManager.NavigateTo($"big-group-chat/{request.GroupChatId}/{UserId}");
                    return Task.CompletedTask;
                };
                });
@@ -434,7 +356,7 @@
             }
 
             InvokeAsync(StateHasChanged);
-
+                
             // // Invoke StateHasChanged only if the user is not the current user
             // if (user.Id != int.Parse(CurrentUserId))
             // {
@@ -451,7 +373,7 @@
             {
                 user.ActiveStatus = false;
 
-                if(user.Id != int.Parse(CurrentUserId))
+                if (user.Id != int.Parse(CurrentUserId))
                 {
                     InvokeAsync(StateHasChanged);
 
@@ -479,7 +401,7 @@
             var user = await ClientGroupChatService.GetUserDetailsAsync(userDetails.Id);
 
             var chatHistory = new GroupChatMessage()
-                {         
+                {
                     Timestamp = DateTime.Now,
                     Content = $"{userDetails.Email} has been removed!",
                     GroupChatId = GroupChatId,
@@ -497,7 +419,7 @@
         {
             Console.WriteLine("GroupID: ", groupChatId);
             Groups.RemoveAll(group => group.Id == groupChatId);
-            NavigationManager.NavigateTo("/group-chat");
+            NavigationManager.NavigateTo("/big-group-chat/0/{UserId}");
             Members.users.Clear();
             Users.Clear();
             messages.Clear();
@@ -524,11 +446,11 @@
         if (GroupChatId == message.GroupChatId && CurrentUserId == message.UserId.ToString())
         {
             messages.Add(new GroupChatMessage
-            {
-                Content = $"{userName} has been removed!",
-                Timestamp = message.Timestamp,
-                User = message.User
-            });
+                {
+                    Content = $"{userName} has been removed!",
+                    Timestamp = message.Timestamp,
+                    User = message.User
+                });
         }
         StateHasChanged();
     });
@@ -588,7 +510,6 @@
                 MembersId = selectedUsers ?? new List<int>()
             };
 
-
         var result = await ClientGroupChatService.CreateGroupChat(input);
 
         input.Id = result;
@@ -603,7 +524,7 @@
             }
         }
 
-        if(result != null)
+        if (result != null)
         {
             await hubConnection.SendAsync("CreateGroup", input);
         }
@@ -625,12 +546,12 @@
 
                 var result = await ClientGroupChatService.AddUserToGroup(newUser);
 
-                if(result != null)
+                if (result != null)
                 {
                     string currentGroup = await ClientGroupChatService.GetGroupName(groupChatId);
                     var userToAdd = await ClientGroupChatService.GetUserDetailsAsync(userId);
 
-                    await hubConnection.SendAsync("AddToGroup", currentGroup, userToAdd);                     
+                    await hubConnection.SendAsync("AddToGroup", currentGroup, userToAdd);
                 }
             }
 
@@ -665,7 +586,7 @@
             await hubConnection.SendAsync("RemoveUserGroup", groupName, user);
         }
 
-        await Task.Delay(1000); 
+        await Task.Delay(1000);
 
         Members.users.RemoveAll(u => u.Id == userId);
         InvokeAsync(StateHasChanged);
@@ -694,13 +615,13 @@
 
             if (hubConnection.State == HubConnectionState.Connected)
             {
-        Console.WriteLine("Connected to Signal R Hub");
+                Console.WriteLine("Connected to Signal R Hub");
 
-        await ClientGroupChatService.RemoveGroupChat(groupChatId);
-              
-        await hubConnection.SendAsync("RemoveGroupAsync", groupChatId, groupName);
+                await ClientGroupChatService.RemoveGroupChat(groupChatId);
 
-        InvokeAsync(StateHasChanged);
+                await hubConnection.SendAsync("RemoveGroupAsync", groupChatId, groupName);
+
+                InvokeAsync(StateHasChanged);
             }
             else
             {
@@ -730,7 +651,7 @@
 
             await EditGroupName();
         }
-    } 
+    }
 
     async Task EditGroupName()
     {

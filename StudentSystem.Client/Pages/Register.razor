@@ -10,12 +10,15 @@
 @layout AuthLayout
 @page "/register"
 
-<MudText Typo="Typo.h4">Register</MudText>
 
     <EditForm Model="user" OnValidSubmit="HandleRegistration">
         <DataAnnotationsValidator />
-        <MudCard>
-            <MudCardContent>
+        <MudContainer Class="login-container d-flex flex-column justify-content-center" MaxWidth="MaxWidth.Small">
+            <MudPaper Class="login-paper p-4">
+            <div class="login-header">
+                <MudText Typo="Typo.h4">Register</MudText>
+            </div>
+            <div class="login-body">
             <MudTextField Label="Email" @bind-Value="@user.Email" Variant="Variant.Outlined"
                               For="@(() => user.Email)">
                 </MudTextField>
@@ -109,15 +112,16 @@
                 </MudButton>
 
             }
-
-
-        </MudCardContent>
-        </MudCard>
+            </div>
+        <div class="register-btn">
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mt-4">Register</MudButton>
+        </div>
+        </MudPaper>
+    </MudContainer>
+       
     <br />
-
-
-        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Register</MudButton>
     </EditForm>
+
 
 @code {
     UserDTO user = new UserDTO();

@@ -8,14 +8,19 @@ using StudentSystem.Client.Services.UserServices;
 using StudentSystem.Server.Data;
 using StudentSystem.Server.Services.UserServices;
 using StudentSystem.Shared.DTOs;
+using StudentSystem.Shared.Models;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace StudentSystem.Server.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub<IGroupChatClient>
     {
-        private Dictionary<string, string> _ConnectionsMap = new Dictionary<string, string>();
+
+        public readonly static List<User> _Connections = new List<User>();
+        private static Dictionary<string, string> _ConnectionsMap = new Dictionary<string, string>();
 
         private readonly DataContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -30,20 +35,40 @@ namespace StudentSystem.Server.Hubs
 
         private string? getEmail() => _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
         public async Task JoinGroup(string group)
-        {           
+        {
             await Groups.AddToGroupAsync(Context.ConnectionId, group);
+            Console.WriteLine($"User: {Context.User.Identity.Name} is connected to Group: {group}");
+            await Clients.Group(group).ActiveStatus(Context.User.Identity.Name);
+        }
+
+        public async Task RemoveGroup(string groupName)
+        {
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+
+            Console.WriteLine($"User: {Context.User.Identity.Name} is disconnected to Group: {groupName}");
+        }
+
+        //TODO: Make a new Method to Change Status to Inactive
+
+        public async Task ChangeStatus(string groupName)
+        { 
+            await Clients.Group(groupName).InActiveStatus(Context.User.Identity.Name);
         }
 
         public async Task SendMessage(ChatMessage message, string userName)
         {
             await Clients.All.ReceiveMessage(message, userName);
+
         }
 
         public async Task ChatNotificationAsync(string message, int receiverUserId, string senderUserId)
         {
             await Clients.All.ReceiveChatNotification(message, receiverUserId, senderUserId);
+
         }
 
+       
         public async Task CreateGroup(GroupChat group)
         {
             await Clients.All.ReceivedGroupName(group);
@@ -52,12 +77,7 @@ namespace StudentSystem.Server.Hubs
         public async Task AddToGroup(string groupName, User request)
         {
             await Clients.Group(groupName).ReceiveUserToAdd(request);
-        }
-      
-        public async Task RemoveGroup(string groupName)
-        {
-            
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+
         }
 
         public async Task GroupNameUpdated(int groupId, GroupToUpdate request)
@@ -70,25 +90,25 @@ namespace StudentSystem.Server.Hubs
             await Clients.Group(groupName).ReceiveGroupToRemove(groupChatId); 
         }
  
-        public async Task RemoveUserGroup(string groupName, string userId)
+        public async Task RemoveUserGroup(string groupName, User user)
         {
             var foo = getEmail();
+
             try
             {
-                var connectionIdToRemove = _ConnectionsMap.FirstOrDefault(x => x.Key == userId).Value;
-                    Console.WriteLine ("Connection ID: ", connectionIdToRemove);
+                var connectionIdToRemove = _ConnectionsMap.FirstOrDefault(x => x.Key == user.Email).Value;
+                 
                 if(!string.IsNullOrEmpty(connectionIdToRemove))
-                {
-                    _ConnectionsMap.Remove(userId.ToString());
-
+                { 
+                    await Clients.Group(groupName).ReceiveUserToRemove(user);
                     // Disconnect the user from the group
                     await Groups.RemoveFromGroupAsync(connectionIdToRemove, groupName);
                     
-                    // Notify the group about the user removal
-                    await Clients.Group(groupName).ReceiveUserToRemove(userId);
                 }
                 else
                 {
+                    await Clients.OthersInGroup(groupName).ReceiveUserToRemove(user);
+
                     //await Clients.Caller.SendAsync("onError", "User not found for removal from group");
                 }
 
@@ -101,46 +121,65 @@ namespace StudentSystem.Server.Hubs
         public async Task SendMessageToGroup(string groupName, GroupChatMessage message)
         {
             await Clients.Group(groupName).ReceivedGroupMessage(message);
+            await GroupChatNotification(groupName, message);
         }
 
-
-        public async Task GetEmail(string email)
+        public async Task GroupChatNotification(string group, GroupChatMessage message)
         {
-            // Store the email in the user's context
-            userEmail = email;
-
-            // Notify clients about the received email
-            await Clients.All.GetEmail(email);
+            await Clients.OthersInGroup(group).ReceiveGroupChatNotification(message);
         }
+
+
         public override async Task OnConnectedAsync()
         {
+            try
+            {
+                var Email = IdentityName;
 
-            Console.WriteLine($"User connected with email: {userEmail}");
+                var user = _context.Users.Where(u => u.Email == IdentityName).FirstOrDefault();
 
+            if(!_ConnectionsMap.ContainsKey(user.Email) && user != null)
+            {
+                _Connections.Add(user);
+                _ConnectionsMap.Add(Email, Context.ConnectionId);
 
-            //try
-            //{
-            //    var user = GetEmail();
-            //    var userDetails = await _context.Users.Where(m => m.Email == user).FirstOrDefaultAsync();
+                Console.WriteLine(Email);
+                Console.WriteLine($"User connected with ConnectionId: {Context.ConnectionId}");
+                Console.WriteLine($"Connections: {_ConnectionsMap.Count}");
+            }
 
-            //    if (userDetails != null && !_ConnectionsMap.ContainsKey(userDetails.Id.ToString()))
-            //    {
-            //        _ConnectionsMap.Add(userDetails.Id.ToString(), Context.ConnectionId);
-            //    }
-
-            //    await Clients.Caller.getProfileInfo(userDetails);
-            //}
-            //catch (Exception ex)
-            //{
-            //    //await Clients.Caller.SendAsync("onError", "OnConnected: " + ex.Message);
-            //}
+                //await Clients.All.ReceiveGroupToUpdate();
+            }
+            catch (Exception ex)
+            {
+                //await Clients.Caller.SendAsync("onError", "OnConnected: " + ex.Message);
+            }
 
             await base.OnConnectedAsync();
         }
 
-    
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            try
+            {
+                var user = _Connections.Where(u => u.Email == IdentityName).First();
+                _Connections.Remove(user);
 
-        private string? IdentityName
+                // Tell other users to remove you from their list
+                //Clients.OthersInGroup(user.CurrentRoom).SendAsync("removeUser", user);
+
+                //// Remove mapping
+                _ConnectionsMap.Remove(user.Email);
+            }
+            catch (Exception ex)
+            {
+                //Clients.Caller.SendAsync("onError", "OnDisconnected: " + ex.Message);
+            }
+
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        private string IdentityName
         {
             get { return Context.User.Identity.Name; }
         }

@@ -5,6 +5,8 @@ using StudentSystem.Server.Data;
 using StudentSystem.Server.Hubs;
 using StudentSystem.Server.Services.AnnouncementServices;
 using StudentSystem.Server.Services.AuthServices;
+using StudentSystem.Server.Services.BigBrotherChatServices;
+using StudentSystem.Server.Services.BigBrotherServices;
 using StudentSystem.Server.Services.BookServices;
 using StudentSystem.Server.Services.BorrowedBooksServices;
 using StudentSystem.Server.Services.ChatServices;
@@ -53,8 +55,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 ValidateIssuer = false,
                 ValidateAudience = false
             };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+
+                    // If the request is for our hub...
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        (path.StartsWithSegments("/chat-hub")))
+                    {
+                        // Read the token out of the query string
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
         })
     ;
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IProfessorService, ProfessorService>();
@@ -66,6 +87,8 @@ builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IUserService,  UserService>();
 builder.Services.AddScoped<IGroupChatService, GroupChatService>();
+builder.Services.AddScoped<IBigBrotherService, BigBrotherService>();
+builder.Services.AddScoped<IBigBrotherChatService , BigBrotherChatService>();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDbContext<DataContext>();   
@@ -86,7 +109,6 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseAuthorization();
-app.MapHub<AnnouncementHub>("announcementhub");
 app.MapHub<ChatHub>("chat-hub");
 
 app.MapRazorPages();

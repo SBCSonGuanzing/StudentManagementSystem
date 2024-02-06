@@ -40,6 +40,16 @@
             @userDetails.Role
         </MudTd>
         <MudTd>
+            <MudIconButton OnClick="() => ViewPeerConvo(userDetails.Id)"
+                           Icon="@Icons.Material.Filled.Message"
+                           Color="Color.Primary"
+                           Variant="Variant.Filled">
+            </MudIconButton>
+            <MudIconButton OnClick="() => ViewGroupConvo(userDetails.Id)"
+                           Icon="@Icons.Material.Filled.People"
+                           Color="Color.Dark"
+                           Variant="Variant.Filled">
+            </MudIconButton>
             <MudIconButton OnClick="() => DeleteUser(userDetails.Id)"
                            Icon="@Icons.Material.Filled.Delete"
                            Color="Color.Error"
@@ -89,5 +99,16 @@
                 config.VisibleStateDuration = 2500;
 
             });
+    }
+
+    async void ViewPeerConvo(int id)
+    {
+        NavigationManager.NavigateTo($"/big-chat/0/{id}");
+    }
+
+    async void ViewGroupConvo(int id)
+    {
+        NavigationManager.NavigateTo($"/big-group-chat/0/{id}");
+
     }
 }

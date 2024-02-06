@@ -10,7 +10,7 @@ namespace StudentSystem.Client.Services.GroupChatServices
         Task<List<User>> GetUsersAsync();
         Task<List<GroupChat>> GetAllGroup();
         Task<User> GetUserDetailsAsync(int userId);
-        Task<List<GroupChat>> CreateGroupChat(GroupChatDTO request);
+        Task<int> CreateGroupChat(GroupChatDTO request);
         Task<List<GroupChat>> RemoveGroupChat(int groupChatId);
         Task<GetChatMembersDTO> GetGroupChatMembers(int groupChatId);
         Task<GroupChat> AddUserToGroup(AddUserToGroupDTO request);
@@ -18,5 +18,6 @@ namespace StudentSystem.Client.Services.GroupChatServices
         Task<string> GetGroupName(int groupChatId);
         Task<List<User>> GetNotMembers(int groupId);
         Task<GroupChat> UpdateGroup(int groupId, GroupToUpdate groupName);
+        Task<bool?> UpdateOnlineStatus(int userId, bool onlineStatus);  
     }
 }

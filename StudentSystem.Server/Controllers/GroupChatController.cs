@@ -14,9 +14,9 @@ namespace StudentSystem.Server.Controllers
     public class GroupChatController : ControllerBase
     {
         private readonly IGroupChatService _chatService;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<ChatHub, IGroupChatClient> _hubContext;
 
-        public GroupChatController(IGroupChatService chatService, IHubContext<ChatHub> hubContext)
+        public GroupChatController(IGroupChatService chatService, IHubContext<ChatHub, IGroupChatClient> hubContext)
         {
             _chatService = chatService;
             _hubContext = hubContext;
@@ -31,7 +31,7 @@ namespace StudentSystem.Server.Controllers
                 return NotFound("No Conversation Found");
             }
             return Ok(result);
-        }
+        } 
 
         [HttpGet("user-detail/{id}")]
         public async Task<ActionResult<User>> GetUserDetailsAsync(int id)
@@ -67,15 +67,15 @@ namespace StudentSystem.Server.Controllers
         }
 
         [HttpPost("create-group")]
-        public async Task<ActionResult<List<GroupChat>>> CreateGroupChat(GroupChatDTO request)
+        public async Task<ActionResult<int>> CreateGroupChat(GroupChatDTO request)
         {
-            List<GroupChat>? result = await _chatService.CreateGroupChat(request);
+            var result = await _chatService.CreateGroupChat(request);
 
-            if (result == null)
+            if (result == 0)
             {
                 return Unauthorized("Group chat already exists.");
             }
-            else if (result.Count == 0)
+            else if (result == 0)
             {
                 return NotFound("User not found.");
             }
@@ -183,6 +183,20 @@ namespace StudentSystem.Server.Controllers
             }
 
             return NotFound("No Group Chat Exist");
+        }
+
+        [HttpPut("update-status/{id}")]
+
+        public async Task<ActionResult<bool>> UpdateStatus(int id, bool status)
+        {
+            var result = await _chatService.UpdateOnlineStatus(id, status);
+            if (result == true)
+            {
+                return Ok(result);
+            }
+
+            return false;
+
         }
 
     }

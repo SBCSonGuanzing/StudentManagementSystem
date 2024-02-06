@@ -26,5 +26,7 @@ namespace StudentSystem.Shared.Models
         // Reference Student Model
         public Student? Student { get; set; }
         public Professor? Professor { get; set; }
+
+        public bool ActiveStatus { get; set; } = false;
     }
 }

@@ -1,73 +1,36 @@
 ﻿@page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
-@inject NavigationManager NavigationManager 
+@inject NavigationManager _navigationManager
+@inject ILocalStorageService _localStorage
+
 <PageTitle>Home</PageTitle>
 
 <AuthorizeView>
     <Authorized>
-
         <MudText Typo="Typo.h2">Welcome, @context.User?.Identity?.Name</MudText>
         </Authorized>
 </AuthorizeView>
 
-
-@if (isConnected)
-{
-    @foreach (var message in messages)
-    {
-        <MudCard Class="mt-2">
-            <MudCardContent>
-                <MudText>Announcement of the Day</MudText>
-                <MudText Typo="Typo.body2">@message</MudText>
-                </MudCardContent>
-            </MudCard>
-    }
-}
-
 @code {
 
-
-    private HubConnection? hubConnection;
-
-    private List<string> messages = new List<string>();
-
-    private string? announcementInput;
+    private HubConnection hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
-        // Instance of Hub Connection
-
-        hubConnection = new HubConnectionBuilder()
-        .WithUrl(NavigationManager.ToAbsoluteUri("/announcementhub"))
-        .Build();
-
-        hubConnection.On<string>("ReceiveMessage", (message) =>
+        if (hubConnection == null)
         {
-            var encodedMessage = $"{message}";
-            messages.Add(encodedMessage);
-            InvokeAsync(StateHasChanged);
-        });
+            string token = await _localStorage.GetItemAsStringAsync("token");
+            string foo = token.Replace("\"", "");
+
+            hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/chat-hub"), options =>
+            {
+
+                options.AccessTokenProvider = async () => foo;
+
+            }).WithAutomaticReconnect().Build();
+        }
 
         await hubConnection.StartAsync();
     }
-
-    private async Task Send()
-    {
-        if (hubConnection is not null)
-        {
-            await hubConnection.SendAsync("SendAnnouncement", announcementInput);
-        }
-
-    }
-
-    public bool isConnected =>
-        hubConnection?.State == HubConnectionState.Connected;
-
-    public async ValueTask DisposeAsync()
-    {
-        if (hubConnection is not null)
-        {
-            await hubConnection.DisposeAsync();
-        }
-    }
-}
+} 

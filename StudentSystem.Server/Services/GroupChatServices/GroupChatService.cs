@@ -21,7 +21,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
             _navigationManager = navigationManager;
         }
 
-        public async Task<GroupChat> AddUserToGroup(int userId, int groupChatId)
+        public async Task<GroupChat?> AddUserToGroup(int userId, int groupChatId)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
                     return null; 
                 }
 
-                User user = await _dataContext.Users.FindAsync(userId);
+                User? user = await _dataContext.Users.FindAsync(userId);
                 if (user != null)
                 {
                     groupExisting.Members.Add(user);
@@ -58,7 +58,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
             }
         }
 
-        public async Task<List<GroupChat>?> CreateGroupChat(GroupChatDTO request)
+        public async Task<int> CreateGroupChat(GroupChatDTO request)
         {
             var groupExisting = await _dataContext.GroupChats
                 .Where(group => group.Name == request.Name)
@@ -66,14 +66,15 @@ namespace StudentSystem.Server.Services.GroupChatServices
 
             if (groupExisting != null)
             {
-                return null;
+                return 0;
             }
 
-            var UserId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var UserId = _contextAccessor.HttpContext?
+                .User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
             if(UserId == null)
             {
-                return null;
+                return 0;
             }
             var newGroup = new GroupChat()
             {             
@@ -101,32 +102,36 @@ namespace StudentSystem.Server.Services.GroupChatServices
                 await _dataContext.SaveChangesAsync();
             }
 
-            return await _dataContext.GroupChats.ToListAsync();
+            return await _dataContext.GroupChats
+                .Where(id => id.Name == request.Name)
+                .Select(m => m.Id)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<GroupChat>> GetAllGroup()
         {
-            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      
+                var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var user = await _dataContext.Users
-                        .Include(user => user.GroupChats)
-                            .ThenInclude(user => user.Members)
-                        .FirstOrDefaultAsync(user => user.Id.ToString() == userId); 
+                var user = await _dataContext.Users
+                            .Include(user => user.GroupChats)
+                                .ThenInclude(user => user.Members)
+                            .FirstOrDefaultAsync(user => user.Id.ToString() == userId); 
 
-            if (user == null)
-            {
-                return new List<GroupChat>();
-            }
+                if (user == null)
+                {
+                    return new List<GroupChat>();
+                }
 
-            return user.GroupChats; 
+                return user.GroupChats; 
+            
         }
 
         public async Task<List<GroupChatMessage>> GetConversationAsync(int groupChatId)
-        {
+        { 
+                var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-          
                 List<GroupChatMessage> groupChatMessages = await _dataContext.GroupChatMessages
                     .Include(a => a.User)
                     .Include(message => message.GroupChat)
@@ -143,8 +148,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
                         User = x.User
                     }).ToListAsync();
                 return groupChatMessages;
-
-           
+            
         }
 
         public async Task<GetChatMembersDTO> GetGroupChatMembers(int groupChatId)
@@ -174,7 +178,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
             return new GetChatMembersDTO();
         }
 
-        public async Task<string> GetGroupName(int groupChatId)
+        public async Task<string?> GetGroupName(int groupChatId)
         {
             var userId = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -182,6 +186,10 @@ namespace StudentSystem.Server.Services.GroupChatServices
                         .Where(group => group.Id == groupChatId && group.Members.Any(m => m.Id == int.Parse(userId)))
                         .Select(group => group.Name)
                         .FirstOrDefaultAsync();
+            if(result == null)
+            {
+                return null;
+            } 
 
             return result;
         }
@@ -203,7 +211,7 @@ namespace StudentSystem.Server.Services.GroupChatServices
             return usersNotInGroup;
         }
 
-        public async Task<User> GetUserDetailsAsync(int userId)
+        public async Task<User?> GetUserDetailsAsync(int userId)
         {
             User? user = await _dataContext.Users
                      .Where(p => p.Id == userId)
@@ -330,6 +338,24 @@ namespace StudentSystem.Server.Services.GroupChatServices
             return await _dataContext.GroupChats
                         .Where(m => m.Name == groupName.Name)
                         .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool?> UpdateOnlineStatus(int userId, bool onlineStatus)
+        {
+            var userToChangeStatus = await _dataContext.Users.FindAsync(userId);
+            if(userToChangeStatus != null)
+            {
+                userToChangeStatus.ActiveStatus = onlineStatus;
+                _dataContext.SaveChanges();
+            } else
+            {
+                return null;
+            }
+
+            var user = await _dataContext.Users.FindAsync(userId);
+
+            return user.ActiveStatus; 
+
         }
     }
 } 

@@ -143,17 +143,6 @@
         </Authorized>
     </AuthorizeView>
 
-    <AuthorizeView Roles="Admin">
-        <Authorized>
-            <MudNavGroup Title="Announcement"
-                         Expanded="@isSelected"
-                         Icon="@Icons.Material.Filled.Announcement" @onclick="ToggleEnrollment"
-                         IconColor="Color.Info">
-                <MudNavLink Href="/announcement">Announcement</MudNavLink>
-            </MudNavGroup>
-        </Authorized>
-    </AuthorizeView>
-
     <AuthorizeView Roles="Admin, Student, Professor">
 
             <MudNavGroup Title="Chat"

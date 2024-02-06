@@ -7,6 +7,7 @@
 @inject NavigationManager _navigationManager
 @inject ISnackbar _snackbar
 @inject IJSRuntime _jsRuntime
+@inject ILocalStorageService _localStorage
 @inject IClientUserService ClientUserService
 @inject IClientAuthService ClientAuthService
 @inherits LayoutComponentBase
@@ -24,9 +25,7 @@
     </MudDrawer>
     <MudMainContent Class="pt-16 px-16" >
         <MudContainer Class="mt-6">
-            <CascadingValue Value="hubConnection">
                 @Body
-            </CascadingValue>
         </MudContainer>
     </MudMainContent>
 </MudLayout>
@@ -49,40 +48,49 @@
     DrawerClipMode clipMode = DrawerClipMode.Never;
 
     private string CurrentUserId { get; set; }
-    private HubConnection hubConnection;
+    // private HubConnection hubConnection;
 
-    public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+    // public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
 
     protected override async Task OnInitializedAsync()
     {
 
-        CurrentUserId = await ClientUserService.GetUserId();
+        // CurrentUserId = await ClientUserService.GetUserId();
 
-        hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/chat-hub")).WithAutomaticReconnect().Build();
+        // if (hubConnection == null)
+        // {
+        //     hubConnection = new HubConnectionBuilder()
+        //     .WithUrl(_navigationManager.ToAbsoluteUri("/chat-hub"), options =>
+        //     {
+        //         options.AccessTokenProvider = async () => await _localStorage.GetItemAsStringAsync("token");
 
-        await hubConnection.StartAsync();
+        //     }).WithAutomaticReconnect().Build();
 
-        hubConnection.On<string, int, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
-        {
-            if (CurrentUserId == receiverUserId.ToString())
-            {
-                _jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
-                _snackbar.Add(message, Severity.Info, config =>
-                {
-                    config.VisibleStateDuration = 10000;
-                    config.HideTransitionDuration = 500;
-                    config.ShowTransitionDuration = 500;
-                    config.Action = "Chat?";
-                    config.ActionColor = Color.Info;
-                    config.Onclick = snackbar => 
-                    {
-                        _navigationManager.NavigateTo($"chat/{senderUserId}");
-                        return Task.CompletedTask;
-                    };
+        // }
 
-                });
-            }
-        });
+        // await hubConnection.StartAsync();
+
+        // hubConnection.On<string, int, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
+        // {
+        //     if (CurrentUserId == receiverUserId.ToString())
+        //     {
+        //         _jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
+        //         _snackbar.Add(message, Severity.Info, config =>
+        //         {
+        //             config.VisibleStateDuration = 10000;
+        //             config.HideTransitionDuration = 500;
+        //             config.ShowTransitionDuration = 500;
+        //             config.Action = "Chat?";
+        //             config.ActionColor = Color.Info;
+        //             config.Onclick = snackbar => 
+        //             {
+        //                 _navigationManager.NavigateTo($"chat/{senderUserId}");
+        //                 return Task.CompletedTask;
+        //             };
+
+        //         });
+        //     }
+        // });
     }
 
     

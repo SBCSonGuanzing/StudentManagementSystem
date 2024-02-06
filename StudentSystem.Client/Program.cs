@@ -8,6 +8,8 @@ using MudBlazor.Services;
 using StudentSystem.Client;
 using StudentSystem.Client.Services.AnnouncementServices;
 using StudentSystem.Client.Services.AuthServices;
+using StudentSystem.Client.Services.BigBrotherChatServices;
+using StudentSystem.Client.Services.BigBrotherServices;
 using StudentSystem.Client.Services.BookServices;
 using StudentSystem.Client.Services.BorrowedBooksServices;
 using StudentSystem.Client.Services.ChatServices;
@@ -40,6 +42,8 @@ builder.Services.AddScoped<IClientUserService, ClientUserService>();
 builder.Services.AddScoped<IClientAnnouncementService , ClientAnnouncementService>();
 builder.Services.AddScoped<IClientChatService, ClientChatService>();
 builder.Services.AddScoped<IClientGroupChatService, ClientGroupChatService>();
+builder.Services.AddScoped<IClientBigBrotherService, ClientBigBrotherService>();
+builder.Services.AddScoped<IClientBigBrotherChatService, ClientBigBrotherChatService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();
 
